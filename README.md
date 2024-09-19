@@ -1,2 +1,2 @@
-# SOEN345_Project
-Course project for SOEN 345.
+# COMP345_Project
+Course project for COMP 345.
