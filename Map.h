@@ -7,23 +7,11 @@
 #include <cstdint>
 #include <iostream>
 #include <list>
-
-class Continent;
-
-class Map
-{
-    bool isWrapable;
-    bool scrollsVertically;
-    bool includeWarnings;
-
-    std::list<Continent*> continents;
-    std::string image;
-
-    bool validate();
-};
+#include <fstream>
 
 class Territory
 {
+    std::string name;
     int16_t xCoord;
     int16_t yCoord;
     std::list<Territory*> adjacentTerritories;
@@ -36,9 +24,23 @@ class Continent
     std::list<Territory*> territories;
 };
 
+class Map
+{
+    bool isWrapable;
+    bool scrollsVertically;
+    bool includeWarnings;
+    std::string image;
+    std::string name;
+    std::string author;
+
+    std::list<Continent*> continents;
+
+    bool validate();
+};
+
 class MapLoader
 {
-
+    std::ifstream inputFileStream;
 };
 
 #endif //MAP_H
