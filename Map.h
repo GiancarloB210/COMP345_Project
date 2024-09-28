@@ -11,35 +11,43 @@
 
 class Territory
 {
+private:
     std::string name;
     int16_t xCoord;
     int16_t yCoord;
     std::list<Territory*> adjacentTerritories;
 
+public:
     Territory(std::string name, int16_t xCoord, int16_t yCoord, std::list<Territory*> adjacentTerritories);
     Territory(Territory& territory);
 };
 
 class Continent
 {
+private:
     std::string name;
     int16_t score;
     std::list<Territory*> territories;
 
-    Continent(std::string name, int16_t score, std::list<Territory*> territories);
+public:
+    Continent(std::string name, int16_t score);
     Continent(Continent& continent);
+
+    std::list<Territory*> getTerritories();
+    void setTerritories(std::list<Territory*> territories);
 };
 
 class Map
 {
+private:
     std::string image;
     bool isWrappable;
     bool scrollsVertically;
     std::string author;
     bool includeWarnings;
-
     std::list<Continent*> continents;
 
+public:
     Map(std::string image, bool isWrappable, bool scrollsVertically, std::list<Continent*> continents);
     Map(Map& map);
 
@@ -48,7 +56,10 @@ class Map
 
 class MapLoader
 {
+private:
     std::ifstream inputFileStream;
+
+public:
     bool readFile(std::string filePath);
 };
 
