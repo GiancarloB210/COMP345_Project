@@ -9,6 +9,7 @@
 #include <sstream>
 #include <list>
 #include <fstream>
+#include <vector>
 
 class Map;
 class Continent;
@@ -22,16 +23,16 @@ class Territory
 {
 private:
     std::string name;
-    int16_t xCoord;
-    int16_t yCoord;
+    int xCoord;
+    int yCoord;
     std::list<std::string> adjacentTerritories;
 
 public:
-    Territory(std::string name, int16_t xCoord, int16_t yCoord, std::list<std::string> adjacentTerritories);
+    Territory(std::string name, int xCoord, int yCoord, std::list<std::string> adjacentTerritories);
     Territory(Territory& territory);
     std::string getName();
-    int16_t getXCoord();
-    int16_t getYCoord();
+    int getXCoord();
+    int getYCoord();
     std::list<std::string> getAdjacentTerritories();
     std::string toString();
 };
@@ -41,17 +42,17 @@ class Continent
 {
 private:
     std::string name;
-    int16_t score;
+    int score;
     std::list<Territory*> territories;
 
 public:
-    Continent(std::string name, int16_t score);
+    Continent(std::string name, int score);
     Continent(Continent& continent);
 
     std::list<Territory*> getTerritories();
     void setTerritories(std::list<Territory*> territories);
     std::string getName();
-    int16_t getScore();
+    int getScore();
     std:: string toString();
 };
 
@@ -68,7 +69,8 @@ private:
     std::list<Continent*> continents;
 
 public:
-    Map(std::string name, std::string image, bool isWrappable, bool scrollsVertically, std::list<Continent*> continents);
+    Map(std::string name, std::string image, bool isWrappable, bool scrollsVertically, std::string author,
+        bool includeWarnings, std::list<Continent*> continents);
     Map(Map& map);
 
     std::string getName();
