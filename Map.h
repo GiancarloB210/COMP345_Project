@@ -10,6 +10,7 @@
 #include <list>
 #include <fstream>
 #include <vector>
+#include <set>
 
 class Map;
 class Continent;
@@ -23,17 +24,24 @@ class Territory
 {
 private:
     std::string name;
+    std::string continentName;
     int xCoord;
     int yCoord;
-    std::list<std::string> adjacentTerritories;
+    std::list<std::string> adjacentTerritoryNames;
+    std::list<Territory*> adjacentTerritories;
 
 public:
-    Territory(std::string name, int xCoord, int yCoord, std::list<std::string> adjacentTerritories);
+    Territory(std::string name, std::string continentName, int xCoord, int yCoord,
+        std::list<std::string> adjacentTerritoryNames);
     Territory(Territory& territory);
     std::string getName();
+    std::string getContinentName();
     int getXCoord();
     int getYCoord();
-    std::list<std::string> getAdjacentTerritories();
+    std::list<std::string> getAdjacentTerritoryNames();
+    std::list<Territory*> getAdjacentTerritories();
+    void setAdjacentTerritories(std::list<Territory*> adjacentTerritories);
+    void addAdjacentTerritory(Territory* territory);
     std::string toString();
 };
 
@@ -44,6 +52,7 @@ private:
     std::string name;
     int score;
     std::list<Territory*> territories;
+    std::list<Continent*> adjacentContinents;
 
 public:
     Continent(std::string name, int score);
@@ -51,6 +60,9 @@ public:
 
     std::list<Territory*> getTerritories();
     void setTerritories(std::list<Territory*> territories);
+    std::list<Continent*> getAdjacentContinents();
+    void setAdjacentContinents(std::list<Continent*> adjacentContinents);
+    void addAdjacentContinent(Continent* continent);
     std::string getName();
     int getScore();
     std:: string toString();

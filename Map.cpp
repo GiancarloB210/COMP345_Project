@@ -6,16 +6,19 @@
 
 Territory::Territory(Territory &territory) {
     name = territory.name;
+    continentName = territory.continentName;
     xCoord = territory.xCoord;
     yCoord = territory.yCoord;
-    adjacentTerritories = territory.adjacentTerritories;
+    adjacentTerritoryNames = territory.adjacentTerritoryNames;
 }
 
-Territory::Territory(std::string name, int xCoord, int yCoord, std::list<std::string> adjacentTerritories) {
+Territory::Territory(std::string name, std::string continentName, int xCoord, int yCoord,
+    std::list<std::string> adjacentTerritoryNames) {
     this->name = name;
+    this->continentName = continentName;
     this->xCoord = xCoord;
     this->yCoord = yCoord;
-    this->adjacentTerritories = adjacentTerritories;
+    this->adjacentTerritoryNames = adjacentTerritoryNames;
 }
 
 std::string Territory::getName() {
@@ -30,19 +33,35 @@ int Territory::getYCoord() {
     return this->yCoord;
 }
 
-std::list<std::string> Territory::getAdjacentTerritories() {
-    return this->adjacentTerritories;
+std::list<std::string> Territory::getAdjacentTerritoryNames() {
+    return this->adjacentTerritoryNames;
+}
+
+std::list<Territory*> Territory::getAdjacentTerritories() {
+    return this-> adjacentTerritories;
+}
+
+void Territory::setAdjacentTerritories(std::list<Territory *> adjacentTerritories) {
+    this->adjacentTerritories = adjacentTerritories;
+}
+
+void Territory::addAdjacentTerritory(Territory *territory) {
+    this->adjacentTerritories.push_back(territory);
+}
+
+std::string Territory::getContinentName() {
+    return this->continentName;
 }
 
  std::ostream& operator << (std::ostream &os, Territory &territory) {
     std::string adjacent;
     for (auto const& i : territory.getAdjacentTerritories()) {
-        adjacent.append("\n\t" + i);
+        adjacent.append("\n\t" + i->getName());
     }
 
-    return (os << "Territory:\n" << "Name: " << territory.getName() << "\nXCoordinate: " <<
-        std::to_string(territory.getXCoord()) + "\nYCoordinate: " << std::to_string(territory.getYCoord())
-        << "\nadjacent territories:" << adjacent << "\n");
+    return (os << "Territory:\n" << "Name: " << territory.getName() << "\nContinent Name: " <<
+        territory.getContinentName() << "\nXCoordinate: " << std::to_string(territory.getXCoord()) + "\nYCoordinate: "
+        << std::to_string(territory.getYCoord()) << "\nadjacent territories:" << adjacent << "\n");
 }
 
 std::string Territory::toString() {
@@ -70,6 +89,21 @@ void Continent::setTerritories(std::list<Territory *> territories) {
     this->territories = territories;
 }
 
+std::list<Continent *> Continent::getAdjacentContinents() {
+    return this->adjacentContinents;
+}
+
+void Continent::setAdjacentContinents(std::list<Continent *> adjacentContinents) {
+    this->adjacentContinents = adjacentContinents;
+}
+
+
+void Continent::addAdjacentContinent(Continent *continent) {
+    this->adjacentContinents.push_back(continent);
+}
+
+
+
 std::string Continent::getName() {
     return this->name;
 }
@@ -80,11 +114,16 @@ int Continent::getScore() {
 
 std::ostream& operator << (std::ostream& os, Continent& continent) {
     std::string territories;
+    std::string adjacent;
     for (auto const& i : continent.getTerritories()) {
         territories.append("\n" + i->toString());
     }
-    return (os << "Country:\n" << "Name: " << continent.getName() << "\nScore: " << std::to_string(continent.getScore())
-        << "\nTerritories:\n{" << territories << "}\n");
+
+    for (auto const& i : continent.getAdjacentContinents()) {
+        adjacent.append("\n\t" + i->getName());
+    }
+    return (os << "Continent:\n" << "Name: " << continent.getName() << "\nScore: " << std::to_string(continent.getScore())
+        << "\nAdjacent Continents: " << adjacent << "\nTerritories:\n{" << territories << "}\n");
 }
 
 std::string Continent::toString() {
@@ -190,11 +229,11 @@ Map* MapLoader::readFile(std::string filePath) {
     std::string line;
     std::ifstream inputFileStream(filePath);
     while (std::getline(inputFileStream, line)) {
-        std::cout << line << std::endl;
+        //std::cout << line << std::endl;
 
         if (!line.empty() && line.find("[Map]") != std::string::npos) {
             while(std::getline(inputFileStream, line)) {
-                std::cout << line << std::endl;
+                //std::cout << line << std::endl;
                 if (line.empty())
                     break;
 
@@ -203,7 +242,7 @@ Map* MapLoader::readFile(std::string filePath) {
                 std::string tokenValue = line.substr(line.find(delimiter) + 1, line.length());
 
                 if (token == "author")
-                        mapAuthor = tokenValue;
+                    mapAuthor = tokenValue;
                 else if (token == "warn")
                 {
                     if (tokenValue == "yes")
@@ -212,7 +251,7 @@ Map* MapLoader::readFile(std::string filePath) {
                         mapIncludeWarnings = false;
                 }
                 else if (token == "image")
-                        mapImage = tokenValue;
+                    mapImage = tokenValue;
                 else if (token == "wrap")
                 {
                     if (tokenValue == "yes")
@@ -232,7 +271,7 @@ Map* MapLoader::readFile(std::string filePath) {
 
         if (!line.empty() && line.find("[Continents]") != std::string::npos) {
             while(std::getline(inputFileStream, line)) {
-                std::cout << line << std::endl;
+                //std::cout << line << std::endl;
                 if (line.empty())
                     break;
                 std::string delimiter = "=";
@@ -248,9 +287,9 @@ Map* MapLoader::readFile(std::string filePath) {
             std::string territoryName;
             int territoryXCoord;
             int territoryYCoord;
-            std::list<std::string> adjacentTerritories;
+            std::list<std::string> adjacentTerritoryNames;
             std::list<Territory*> continentTerritories;
-            std::string countryName;
+            std::string continentName;
 
             while(!inputFileStream.eof()) {
                 std::vector<std::string> tokens;
@@ -259,10 +298,10 @@ Map* MapLoader::readFile(std::string filePath) {
                 std::string delimiter = ",";
 
                 while(std::getline(inputFileStream, line)) {
-                    std::cout << line << std::endl;
+                    //std::cout << line << std::endl;
                     if (line.empty()) {
                         for (auto const& i : mapContinents) {
-                            if (i->getName() == countryName)
+                            if (i->getName() == continentName)
                                 i->setTerritories(continentTerritories);
                         }
                         continentTerritories.clear();
@@ -276,33 +315,78 @@ Map* MapLoader::readFile(std::string filePath) {
                             territoryName = tokens.at(0);
                             territoryXCoord = std::stoi(tokens.at(1));
                             territoryYCoord = std::stoi(tokens.at(2));
-                            countryName = tokens.at(3);
+                            continentName = tokens.at(3);
 
                         }
-                        adjacentTerritories.push_back(tokens.at(i));
-                        }
+                        adjacentTerritoryNames.push_back(tokens.at(i));
+                    }
 
-                    std::cout << territoryName << std::endl;
-                    std::cout << territoryXCoord << std::endl;
-                    std::cout << territoryYCoord << std::endl;
-                    std::cout << countryName << std::endl;
+                    //std::cout << territoryName << std::endl;
+                    //std::cout << territoryXCoord << std::endl;
+                    //std::cout << territoryYCoord << std::endl;
+                    //std::cout << continentName << std::endl;
 
-                    continentTerritories.push_back(new Territory(territoryName, territoryXCoord,
-                                                                     territoryYCoord, adjacentTerritories));
-                    adjacentTerritories.clear();
+                    continentTerritories.push_back(new Territory(territoryName, continentName,  territoryXCoord,
+                                                                     territoryYCoord, adjacentTerritoryNames));
+                    adjacentTerritoryNames.clear();
                 }
             }
 
             for (auto const& i : mapContinents) {
-                if (i->getName() == countryName)
+                if (i->getName() == continentName)
                     i->setTerritories(continentTerritories);
             }
         }
     }
     inputFileStream.close();
-    return new Map(mapName,mapImage, mapIsWrappable, mapScrollsVertically, mapAuthor, mapIncludeWarnings,
-        mapContinents);
+    std::list<Territory*> mapTerritories;
+
+    // Create a unique list of all territories on the map
+    for (auto const& i : mapContinents) {
+        for (auto const& j : i->getTerritories()) {
+            mapTerritories.push_back(j);
+        }
+    }
+    mapTerritories.unique();
+
+    // Use the newly created list to create the adjacency list for each territory in each continent
+    for (auto const& i : mapContinents) {
+        for (auto const& j : i->getTerritories()) {
+            for (auto const& k : j->getAdjacentTerritoryNames()) {
+                for (auto const& l : mapTerritories)
+                if (k == l->getName()) {
+                    j->addAdjacentTerritory(l);
+                }
+            }
+        }
+    }
+
+    std::list<Continent*> adjacentContinents;
+
+    // Use the newly created adjacency lists to create the adjacency list for each continent
+    for ( auto const& i : mapContinents) {
+        for (auto const& j : i->getTerritories()) {
+            for (auto const& k : j->getAdjacentTerritories()) {
+                if (k->getContinentName() != i->getName()) {
+                    for (auto const& l : mapContinents) {
+                        if (k->getContinentName() == l->getName()) {
+                            adjacentContinents.push_back(l);
+                        }
+                    }
+                }
+            }
+        }
+        adjacentContinents.sort([](Continent* a, Continent* b) {return a->getName() < b->getName();});
+        adjacentContinents.unique();
+        i->setAdjacentContinents(adjacentContinents);
+        adjacentContinents.clear();
+    }
+
+
+        return new Map(mapName,mapImage, mapIsWrappable, mapScrollsVertically, mapAuthor, mapIncludeWarnings,
+            mapContinents);
 }
+
 
 
 
