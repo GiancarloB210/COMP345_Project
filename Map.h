@@ -86,9 +86,6 @@ public:
 
 class MapLoader
 {
-private:
-    std::ifstream inputFileStream;
-
 public:
     Map* readFile(std::string filePath);
 };

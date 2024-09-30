@@ -170,16 +170,15 @@ Map* MapLoader::readFile(std::string filePath) {
     std::string mapImage;
     bool mapIncludeWarnings;
     std::list<Continent*> mapContinents;
-    inputFileStream.exceptions(std::ifstream::badbit);
+    std::string line;
+    std::ifstream inputFileStream("MapFiles/" + filePath);
 
-    try
+    if (getline (inputFileStream,line))
     {
-        std::cout << "Reading Map File: " << "MapFiles/" + filePath << std::endl;
-        inputFileStream.open("MapFiles/" + filePath);
-
         while (!inputFileStream.eof()) {
             std::string line;
             std::getline(inputFileStream, line);
+            //std::cout << line << std::endl;
 
             if (!line.empty() && line.find("[Map]") != std::string::npos) {
                 while(std::getline(inputFileStream, line)) {
@@ -299,9 +298,9 @@ Map* MapLoader::readFile(std::string filePath) {
             }
         }
     }
-    catch (const ifstream::failure& e)
+    else
     {
-    cout << "Error: " << e.what() << endl;
+    std::cout << "Error reading file" <<std::endl;
     }
     inputFileStream.close();
     return new Map(mapName,mapImage, mapIsWrappable, mapScrollsVertically, mapContinents);
