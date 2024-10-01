@@ -14,8 +14,8 @@ void OrdersDriver::testOrdersLists() {
     orderList.add(new BlockadeOrder(true));
     orderList.add(new AirliftOrder(true));
     orderList.add(new NegotiateOrder(true));
-    //2 -> AdvanceOrder
-    orderList.move(2, 4);
+    orderList.remove(1); //removes Deploy order.
+    orderList.move(2, 4); //2 -> AdvanceOrder
     for (Order* o : orderList.orders) {
         o->execute();
     }

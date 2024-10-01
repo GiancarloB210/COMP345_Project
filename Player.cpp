@@ -1,4 +1,6 @@
 #include "Player.h"
+#include "Orders.h"
+#include "Cards.h"
 
 Player::Player() {
     this->orderList = new OrdersList();
@@ -20,6 +22,20 @@ Player& Player::operator=(Player player) {
     *(player.playerHand) = tempHandPointer;
 
     return *this;
+}
+
+ostream& operator << (ostream &out_stream, Player &player) {
+    out_stream<<"For the current player:"<<endl;
+    out_stream<<player.orderList<<endl;
+    out_stream<<player.playerHand<<endl;
+    return out_stream;
+}
+
+istream& operator >> (istream &in_stream, Player &player) {
+    cout<<"For the current player:"<<endl;
+    in_stream>>*player.orderList;
+    in_stream>>*player.playerHand;
+    return in_stream;
 }
 
 void Player::issueOrder(std::string orderType) {

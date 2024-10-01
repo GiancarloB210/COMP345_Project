@@ -26,47 +26,45 @@ Card& Card::operator=(Card card) {
     return *this;
 }
 
-ostream& Card::operator << (ostream &out_stream, Card &card) {
-    out_stream<<"ID: "<<card.cardID<<" | Type: "<<to_string(*(card.type))<<" | Available to draw: "<<this->availableToDraw ? "Yes" : "No"<<endl;
+ostream& operator << (ostream &out_stream, Card &card) {
+    out_stream<<"ID: "<<card.cardID<<" | Type: "<<to_string(*(card.type))<<" | Available to draw: "<<(card.availableToDraw ? "Yes" : "No")<<endl;
     return out_stream;
 }
 
-istream& Card::operator >> (istream &in_stream, Card &card) {
+istream& operator >> (istream &in_stream, Card &card) {
     cout<<"What type of card is this?"<<endl;
     string input;
     in_stream>>input;
     for (char& ch : input) {
-        ch = tolower(ch);
+        ch = tolower(ch, locale());
     }
-    switch(input) {
-        case "bomb":
-            card.type = new CardType(BOMB);
-        break;
-        case "reinforcement":
-            card.type = new CardType(REINFORCEMENT);
-        break;
-        case "airlift":
-            card.type = new CardType(AIRLIFT);
-        break;
-        case "blockade":
-            card.type = new CardType(BLOCKADE);
-        break;
-        case "diplomacy":
-            card.type = new CardType(DIPLOMACY);
-        break;
-        default:
-            throw std::invalid_argument("Invalid card type entered");
-        break;
+    if (input == "bomb") {
+        card.type = new CardType(BOMB);
+    }
+    else if (input == "reinforcement") {
+        card.type = new CardType(REINFORCEMENT);
+    }
+    else if (input == "airlift") {
+        card.type = new CardType(AIRLIFT);
+    }
+    else if (input == "blockade") {
+        card.type = new CardType(BLOCKADE);
+    }
+    else if (input == "diplomacy") {
+        card.type = new CardType(DIPLOMACY);
+    }
+    else {
+        throw std::invalid_argument("Invalid card type entered");
     }
     return in_stream;
 }
 
 void Card::makeAvailableToDraw() {
-    this->availableToDraw = new bool(true);
+    this->availableToDraw = true;
 }
 
 void Card::makeUnavailableToDraw() {
-    this->availableToDraw = new bool(false);
+    this->availableToDraw = false;;
 }
 
 Order* Card::play() {
@@ -138,7 +136,7 @@ Deck::Deck(Deck& deck) {
     }
 }
 
-ostream& Deck::operator << (ostream &out_stream, Deck &deck) {
+ostream& operator << (ostream &out_stream, Deck &deck) {
     out_stream<<"Deck Contents:"<<endl;
     for (int i = 0; i < 40; i++) {
         out_stream<<"["<<i<<"]: "<<to_string(*(deck.cards[i]->type))<<endl;
@@ -146,7 +144,7 @@ ostream& Deck::operator << (ostream &out_stream, Deck &deck) {
     return out_stream;
 }
 
-istream& Deck::operator >> (istream &in_stream, Deck &deck) {
+istream& operator >> (istream &in_stream, Deck &deck) {
     Card* newCards[40];
     int howeverManyCards = 0;
     int lastPositionTracker = 0;
@@ -238,16 +236,16 @@ void Deck::shuffleDeck() {
 }
 
 Card* Deck::draw() {
+    //The deck is shuffled twice such that a "random" card is drawn.
     this->shuffleDeck();
-    int i = 0;
-    if (this->cards[i]->availableToDraw == false) {
-        i++;
-        while (this->cards[i]->availableToDraw == false) {
-            i++;
+    this->shuffleDeck();
+    for (int i = 0; i < 40; i++) {
+        if (this->cards[i]->availableToDraw) {
+            this->cards[i]->availableToDraw = false;
+            return this->cards[i];
         }
     }
-    this->cards[i]->availableToDraw = false;
-    return this->cards[i];
+    throw runtime_error("No card in the deck is available to draw.");
 }
 
 Hand::Hand(Deck* deckInput) {
@@ -265,16 +263,17 @@ Hand::Hand(Hand& hand) {
     this->handPointer = hand.handPointer;
 }
 
-ostream& Hand::operator << (ostream &out_stream, Hand &hand) {
+ostream& operator << (ostream &out_stream, Hand &hand) {
     cout<<"Hand Contents:"<<endl;
     for (int i = 0; i < 40; i++) {
         if (hand.cardsInHand[i] != nullptr) {
-            cout<<"["<<i<<"]: "<<to_string(*(hand.cardsInHand[i]->type))<<endl;
+            out_stream<<"["<<i<<"]: "<<to_string(*(hand.cardsInHand[i]->type))<<endl;
         }
     }
+    return out_stream;
 }
 
-istream& Hand::operator >> (istream &in_stream, Hand &hand) {
+istream& operator >> (istream &in_stream, Hand &hand) {
     cout<<"How many cards would you like in this hand?"<<endl;
     int numCards;
     in_stream>>numCards;
@@ -287,30 +286,23 @@ istream& Hand::operator >> (istream &in_stream, Hand &hand) {
             for (char& ch : newType) {
                 ch = tolower(ch);
             }
-            switch(newType) {
-                case "bomb":
-                    hand.cardsInHand[i] = new Card(new CardType(BOMB));
-                    isValidType = true;
-                    break;
-                case "reinforcement":
+            if (newType == "bomb") {
+                hand.cardsInHand[i] = new Card(new CardType(BOMB));
+                isValidType = true;
+            } else if (newType == "reinforcement") {
                     hand.cardsInHand[i] = new Card(new CardType(REINFORCEMENT));
                     isValidType = true;
-                    break;
-                case "airlift":
+            } else if (newType == "airlift") {
                     hand.cardsInHand[i] = new Card(new CardType(AIRLIFT));
                     isValidType = true;
-                    break;
-                case "blockade":
+            } else if (newType == "airlift") {
                     hand.cardsInHand[i] = new Card(new CardType(BLOCKADE));
                     isValidType = true;
-                    break;
-                case "diplomacy":
+            } else if (newType == "diplomacy") {
                     hand.cardsInHand[i] = new Card(new CardType(DIPLOMACY));
                     isValidType = true;
-                    break;
-                default:
+            } else {
                     cout<<"Invalid card type. Please enter a valid card type."<<endl;
-                    break;
             }
         }
     }
@@ -341,10 +333,12 @@ Order* Hand::play(int cardIndex) {
     Order* order = this->cardsInHand[cardIndex]->play();
     for (int i = 0; i < 40; i++) {
         if (this->deckPlayedWith->cards[i]->cardID == this->cardsInHand[cardIndex]->cardID) {
+            //"Returns" the card to the deck by making it available to draw in the deck.
             this->deckPlayedWith->cards[i]->makeAvailableToDraw();
             break;
         }
     }
+    //Removes the card from the hand, and sets the next empty spot in the hand to where the most recently played card originally was.
     this->cardsInHand[cardIndex] = nullptr;
     *handPointer = cardIndex;
     return order;
@@ -352,6 +346,14 @@ Order* Hand::play(int cardIndex) {
 
 void Hand::addToHand(Card* card) {
     this->cardsInHand[*handPointer] = card;
+    *handPointer = *(handPointer) + 1;
+    while (this->cardsInHand[*handPointer] != nullptr) {
+        *handPointer = *(handPointer) + 1;
+    }
+}
+
+void Hand::drawCard() {
+    this->cardsInHand[*handPointer] = this->deckPlayedWith->draw();
     *handPointer = *(handPointer) + 1;
     while (this->cardsInHand[*handPointer] != nullptr) {
         *handPointer = *(handPointer) + 1;
