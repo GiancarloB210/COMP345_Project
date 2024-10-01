@@ -10,6 +10,7 @@ void testLoadMaps() {
 
     Map* map = mapLoader->readFile("C:\\Users\\Dugua\\CLionProjects\\COMP345_Project\\USA.map");
     std::cout << map->toString() << std::endl;
+    map->validate(map);
 }
 
 int main(int argc, char *argv[]) {
