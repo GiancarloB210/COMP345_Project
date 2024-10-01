@@ -2,13 +2,24 @@
 
 Player::Player() {
     this->orderList = new OrdersList();
-    Deck* deck = new Deck();
-    this->playerHand = new Hand(deck);
+    this->playerHand = new Hand(new Deck());
 }
 
 Player::Player(Player& player) {
     this->orderList = player.orderList;
     this->playerHand = player.playerHand;
+}
+
+Player& Player::operator=(Player player) {
+    OrdersList tempOrderListPointer = *(this->orderList);
+    *(this->orderList) = *(player.orderList);
+    *(player.orderList) = tempOrderListPointer;
+
+    Hand tempHandPointer = *(this->playerHand);
+    *(this->playerHand) = *(player.playerHand);
+    *(player.playerHand) = tempHandPointer;
+
+    return *this;
 }
 
 void Player::issueOrder(std::string orderType) {
@@ -24,29 +35,31 @@ void Player::issueOrder(std::string orderType) {
     else if (orderType == "Blockade") {
         this->orderList->add(new BlockadeOrder(true));
     }
-   else if (orderType == "Airlift") {
+    else if (orderType == "Airlift") {
        this->orderList->add(new AirliftOrder(true));
-   }
-   else if (orderType == "Negotiate") {
+    }
+    else if (orderType == "Negotiate") {
        this->orderList->add(new NegotiateOrder(true));
-   }
-   else if (orderType == "Reinforcement") {
+    }
+    else if (orderType == "Reinforcement") {
        this->orderList->add(new OtherSpecialOrder("Reinforcement", true));
-   }
-   else if (orderType == "Diplomacy") {
+    }
+    else if (orderType == "Diplomacy") {
        this->orderList->add(new OtherSpecialOrder("Diplomacy", true));
-   }
-   else {
+    }
+    else {
        this->orderList->add(new OtherSpecialOrder("Invalid", false));
-   }
+    }
 }
 
 void Player::playCard(int16_t targetCardID) {
     for (int i = 0;i < 40; i++) {
-        if (this->playerHand->cardsInHand[i]->cardID == targetCardID) {
-            Order* playedOrder = this->playerHand->play(i);
-            this->orderList->orders.insert(this->orderList->orders.end(), playedOrder);
-            return;
+        if (this->playerHand->cardsInHand[i] != nullptr) {
+            if (this->playerHand->cardsInHand[i]->cardID == targetCardID) {
+                Order* playedOrder = this->playerHand->play(i);
+                this->orderList->orders.insert(this->orderList->orders.end(), playedOrder);
+                return;
+            }
         }
     }
     throw std::invalid_argument("Error: The provided card ID does not exist in the current Player's hand.");

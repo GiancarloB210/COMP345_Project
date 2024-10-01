@@ -1,6 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-#include "Card.h"
+#include "Cards.h"
 #include "Orders.h"
 
 class Player {
@@ -9,6 +9,7 @@ public:
     Hand* playerHand;
     Player();
     Player(Player& player);
+    Player& operator=(Player player);
     void issueOrder(std::string orderType);
     void playCard(int16_t targetCardID);
     void draw();

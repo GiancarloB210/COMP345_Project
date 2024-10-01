@@ -16,6 +16,13 @@ Order::Order(Order& order) {
     this->isValid = order.isValid;
 }
 
+Order& Order::operator=(Order order) {
+    swap(this->orderID, order.orderID);
+    swap(this->orderType, order.orderType);
+    swap(this->isValid, order.isValid);
+    return *this;
+}
+
 bool Order::validate() {
     return this->isValid;
 }

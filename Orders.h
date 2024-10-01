@@ -13,6 +13,7 @@ public:
 
     Order(std::string orderType, bool isValid);
     Order(Order& order);
+    Order& operator=(Order order);
     bool validate();
     bool execute();
 };

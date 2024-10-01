@@ -4,28 +4,72 @@
 #include "Orders.h"
 using namespace std;
 
-Cards::Cards(CardType* type) {
+Card::Card(CardType* type) {
     this->cardID = staticCardID;
     staticCardID++;
     this->type = type;
     this->availableToDraw = true;
 }
 
-Cards::Cards(Cards& card) {
+Card::Card(Card& card) {
     this->cardID = card.cardID;
     this->type = *(&card.type);
     this->availableToDraw = card.availableToDraw;
 }
 
-void Cards::makeAvailableToDraw() {
+Card& Card::operator=(Card card) {
+    swap(this->cardID, card.cardID);
+    CardType tempTypePointer = *(this->type);
+    *(this->type) = *(card.type);
+    *(card.type) = tempTypePointer;
+    swap(this->availableToDraw, card.availableToDraw);
+    return *this;
+}
+
+ostream& Card::operator << (ostream &out_stream, Card &card) {
+    out_stream<<"ID: "<<card.cardID<<" | Type: "<<to_string(*(card.type))<<" | Available to draw: "<<this->availableToDraw ? "Yes" : "No"<<endl;
+    return out_stream;
+}
+
+istream& Card::operator >> (istream &in_stream, Card &card) {
+    cout<<"What type of card is this?"<<endl;
+    string input;
+    in_stream>>input;
+    for (char& ch : input) {
+        ch = tolower(ch);
+    }
+    switch(input) {
+        case "bomb":
+            card.type = new CardType(BOMB);
+        break;
+        case "reinforcement":
+            card.type = new CardType(REINFORCEMENT);
+        break;
+        case "airlift":
+            card.type = new CardType(AIRLIFT);
+        break;
+        case "blockade":
+            card.type = new CardType(BLOCKADE);
+        break;
+        case "diplomacy":
+            card.type = new CardType(DIPLOMACY);
+        break;
+        default:
+            throw std::invalid_argument("Invalid card type entered");
+        break;
+    }
+    return in_stream;
+}
+
+void Card::makeAvailableToDraw() {
     this->availableToDraw = new bool(true);
 }
 
-void Cards::makeUnavailableToDraw() {
+void Card::makeUnavailableToDraw() {
     this->availableToDraw = new bool(false);
 }
 
-Order* Cards::play() {
+Order* Card::play() {
     switch(*type) {
         case BOMB:
             cout<<"Opposing territory bombed."<<endl;
@@ -48,7 +92,7 @@ Order* Cards::play() {
     }
 }
 
-std::string Cards::getCardTypeStringValue() {
+std::string Card::getCardTypeStringValue() {
     if (*this->type == BOMB) {
         return"BOMB";
     } else if (*this->type == REINFORCEMENT) {
@@ -66,23 +110,23 @@ std::string Cards::getCardTypeStringValue() {
 
 Deck::Deck() {
     for (int i = 0; i < 8; i++) {
-        this->cards[i] = new Cards(new CardType(BOMB));;
+        this->cards[i] = new Card(new CardType(BOMB));;
     }
     for (int i = 8; i < 16; i++) {
-        this->cards[i] = new Cards(new CardType(REINFORCEMENT));
+        this->cards[i] = new Card(new CardType(REINFORCEMENT));
     }
     for (int i = 16; i < 24; i++) {
-        this->cards[i] = new Cards(new CardType(BLOCKADE));
+        this->cards[i] = new Card(new CardType(BLOCKADE));
     }
     for (int i = 24; i < 32; i++) {
-        this->cards[i] = new Cards(new CardType(AIRLIFT));
+        this->cards[i] = new Card(new CardType(AIRLIFT));
     }
     for (int i = 32; i < 40; i++) {
-        this->cards[i] = new Cards(new CardType(DIPLOMACY));
+        this->cards[i] = new Card(new CardType(DIPLOMACY));
     }
 }
 
-Deck::Deck(Cards* newDeckCards[40]) {
+Deck::Deck(Card* newDeckCards[40]) {
     for (int i = 0; i < 40; i++) {
         this->cards[i] = newDeckCards[i];
     }
@@ -92,6 +136,83 @@ Deck::Deck(Deck& deck) {
     for (int i = 0; i < 40; i++) {
         this->cards[i] = deck.cards[i];
     }
+}
+
+ostream& Deck::operator << (ostream &out_stream, Deck &deck) {
+    out_stream<<"Deck Contents:"<<endl;
+    for (int i = 0; i < 40; i++) {
+        out_stream<<"["<<i<<"]: "<<to_string(*(deck.cards[i]->type))<<endl;
+    }
+    return out_stream;
+}
+
+istream& Deck::operator >> (istream &in_stream, Deck &deck) {
+    Card* newCards[40];
+    int howeverManyCards = 0;
+    int lastPositionTracker = 0;
+    cout<<"How many cards of type 'Bomb' would you like [7-9]?"<<endl;
+    int numBombCards;
+    in_stream>>numBombCards;
+    while (numBombCards < 7 || numBombCards > 9) {
+        cout<<"Invalid value. Enter a number between 7-9";
+        in_stream>>numBombCards;
+    }
+    howeverManyCards += numBombCards;
+    for (int i = lastPositionTracker;i < numBombCards;i++) {
+        newCards[i] = new Card(new CardType(BOMB));
+    }
+    lastPositionTracker += numBombCards;
+    cout<<"How many cards of type 'Reinforcement' would you like [7-9]?"<<endl;
+    int numReinCards;
+    in_stream>>numReinCards;
+    while (numReinCards < 7 || numReinCards > 9) {
+        cout<<"Invalid value. Enter a number between 7-9";
+        in_stream>>numReinCards;
+    }
+    howeverManyCards += numReinCards;
+    for (int i = lastPositionTracker;i < numReinCards;i++) {
+        newCards[i] = new Card(new CardType(REINFORCEMENT));
+    }
+    lastPositionTracker += numReinCards;
+    cout<<"How many cards of type 'Blockade' would you like [7-9]?"<<endl;
+    int numBlockCards;
+    in_stream>>numBlockCards;
+    while (numBlockCards < 7 || numBlockCards > 9) {
+        cout<<"Invalid value. Enter a number between 7-9";
+        in_stream>>numBlockCards;
+    }
+    howeverManyCards += numBlockCards;
+    for (int i = lastPositionTracker;i < numBlockCards;i++) {
+        newCards[i] = new Card(new CardType(BLOCKADE));
+    }
+    lastPositionTracker += numBlockCards;
+    cout<<"How many cards of type 'Airlift' would you like [7-9]?"<<endl;
+    int numAirCards;
+    in_stream>>numAirCards;
+    while (numAirCards < 7 || numAirCards > 9) {
+        cout<<"Invalid value. Enter a number between 7-9";
+        in_stream>>numAirCards;
+    }
+    howeverManyCards += numAirCards;
+    for (int i = lastPositionTracker;i < numAirCards;i++) {
+        newCards[i] = new Card(new CardType(AIRLIFT));
+    }
+    lastPositionTracker += numAirCards;
+    cout<<"The remaining "<<40 - howeverManyCards<<" cards will be of type 'Diplomacy'.";
+    for (int i = lastPositionTracker;i < 40;i++) {
+        newCards[i] = new Card(new CardType(DIPLOMACY));
+    }
+    for (int i = 0;i < 40;i++) {
+        deck.cards[i] = newCards[i];
+    }
+    return in_stream;
+}
+
+Deck& Deck::operator=(Deck deck) {
+    Card* tempDeckPointer = *(this->cards);
+    *(this->cards) = *(deck.cards);
+    *(deck.cards) = tempDeckPointer;
+    return *this;
 }
 
 void Deck::shuffleDeck() {
@@ -116,7 +237,7 @@ void Deck::shuffleDeck() {
     }
 }
 
-Cards* Deck::draw() {
+Card* Deck::draw() {
     this->shuffleDeck();
     int i = 0;
     if (this->cards[i]->availableToDraw == false) {
@@ -128,25 +249,6 @@ Cards* Deck::draw() {
     this->cards[i]->availableToDraw = false;
     return this->cards[i];
 }
-
-// void Deck::draw() {
-//     this->deckPlayedWith->shuffleDeck();
-//     int i = 0;
-//     if (*(deckPlayedWith->cards[i]->isAvailableToDraw()) == false) {
-//         i++;
-//         while (*(deckPlayedWith->cards[i]->isAvailableToDraw()) == false) {
-//             i++;
-//         }
-//     }
-//     if (this->cardsInHand[*handPointer] != nullptr) {
-//         *handPointer = *handPointer + 1;
-//         while (this->cardsInHand[*handPointer] != nullptr) {
-//             *handPointer = *handPointer + 1;
-//         }
-//     }
-//     this->cardsInHand[*handPointer] = deckPlayedWith->cards[i];
-//     deckPlayedWith->cards[i]->makeUnavailableToDraw();
-// }
 
 Hand::Hand(Deck* deckInput) {
     this->deckPlayedWith = deckInput;
@@ -163,6 +265,78 @@ Hand::Hand(Hand& hand) {
     this->handPointer = hand.handPointer;
 }
 
+ostream& Hand::operator << (ostream &out_stream, Hand &hand) {
+    cout<<"Hand Contents:"<<endl;
+    for (int i = 0; i < 40; i++) {
+        if (hand.cardsInHand[i] != nullptr) {
+            cout<<"["<<i<<"]: "<<to_string(*(hand.cardsInHand[i]->type))<<endl;
+        }
+    }
+}
+
+istream& Hand::operator >> (istream &in_stream, Hand &hand) {
+    cout<<"How many cards would you like in this hand?"<<endl;
+    int numCards;
+    in_stream>>numCards;
+    for (int i = 0; i < numCards; i++) {
+        cout<<"What type of card would you like at hand position "<<i<<"?"<<endl;
+        bool isValidType = false;
+        string newType;
+        while (!isValidType) {
+            in_stream>>newType;
+            for (char& ch : newType) {
+                ch = tolower(ch);
+            }
+            switch(newType) {
+                case "bomb":
+                    hand.cardsInHand[i] = new Card(new CardType(BOMB));
+                    isValidType = true;
+                    break;
+                case "reinforcement":
+                    hand.cardsInHand[i] = new Card(new CardType(REINFORCEMENT));
+                    isValidType = true;
+                    break;
+                case "airlift":
+                    hand.cardsInHand[i] = new Card(new CardType(AIRLIFT));
+                    isValidType = true;
+                    break;
+                case "blockade":
+                    hand.cardsInHand[i] = new Card(new CardType(BLOCKADE));
+                    isValidType = true;
+                    break;
+                case "diplomacy":
+                    hand.cardsInHand[i] = new Card(new CardType(DIPLOMACY));
+                    isValidType = true;
+                    break;
+                default:
+                    cout<<"Invalid card type. Please enter a valid card type."<<endl;
+                    break;
+            }
+        }
+    }
+    return in_stream;
+}
+
+Hand& Hand::operator=(Hand hand) {
+    Card* tempCardsInHandPointer = *(this->cardsInHand);
+    *(this->cardsInHand) = *(hand.cardsInHand);
+    *(hand.cardsInHand) = tempCardsInHandPointer;
+
+    Deck tempDeckPlayedWithPointer = *(this->deckPlayedWith);
+    *(this->deckPlayedWith) = *(hand.deckPlayedWith);
+    *(hand.deckPlayedWith) = tempDeckPlayedWithPointer;
+
+    int tempDeckPointer = *(this->associatedDeckPointer);
+    *(this->associatedDeckPointer) = *(hand.associatedDeckPointer);
+    *(hand.associatedDeckPointer) = tempDeckPointer;
+
+    int tempHandPointer = *(this->handPointer);
+    *(this->handPointer) = *(hand.handPointer);
+    *(hand.handPointer) = tempHandPointer;
+
+    return *this;
+}
+
 Order* Hand::play(int cardIndex) {
     Order* order = this->cardsInHand[cardIndex]->play();
     for (int i = 0; i < 40; i++) {
@@ -176,7 +350,7 @@ Order* Hand::play(int cardIndex) {
     return order;
 }
 
-void Hand::addToHand(Cards* card) {
+void Hand::addToHand(Card* card) {
     this->cardsInHand[*handPointer] = card;
     *handPointer = *(handPointer) + 1;
     while (this->cardsInHand[*handPointer] != nullptr) {

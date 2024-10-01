@@ -5,6 +5,8 @@
 
 #include "Orders.h"
 
+using namespace std;
+
 enum CardType {
     BOMB,
     REINFORCEMENT,
@@ -15,14 +17,17 @@ enum CardType {
 
 static int staticCardID = 0;
 
-class Cards {
+class Card {
 public:
     int16_t cardID;
     CardType* type;
     bool availableToDraw;
 
-    Cards(CardType* type);
-    Cards(Cards& card);
+    Card(CardType* type);
+    Card(Card& card);
+    Card& operator=(Card card);
+    ostream& operator << (ostream &out_stream, Card &card);
+    istream& operator >> (istream &in_stream, Card &card);
     void makeAvailableToDraw();
     void makeUnavailableToDraw();
     Order* play();
@@ -31,26 +36,32 @@ public:
 
 class Deck {
 public:
-    Cards* cards[40];
+    Card* cards[40];
 
     Deck();
-    Deck(Cards* newDeckCards[40]);
+    Deck(Card* newDeckCards[40]);
     Deck(Deck& deck);
+    ostream& operator << (ostream &out_stream, Deck &deck);
+    istream& operator >> (istream &in_stream, Deck &deck);
+    Deck& operator=(Deck deck);
     void shuffleDeck();
-    Cards* draw();
+    Card* draw();
 };
 
 class Hand {
 public:
-    Cards* cardsInHand[40];
+    Card* cardsInHand[40];
     Deck* deckPlayedWith;
     int* associatedDeckPointer;
     int* handPointer;
 
     Hand(Deck* deckInput);
     Hand(Hand& hand);
+    ostream& operator << (ostream &out_stream, Hand &hand);
+    istream& operator >> (istream &in_stream, Hand &hand);
+    Hand& operator=(Hand hand);
     Order* play(int cardIndex);
-    void addToHand(Cards* card);
+    void addToHand(Card* card);
     void displayCardsInHand();
     void clean();
 };
