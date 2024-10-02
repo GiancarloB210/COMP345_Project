@@ -178,7 +178,7 @@ Map::Map(Map &map) {
 
 // Map Class Constructor
 Map::Map(std::string name, std::string image, bool isWrappable,  bool scrollsVertically, std::string author,
-    bool includeWarnings, std::list<Continent *> continents, std::list<Territory *> territories) {
+    bool includeWarnings, std::list<Continent *> continents, std::list<Territory *> territories, bool areTerritoriesValid) {
     this->name = name;
     this->image = image;
     this->isWrappable = isWrappable;
@@ -187,6 +187,7 @@ Map::Map(std::string name, std::string image, bool isWrappable,  bool scrollsVer
     this->includeWarnings = includeWarnings;
     this->continents = continents;
     this->territories = territories;
+    this->areTerritoriesValid = areTerritoriesValid;
 }
 
 // Map Class Accessors
@@ -375,9 +376,11 @@ Map* MapLoader::readFile(std::string filePath) {
     std::string mapImage;
     bool mapIncludeWarnings;
     std::list<Continent*> mapContinents;
+    std::list<Territory*> mapTerritories;
     std::string line;
     std::ifstream inputFileStream;
     inputFileStream.open(filePath);
+    bool mapTerritoriesAreValid = true;
 
     // Check if the file at the provided filePath can be opened
     if (!inputFileStream.is_open()) {
@@ -486,6 +489,13 @@ Map* MapLoader::readFile(std::string filePath) {
                     // into the appropriate continent later
                     continentTerritories.push_back(new Territory(territoryName, continentName,  territoryXCoord,
                                                                      territoryYCoord, adjacentTerritoryNames));
+                    for (auto const& i : mapTerritories) {
+                        if (i->getName() == continentTerritories.back()->getName())
+                            mapTerritoriesAreValid = false;
+                    }
+                    if (mapTerritoriesAreValid) {
+                        mapTerritories.push_back(continentTerritories.back());
+                    }
                     adjacentTerritoryNames.clear();
                 }
             }
@@ -498,8 +508,6 @@ Map* MapLoader::readFile(std::string filePath) {
     }
     // We're done reading from the file, so we close it
     inputFileStream.close();
-
-    std::list<Territory*> mapTerritories;
 
     // Create a unique list of all territories on the map
     for (auto const& i : mapContinents) {
@@ -543,7 +551,7 @@ Map* MapLoader::readFile(std::string filePath) {
     }
         // the map instance is created, populated, and returned
         return new Map(mapName,mapImage, mapIsWrappable, mapScrollsVertically, mapAuthor, mapIncludeWarnings,
-            mapContinents, mapTerritories);
+            mapContinents, mapTerritories, areTerritoriesValid);
 }
 
 

@@ -111,7 +111,7 @@ private:
 public:
     // Constructors
     Map(std::string name, std::string image, bool isWrappable, bool scrollsVertically, std::string author,
-        bool includeWarnings, std::list<Continent*> continents, std::list<Territory*> territories);
+        bool includeWarnings, std::list<Continent*> continents, std::list<Territory*> territories, bool areTerritoriesValid);
     Map(Map& map);
 
     // Accessors
