@@ -353,7 +353,7 @@ bool Map::validate(Map* map) {
     std::cout << "validating territory graph: " << std::endl;
     validTerritoriesGraph = traverseTerritories(map->getTerritories().front()->getAdjacentTerritories(),
         uncheckedTerritories,map->getTerritories().front());
-    std::cout << "\tTerritory Graph Validation Result: " << validContinentGraph << "\n" << std::endl;
+    std::cout << "\tTerritory Graph Validation Result: " << validTerritoriesGraph << "\n" << std::endl;
 
     // validate that each territory belongs to one and only one continent by returning the value of areTerritoriesValid
     std::cout << "validating uniqueness of territories: " << std::endl;
@@ -509,7 +509,7 @@ Map* MapLoader::readFile(std::string filePath) {
                 std::string delimiter = ",";
 
                 while(std::getline(inputFileStream, line)) {
-
+                    std::cout << line << std::endl;
                     if (line.empty()) {
                         for (auto const& i : mapContinents) {
                             if (i->getName() == continentName)
@@ -521,15 +521,22 @@ Map* MapLoader::readFile(std::string filePath) {
 
                     tokens = split(line, delimiter);
 
-                    for(int i = 4; i < tokens.size(); i++) {
-                        if (i == 4) {
-                            territoryName = tokens.at(0);
-                            territoryXCoord = std::stoi(tokens.at(1));
-                            territoryYCoord = std::stoi(tokens.at(2));
-                            continentName = tokens.at(3);
-
+                    for(int i = 0; i < tokens.size(); i++) {
+                        if (i == 0) {
+                            territoryName = tokens.at(i);
                         }
-                        adjacentTerritoryNames.push_back(tokens.at(i));
+                        else if (i == 1) {
+                            territoryXCoord = std::stoi(tokens.at(i));
+                        }
+                        else if (i == 2) {
+                            territoryYCoord = std::stoi(tokens.at(i));
+                        }
+                        else if (i == 3) {
+                            continentName = tokens.at(i);
+                        }
+                        else if ( i > 3) {
+                            adjacentTerritoryNames.push_back(tokens.at(i));
+                        }
                     }
                     // we also keep track of what continent the Territory belongs to, so that we can add the list
                     // into the appropriate continent later
