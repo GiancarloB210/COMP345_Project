@@ -43,6 +43,12 @@ public:
         std::list<std::string> adjacentTerritoryNames);
     Territory(Territory& territory);
 
+    // Operators
+    Territory& operator=(const Territory& territory);
+
+    // Deconstructor
+    ~Territory();
+
     // Accessors
     std::string getName();
     std::string getContinentName();
@@ -79,6 +85,12 @@ public:
     Continent(std::string name, int score);
     Continent(Continent& continent);
 
+    // Operators
+    Continent& operator=(const Continent& continent);
+
+    // Deconstructor
+    ~Continent();
+
     // Accessors
     std::list<Territory*> getTerritories();
     std::list<Continent*> getAdjacentContinents();
@@ -114,6 +126,12 @@ public:
         bool includeWarnings, std::list<Continent*> continents, std::list<Territory*> territories, bool areTerritoriesValid);
     Map(Map& map);
 
+    // Operators
+    Map& operator=(const Map& map);
+
+    // Deconstructor
+    ~Map();
+
     // Accessors
     std::string getName();
     std::string getImage();
@@ -145,6 +163,12 @@ public:
     // Constructors
     MapLoader();
     MapLoader(MapLoader& mapLoader);
+
+    // Operators
+    MapLoader& operator=(const MapLoader& mapLoader);
+
+    // Deconstructor
+    ~MapLoader();
 
     // Accessors
     std::list<Map*> getMaps();

@@ -23,6 +23,16 @@ Territory::Territory(std::string name, std::string continentName, int xCoord, in
     this->adjacentTerritoryNames = adjacentTerritoryNames;
 }
 
+// Territory Class Deconstructor
+Territory::~Territory() {
+    for (auto const& i : adjacentTerritories) {
+    delete i;
+    }
+
+    //TODO: uncomment after merge
+    // delete territoryOwner;
+}
+
 // Territory Class Accessors
 std::string Territory::getName() {
     return this->name;
@@ -87,6 +97,8 @@ void Territory::setArmyCount(int armyCount) {
         << std::to_string(territory.getYCoord()) << "\nadjacent territories:" << adjacent << "\n");
 }
 
+Territory& Territory::operator=(const Territory &territory) = default;
+
 // Territory Class Methods
 // toString() uses the overloaded << operator to generate a formatted string containing the values of the
 // Territory's data member values
@@ -108,6 +120,17 @@ Continent::Continent(Continent &continent) {
 Continent::Continent(std::string name, int score) {
     this->name = name;
     this->score = score;
+}
+
+// Continent Class Deconstructor
+Continent::~Continent() {
+    for (auto const& i : territories) {
+    delete i;
+    }
+
+    for (auto const& i : adjacentContinents) {
+    delete i;
+    }
 }
 
 // Continent Class Accessors
@@ -155,6 +178,8 @@ std::ostream& operator << (std::ostream& os, Continent& continent) {
         << "\nAdjacent Continents: " << adjacent << "\nTerritories:\n{" << territories << "}\n");
 }
 
+Continent& Continent::operator=(const Continent &continent) = default;
+
 // Continent Class Methods
 // toString() uses the overloaded << operator to generate a formatted string containing the values of the
 // Continent's data member values
@@ -163,7 +188,6 @@ std::string Continent::toString() {
     ss << (*this);
     return ss.str();
 }
-
 
 // Map Class Copy Constructor
 Map::Map(Map &map) {
@@ -188,6 +212,17 @@ Map::Map(std::string name, std::string image, bool isWrappable,  bool scrollsVer
     this->continents = continents;
     this->territories = territories;
     this->areTerritoriesValid = areTerritoriesValid;
+}
+
+// Map Class Deconstructor
+Map::~Map() {
+    for (auto const& i : continents) {
+    delete i;
+    }
+
+    for (auto const& i : territories) {
+    delete i;
+    }
 }
 
 // Map Class Accessors
@@ -239,6 +274,8 @@ std::ostream& operator << (std::ostream& os, Map& map) {
         << "\nAuthor: " << map.getAuthor() << "\nInclude Warnings?: " << map.getIncludeWarnings()
         << "\n\nContinents:\n" << continents << "\n");
 }
+
+Map& Map::operator=(const Map &map) = default;
 
 // Map Class Methods
 // toString() uses the overloaded << operator to generate a formatted string containing the values of the
@@ -308,7 +345,6 @@ bool Map::validate(Map* map) {
 
     // validate that the continents are a connected graph by validating that a path exists from all continents to all
     // other continents
-    // TODO
     std::list<Continent*> uncheckedContinents(map->getContinents());
     std::cout << "validating continent graph: " << std::endl;
     validContinentGraph = traverseContinents(map->getContinents().front()->getAdjacentContinents(), uncheckedContinents,
@@ -317,15 +353,16 @@ bool Map::validate(Map* map) {
 
     // validate that the territories are a connected graph by validating that a path exists from all territories to all
     // other territories
-    // TODO
     std::list<Territory*> uncheckedTerritories(map->getTerritories());
     std::cout << "validating territory graph: " << std::endl;
     validTerritoriesGraph = traverseTerritories(map->getTerritories().front()->getAdjacentTerritories(),
         uncheckedTerritories,map->getTerritories().front());
     std::cout << "\tTerritory Graph Validation Result: " << validContinentGraph << "\n" << std::endl;
 
-    // validate that each territory belongs to one and only one continent
-    // TODO
+    // validate that each territory belongs to one and only one continent by returning the value of areTerritoriesValid
+    std::cout << "validating uniqueness of territories: " << std::endl;
+    validTerritories = map->getAreTerritoriesValid();
+    std::cout << "\tTerritories Validation Result: " << validTerritories << "\n" << std::endl;
 
     return (validContinentGraph && validTerritoriesGraph && validTerritories);
 }
@@ -339,6 +376,12 @@ MapLoader::MapLoader(MapLoader &mapLoader) {
 // MapLoader Class Default Constructor
 MapLoader::MapLoader() = default;
 
+// MapLoader Class Deconstructor
+MapLoader::~MapLoader() {
+    for (auto const& i : loadedMaps) {
+    delete i;
+    }
+}
 
 // MapLoader Class Accessors
 std::list<Map*> MapLoader::getMaps() {
@@ -349,6 +392,9 @@ std::list<Map*> MapLoader::getMaps() {
 void MapLoader::addMap(Map *map) {
     this->loadedMaps.push_back(map);
 }
+
+// MapLoader Operators
+MapLoader& MapLoader::operator=(const MapLoader &mapLoader) = default;
 
 // MapLoader Class Methods
 // split is a helper method that splits a string into a vector of string tokens depending on a passed delimiter
@@ -489,13 +535,15 @@ Map* MapLoader::readFile(std::string filePath) {
                     // into the appropriate continent later
                     continentTerritories.push_back(new Territory(territoryName, continentName,  territoryXCoord,
                                                                      territoryYCoord, adjacentTerritoryNames));
-                    for (auto const& i : mapTerritories) {
-                        if (i->getName() == continentTerritories.back()->getName())
-                            mapTerritoriesAreValid = false;
-                    }
-                    if (mapTerritoriesAreValid) {
+
+                    // If this is a new territory, add it to mapTerritories
+                    if (true)
+                    {
                         mapTerritories.push_back(continentTerritories.back());
                     }
+                    // Else mark the map as invalid (duplicate territory)
+                    else
+                        mapTerritoriesAreValid = false;
                     adjacentTerritoryNames.clear();
                 }
             }
@@ -510,11 +558,11 @@ Map* MapLoader::readFile(std::string filePath) {
     inputFileStream.close();
 
     // Create a unique list of all territories on the map
-    for (auto const& i : mapContinents) {
-        for (auto const& j : i->getTerritories()) {
-            mapTerritories.push_back(j);
-        }
-    }
+    //for (auto const& i : mapContinents) {
+    //    for (auto const& j : i->getTerritories()) {
+    //        mapTerritories.push_back(j);
+    //    }
+    //}
     mapTerritories.unique();
 
     // Use the newly created list to create the adjacency list for each territory in each continent
@@ -551,7 +599,7 @@ Map* MapLoader::readFile(std::string filePath) {
     }
         // the map instance is created, populated, and returned
         return new Map(mapName,mapImage, mapIsWrappable, mapScrollsVertically, mapAuthor, mapIncludeWarnings,
-            mapContinents, mapTerritories, areTerritoriesValid);
+            mapContinents, mapTerritories, mapTerritoriesAreValid);
 }
 
 
