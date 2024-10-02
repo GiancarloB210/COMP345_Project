@@ -1,36 +1,57 @@
 #include "Player.h"
-#include "Map.h" 
+#include "Map.h"
 #include "Cards.h"
 #include <iostream>
 
+// Function to test the Player class methods
 void testPlayers() {
+    // Mock territories from the Map
     Territory* t1 = new Territory("Territory1", "Continent1", 10, 10, std::list<std::string>{"Territory2", "Territory3"});
     Territory* t2 = new Territory("Territory2", "Continent1", 20, 20, std::list<std::string>{"Territory1", "Territory4"});
     Territory* t3 = new Territory("Territory3", "Continent1", 30, 30, std::list<std::string>{"Territory1", "Territory5"});
     
     std::list<Territory*> territories = { t1, t2, t3 };
-    
+    std::list<Territory*>* territoryPointer = &territories;
+
+    // Mock hand of cards and deck
     Deck* deck = new Deck();
     Hand* hand = new Hand(deck);
-    
-    Player* player = new Player(territories, hand);
-    
-    std::cout << "Territories to defend: \n";
-    for (Territory* t : player->toDefend()) {
-        std::cout << t->getName() << "\n";
+
+    // Create a player object
+    Player* player = new Player(territoryPointer, hand);
+
+    // Test toDefend method
+    std::cout << "Testing toDefend method: \n";
+    std::list<Territory*>* defendList = player->toDefend();
+    for (Territory* t : *defendList) {
+        std::cout << "Territory to defend: " << t->getName() << "\n";
     }
-    
-    std::cout << "Territories to attack: \n";
-    for (Territory* t : player->toAttack()) {
-        std::cout << t->getName() << "\n";
+    delete defendList; // Clean up dynamically allocated defendList
+
+    // Test toAttack method
+    std::cout << "Testing toAttack method: \n";
+    std::list<Territory*>* attackList = player->toAttack();
+    for (Territory* t : *attackList) {
+        std::cout << "Territory to attack: " << t->getName() << "\n";
     }
-    
+    delete attackList; // Clean up dynamically allocated attackList
+
+    // Test issueOrder method
+    std::cout << "Testing issueOrder method:\n";
     player->issueOrder();
-    
+    std::cout << "Player's orders: \n";
+    std::cout << *(player->orders) << "\n";
+
+    // Test stream insertion operator (printing player details)
+    std::cout << "Testing stream insertion operator (Player details):\n";
+    std::cout << *player;
+
+    // Clean up dynamically allocated memory
     delete player;
     delete t1;
     delete t2;
     delete t3;
+    delete deck;
 }
 
 int main() {

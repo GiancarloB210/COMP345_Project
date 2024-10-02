@@ -25,9 +25,9 @@ public:
 
     Card(CardType* type);
     Card(Card& card);
+    friend ostream& operator <<(ostream& out_stream, Card& card);
+    friend istream& operator >>(istream& in_stream, Card& card);
     Card& operator=(Card card);
-    ostream& operator << (ostream &out_stream, Card &card);
-    istream& operator >> (istream &in_stream, Card &card);
     void makeAvailableToDraw();
     void makeUnavailableToDraw();
     Order* play();
@@ -41,8 +41,8 @@ public:
     Deck();
     Deck(Card* newDeckCards[40]);
     Deck(Deck& deck);
-    ostream& operator << (ostream &out_stream, Deck &deck);
-    istream& operator >> (istream &in_stream, Deck &deck);
+    friend ostream& operator <<(ostream& out_stream, Deck& deck);
+    friend istream& operator >>(istream& in_stream, Deck& deck);
     Deck& operator=(Deck deck);
     void shuffleDeck();
     Card* draw();
@@ -57,10 +57,11 @@ public:
 
     Hand(Deck* deckInput);
     Hand(Hand& hand);
-    ostream& operator << (ostream &out_stream, Hand &hand);
-    istream& operator >> (istream &in_stream, Hand &hand);
+    friend ostream& operator <<(ostream& out_stream, Hand& hand);
+    friend istream& operator >>(istream& in_stream, Hand& hand);
     Hand& operator=(Hand hand);
     Order* play(int cardIndex);
+    void drawCard();
     void addToHand(Card* card);
     void displayCardsInHand();
     void clean();

@@ -3,27 +3,33 @@
 
 #include <list>
 #include <string>
-#include "Map.h"  
-#include "Cards.h"
-#include "Orders.h"
+#include "Map.h"    // For Territory
+#include "Cards.h"  // For Hand
+#include "Orders.h" // For OrdersList
 
 class Player {
 public:
-    std::list<Territory*> territories;  
-    Hand* hand;                        
-    OrdersList* orders;                  
+    std::list<Territory*>* territories; // List of territories owned by the player
+    Hand* hand;                         // Pointer to the player's hand of cards
+    OrdersList* orders;                 // Pointer to the player's list of orders
 
-    Player(std::list<Territory*> territories, Hand* hand);
+    // Constructors
+    Player(std::list<Territory*>* territories, Hand* hand); // Parameterized constructor
+    Player(const Player& player);                           // Copy constructor
 
-    Player(Player& player);
+    // Destructor
+    ~Player(); 
 
-    ~Player();
+    // Assignment operator
+    Player& operator=(const Player& player);
 
-    std::list<Territory*> toDefend();
+    // Stream insertion operator
+    friend std::ostream& operator<<(std::ostream& out, const Player& player);
 
-    std::list<Territory*> toAttack();
-
-    void issueOrder();
+    // Methods
+    std::list<Territory*>* toDefend(); 
+    std::list<Territory*>* toAttack(); 
+    void issueOrder();   
 };
 
 #endif // PLAYER_H
