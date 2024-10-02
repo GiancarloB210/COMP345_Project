@@ -12,7 +12,7 @@ Player::Player(Player& player) {
     this->playerHand = player.playerHand;
 }
 
-Player& Player::operator=(Player player) {
+Player& Player::operator=(const Player player) {
     OrdersList tempOrderListPointer = *(this->orderList);
     *(this->orderList) = *(player.orderList);
     *(player.orderList) = tempOrderListPointer;
@@ -38,7 +38,7 @@ istream& operator >> (istream &in_stream, Player &player) {
     return in_stream;
 }
 
-void Player::issueOrder(std::string orderType) {
+void Player::issueOrder(const std::string orderType) {
     if (orderType == "Bomb") {
         this->orderList->add(new BombOrder(true));
     }

@@ -9,13 +9,22 @@ CardsDriver::CardsDriver() {
 
 }
 
+int CardsDriver::countDrawableCards(Hand *hand) {
+    int canBeDrawn = 0;
+    for (int i = 0; i < 40;i++) {
+        if (hand->deckPlayedWith->cards[i]->availableToDraw == true) {
+            canBeDrawn++;
+        }
+    }
+    return canBeDrawn;
+}
+
 void CardsDriver::testCards() {
-    Deck* deck = new Deck();
-    Hand* hand = new Hand(deck);
-    cout<<"Csrds in deck that can be played (before drawing any cards):"<<endl;
+    Hand* hand = new Hand(new Deck());
+    cout<<"Cards in deck that can be played (before drawing any cards):"<<endl;
     int canBePlayedBefore = 0;
     for (int i = 0; i < 40;i++) {
-        if (hand->deckPlayedWith->cards[i]->availableToDraw) {
+        if (hand->deckPlayedWith->cards[i]->availableToDraw == true) {
             canBePlayedBefore++;
         }
     }
@@ -24,18 +33,17 @@ void CardsDriver::testCards() {
     // hand->addToHand(deck->draw());
     // hand->addToHand(deck->draw());
     hand->drawCard();
+    cout<<"Cards in deck that can be played (after drawing 1 card):"<<endl;
+    cout<<countDrawableCards(hand)<<endl;
     hand->drawCard();
+    cout<<"Cards in deck that can be played (after drawing 2 cards):"<<endl;
+    cout<<countDrawableCards(hand)<<endl;
     hand->drawCard();
-    cout<<"Csrds in deck that can be played (after drawing 3 cards):"<<endl;
-    int canBePlayedAfterDraw3 = 0;
-    for (int i = 0; i < 40;i++) {
-        if (hand->deckPlayedWith->cards[i]->availableToDraw) {
-            canBePlayedAfterDraw3++;
-        }
-    }
-    cout<<canBePlayedAfterDraw3<<endl;
-    hand->addToHand(deck->draw());
-    hand->addToHand(deck->draw());
+    cout<<*hand->deckPlayedWith<<endl;
+    cout<<"Cards in deck that can be played (after drawing 3 cards):"<<endl;
+    cout<<countDrawableCards(hand)<<endl;
+    hand->addToHand(hand->deckPlayedWith->draw());
+    hand->addToHand(hand->deckPlayedWith->draw());
     cout<<"Hand size (before playing all cards):"<<endl;
     int sizeBefore = 0;
     for (int i = 0; i < 40;i++) {
@@ -43,6 +51,7 @@ void CardsDriver::testCards() {
             sizeBefore++;
         }
     }
+    cout<<sizeBefore<<endl;
     for (int i = 0;i < 40;i++) {
         if (hand->cardsInHand[i] == nullptr) {
             break;
@@ -67,5 +76,7 @@ void CardsDriver::testCards() {
         }
     }
     cout<<sizeAfter<<endl;
+    hand->deckPlayedWith->clean();
+    hand->clean();
 }
 
