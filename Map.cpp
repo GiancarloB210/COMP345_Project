@@ -290,12 +290,10 @@ std::string Map::toString() {
 // adjacentContinent list, while keeping track of a list of continents that haven't been visited yet
 bool Map::traverseContinents(std::list<Continent*> adjacentContinents, std::list<Continent*> &uncheckedContinents,
     Continent* startingContinent) {
-    //std::cout << "\n\tvisiting: " << startingContinent->getName() << std::endl;
 
     for (auto const& i : uncheckedContinents) {
         if (i->getName() == startingContinent->getName()) {
             uncheckedContinents.remove(startingContinent);
-            //std::cout << "\tremoved: " << startingContinent->getName() << " from uncheckedContinents" << std::endl;
             break;
         }
     }
@@ -315,12 +313,10 @@ bool Map::traverseContinents(std::list<Continent*> adjacentContinents, std::list
 // adjacentTerritory list, while keeping track of a list of territories that haven't been visited yet
 bool Map::traverseTerritories(std::list<Territory*> adjacentTerritories, std::list<Territory*> &uncheckedTerritories,
     Territory* startingTerritory) {
-    //std::cout << "\n\tvisiting: " << startingTerritory->getName() << std::endl;
 
     for (auto const& i : uncheckedTerritories) {
         if (i->getName() == startingTerritory->getName()) {
             uncheckedTerritories.remove(startingTerritory);
-            //std::cout << "\tremoved: " << startingTerritory->getName() << " from uncheckedTerritories" << std::endl;
             break;
         }
     }
@@ -415,6 +411,14 @@ std::vector<std::string> MapLoader::split(std::string& s, std::string& delimiter
 
 // readFile takes in a filePath string to a .map file and parses it line by line to create an instance of Map
 Map* MapLoader::readFile(std::string filePath) {
+    std::ifstream inputFileStream;
+    inputFileStream.open(filePath);
+    // Check if the file at the provided filePath can be opened
+    if (!inputFileStream.is_open()) {
+        std::cerr << "Error opening file " << filePath << std::endl;
+        return nullptr;
+    }
+
     std::string mapName = filePath.substr(filePath.find_last_of('\\')+1, filePath.find_last_of("."));
     std::string mapAuthor;
     bool mapIsWrappable;
@@ -424,14 +428,10 @@ Map* MapLoader::readFile(std::string filePath) {
     std::list<Continent*> mapContinents;
     std::list<Territory*> mapTerritories;
     std::string line;
-    std::ifstream inputFileStream;
-    inputFileStream.open(filePath);
+
     bool mapTerritoriesAreValid = true;
 
-    // Check if the file at the provided filePath can be opened
-    if (!inputFileStream.is_open()) {
-        std::cerr << "Error opening file " << filePath << std::endl;
-    }
+
 
     // Parse the file line by line
     while (std::getline(inputFileStream, line)) {
@@ -537,10 +537,11 @@ Map* MapLoader::readFile(std::string filePath) {
                                                                      territoryYCoord, adjacentTerritoryNames));
 
                     // If this is a new territory, add it to mapTerritories
-                    if (true)
-                    {
+                    std::string currentTerritoryName = continentTerritories.back()->getName();
+                    if (std::find_if(mapTerritories.begin(), mapTerritories.end(),
+                        [&currentTerritoryName](Territory* t){return t->getName() == currentTerritoryName;})
+                        == mapTerritories.end())
                         mapTerritories.push_back(continentTerritories.back());
-                    }
                     // Else mark the map as invalid (duplicate territory)
                     else
                         mapTerritoriesAreValid = false;
@@ -556,14 +557,6 @@ Map* MapLoader::readFile(std::string filePath) {
     }
     // We're done reading from the file, so we close it
     inputFileStream.close();
-
-    // Create a unique list of all territories on the map
-    //for (auto const& i : mapContinents) {
-    //    for (auto const& j : i->getTerritories()) {
-    //        mapTerritories.push_back(j);
-    //    }
-    //}
-    mapTerritories.unique();
 
     // Use the newly created list to create the adjacency list for each territory in each continent
     for (auto const& i : mapContinents) {
