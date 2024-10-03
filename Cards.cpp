@@ -219,7 +219,7 @@ void Deck::shuffleDeck() {
     for (int i = 0; i < 40; i++) {
         check[i] = "Available";
     }
-    Deck tempDeck = Deck();
+    Deck tempDeck;
     for (int i = 0; i < 40; i++) {
         int randomPosition = random() % 40;
         if (check[randomPosition] == "Available") {
