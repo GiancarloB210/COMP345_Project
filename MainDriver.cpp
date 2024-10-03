@@ -3,6 +3,9 @@
 //
 
 #include "MainDriver.h"
+
+#include <OrdersDriver.h>
+
 #include "CardsDriver.h"
 #include "MapDriver.h"
 #include "PlayerDriver.h"
@@ -17,8 +20,8 @@ int main() {
 
     testLoadMaps();
     testPlayers();
-    CardsDriver* cardsDriver = new CardsDriver();
-    cardsDriver->testCards();
+    testOrdersLists();
+    testCards();
     testGameStates();
 
     return 0;

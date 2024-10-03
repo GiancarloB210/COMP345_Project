@@ -4,40 +4,11 @@
 
 using namespace std;
 
-//Class for testing methods present in the card-related classes.
-
-//Since nothing needs to be instantiated (these classes are purely for testing card-related
-//methods. , the constructor & copy constructor can be left empty.
-CardsDriver::CardsDriver() {
-
-}
-
-CardsDriver::CardsDriver(CardsDriver& driver) {
-
-}
-
-//There is no relevant information to display when it comes to this testing-purposed class.
-ostream& operator <<(ostream& out_stream, CardsDriver& driver) {
-    out_stream << "A tester class for card-related methods." << endl;
-    return out_stream;
-}
-
-//Nothing should be able to be inputted or created when it comes to this testing-purposed class.
-//Hence, the stream insertion operator will not do anything.
-istream& operator >>(istream& in_stream, CardsDriver& driver) {
-    return in_stream;
-}
-
-//Since there are no attributes of the CardsDriver class, nothing should happen when
-//assignment is attempted with a CardsDriver variable on the RHS of the assignment statement.
-//The provided input variable will just returned, since (in principle) it is essentially the same.
-CardsDriver& CardsDriver::operator=(CardsDriver driver) {
-    return driver;
-}
+//Methods for testing methods present in the card-related classes.
 
 //Counts the number of cards in a hand's associated deck which can still be drawn.
 //In essence: counts the cards "remaining" in the deck.
-int CardsDriver::countDrawableCards(Hand *hand) {
+int countDrawableCards(Hand *hand) {
     int canBeDrawn = 0;
     for (int i = 0; i < 40;i++) {
         if (hand->deckPlayedWith->cards[i]->availableToDraw == true) {
@@ -48,7 +19,7 @@ int CardsDriver::countDrawableCards(Hand *hand) {
 }
 
 //Tests several card-related methods.
-void CardsDriver::testCards() {
+void testCards() {
     Hand* hand = new Hand(new Deck());
     //Before drawing any cards, there should be 40 playable cards in the deck.
     cout<<"Cards in deck that can be played (before drawing any cards):"<<endl;

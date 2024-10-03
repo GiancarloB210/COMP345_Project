@@ -3,7 +3,12 @@ project(COMP345_Project)
 
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories(.)
+include_directories(. MapFiles)
+
+file(COPY MapFiles/USA.map DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY MapFiles/USA_Fail1.map DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY MapFiles/USA_Fail2.map DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY MapFiles/USA_Fail3.map DESTINATION ${CMAKE_BINARY_DIR})
 
 add_executable(COMP345_Project
     Map.cpp
