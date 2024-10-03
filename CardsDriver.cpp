@@ -70,7 +70,7 @@ void CardsDriver::testCards() {
     }
     cout<<"Hand size (after playing):"<<endl;
     int sizeAfter = 0;
-    for (int i = 0; i < size(hand->cardsInHand);i++) {
+    for (int i = 0; i < 40;i++) {
         if (hand->cardsInHand[i] != nullptr) {
             sizeAfter++;
         }
@@ -80,3 +80,7 @@ void CardsDriver::testCards() {
     hand->clean();
 }
 
+// int main(int argc, char *argv[]) {
+//     CardsDriver driver;
+//     driver.testCards();
+// }

@@ -17,8 +17,8 @@ void PlayerDriver::testPlayers() {
     player2.issueOrder("Diplomacy");
     player2.issueOrder("Blockade");
     player2.issueOrder("Reinforcement");
-    cout<<"Player 1 has "<<size(player1.orderList->orders)<<" orders in their list of orders."<<endl;
-    cout<<"Player 2 has "<<size(player2.orderList->orders)<<" orders in their list of orders."<<endl;
+    cout<<"Player 1 has "<<player1.orderList->orders.size()<<" orders in their list of orders."<<endl;
+    cout<<"Player 2 has "<<player2.orderList->orders.size()<<" orders in their list of orders."<<endl;
     player1.draw();
     player1.draw();
     player1.draw();
@@ -41,7 +41,7 @@ void PlayerDriver::testPlayers() {
             player2.playCard(c->cardID);
         }
     }
-    cout<<"Player 1 has "<<size(player1.orderList->orders)<<" orders in their list of orders."<<endl;
-    cout<<"Player 2 has "<<size(player2.orderList->orders)<<" orders in their list of orders."<<endl;
+    cout<<"Player 1 has "<<player1.orderList->orders.size()<<" orders in their list of orders."<<endl;
+    cout<<"Player 2 has "<<player2.orderList->orders.size()<<" orders in their list of orders."<<endl;
 
 }

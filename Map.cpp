@@ -95,7 +95,7 @@ void Territory::setArmyCount(int armyCount) {
     return (os << "Territory:\n" << "Name: " << territory.getName() << "\nContinent Name: " <<
         territory.getContinentName() << "\nXCoordinate: " << std::to_string(territory.getXCoord()) << "\nYCoordinate: "
         << std::to_string(territory.getYCoord()) << "\nadjacent territories:" << adjacent << "\n"
-        + /*TODO: uncomment after merge - "Territory Owner: " << territory.getPlayer() << "\nArmy Count: " <<
+        /*+ TODO: uncomment after merge - "Territory Owner: " << territory.getPlayer() << "\nArmy Count: " <<
         territory.getArmyCount() << "\n" */);
 }
 
