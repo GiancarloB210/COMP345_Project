@@ -13,8 +13,10 @@
 
 int main() {
 
+    testLoadMaps();
     testPlayers();
     CardsDriver* cardsDriver = new CardsDriver();
     cardsDriver->testCards();
-    testLoadMaps();
+
+    return 0;
 }

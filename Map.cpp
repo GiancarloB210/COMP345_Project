@@ -11,6 +11,8 @@ Territory::Territory(Territory &territory) {
     xCoord = territory.xCoord;
     yCoord = territory.yCoord;
     adjacentTerritoryNames = territory.adjacentTerritoryNames;
+    territoryOwner = territory.territoryOwner;
+    armyCount = territory.armyCount;
 }
 
 // Territory Class Constructor
@@ -21,6 +23,8 @@ Territory::Territory(std::string name, std::string continentName, int xCoord, in
     this->xCoord = xCoord;
     this->yCoord = yCoord;
     this->adjacentTerritoryNames = adjacentTerritoryNames;
+    this->territoryOwner = nullptr;
+    this->armyCount = 0;
 }
 
 // Territory Class Deconstructor
@@ -409,7 +413,7 @@ std::vector<std::string> MapLoader::split(std::string& s, std::string& delimiter
 }
 
 // readFile takes in a filePath string to a .map file and parses it line by line to create an instance of Map
-Map* MapLoader::readFile(std::string filePath) {
+Map *MapLoader::readFile(std::string filePath) {
     std::ifstream inputFileStream;
     inputFileStream.open(filePath);
     // Check if the file at the provided filePath can be opened
