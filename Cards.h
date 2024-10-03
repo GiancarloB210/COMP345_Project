@@ -2,8 +2,9 @@
 #define CARD_H
 #include <string>
 #include <iostream>
-
+#include <chrono>
 #include "Orders.h"
+#include <algorithm>
 
 using namespace std;
 

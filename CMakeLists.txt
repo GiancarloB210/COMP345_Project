@@ -9,4 +9,17 @@ add_executable(COMP345_Project
     Map.cpp
     Map.h
     MapDriver.cpp
-    MapDriver.h)
+    MapDriver.h
+        Cards.cpp
+        Cards.h
+        CardsDriver.cpp
+        CardsDriver.h
+        Orders.cpp
+        OrdersDriver.cpp
+        Player.cpp
+        PlayerDriver.h
+        PlayerDriver.cpp
+        MainDriver.cpp
+        MainDriver.h)
+
+

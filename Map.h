@@ -12,11 +12,13 @@
 #include <vector>
 #include <set>
 #include <algorithm>
+#include "Player.h"
 
 // Forward Declarations
 class Map;
 class Continent;
 class Territory;
+class Player;
 
 // Free functions
 std::ostream& operator << (std::ostream &os, Territory &territory);
@@ -33,8 +35,7 @@ private:
     int yCoord;
     std::list<std::string> adjacentTerritoryNames;
     std::list<Territory*> adjacentTerritories;
-    //TODO: uncomment after merge
-    // Player* territoryOwner;
+    Player* territoryOwner;
     int armyCount;
 
 public:
@@ -62,9 +63,8 @@ public:
     void setAdjacentTerritories(std::list<Territory*> adjacentTerritories);
     void addAdjacentTerritory(Territory* territory);
     void setArmyCount(int armyCount);
-    //TODO: uncomment after merge
-    // Player* getPlayer();
-    // void setPlayer();
+    Player* getPlayer();
+    void setPlayer(Player* player);
 
     // Methods
     std::string toString();

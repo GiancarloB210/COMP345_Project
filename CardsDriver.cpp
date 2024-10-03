@@ -128,9 +128,3 @@ void CardsDriver::testCards() {
     hand->deckPlayedWith->clean();
     hand->clean();
 }
-
-//Commented-out main method which was used to run the code above.
-// int main(int argc, char *argv[]) {
-//     CardsDriver driver;
-//     driver.testCards();
-// }

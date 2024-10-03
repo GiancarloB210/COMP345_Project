@@ -29,8 +29,7 @@ Territory::~Territory() {
     delete i;
     }
 
-    //TODO: uncomment after merge
-    // delete territoryOwner;
+    delete territoryOwner;
 }
 
 // Territory Class Accessors
@@ -75,15 +74,14 @@ void Territory::setArmyCount(int armyCount) {
     this->armyCount = armyCount;
 }
 
-//TODO: uncomment after merge
-// Player* Territory::getPlayer() {
-// return this->territoryOwner;
-// }
 
-//TODO: uncomment after merge
-// void setPlayer(Player* player) {
-// this->territoryOwner = player;
-// }
+ Player* Territory::getPlayer() {
+ return this->territoryOwner;
+ }
+
+ void Territory::setPlayer(Player* player) {
+ this->territoryOwner = player;
+ }
 
 // Territory Class Operators
  std::ostream& operator << (std::ostream &os, Territory &territory) {
@@ -94,9 +92,8 @@ void Territory::setArmyCount(int armyCount) {
 
     return (os << "Territory:\n" << "Name: " << territory.getName() << "\nContinent Name: " <<
         territory.getContinentName() << "\nXCoordinate: " << std::to_string(territory.getXCoord()) << "\nYCoordinate: "
-        << std::to_string(territory.getYCoord()) << "\nadjacent territories:" << adjacent << "\n"
-         /*+ TODO: uncomment after merge - "Territory Owner: " << territory.getPlayer() << "\nArmy Count: " <<
-        territory.getArmyCount() << "\n" */);
+        << std::to_string(territory.getYCoord()) << "\nadjacent territories:" << adjacent <<
+         "\nTerritory Owner: " << territory.getPlayer() << "\nArmy Count: " << territory.getArmyCount() << "\n");
 }
 
 Territory& Territory::operator=(const Territory &territory) = default;
@@ -433,8 +430,6 @@ Map* MapLoader::readFile(std::string filePath) {
 
     bool mapTerritoriesAreValid = true;
 
-
-
     // Parse the file line by line
     while (std::getline(inputFileStream, line)) {
         // Look for the [Map] section of the file
@@ -511,7 +506,6 @@ Map* MapLoader::readFile(std::string filePath) {
                 std::string delimiter = ",";
 
                 while(std::getline(inputFileStream, line)) {
-                    std::cout << line << std::endl;
                     if (line.empty()) {
                         for (auto const& i : mapContinents) {
                             if (i->getName() == continentName)

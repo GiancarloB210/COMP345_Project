@@ -53,8 +53,3 @@ void testPlayers() {
     delete t3;
     delete deck;
 }
-
-int main() {
-    testPlayers();
-    return 0;
-}

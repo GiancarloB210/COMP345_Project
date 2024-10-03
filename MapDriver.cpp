@@ -46,7 +46,3 @@ void testLoadMaps() {
     mapLoader = nullptr;
 
 }
-
-int main(int argc, char *argv[]) {
-    testLoadMaps();
-}

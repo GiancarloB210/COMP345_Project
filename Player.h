@@ -7,6 +7,8 @@
 #include "Cards.h"  // For Hand
 #include "Orders.h" // For OrdersList
 
+class Territory;
+
 class Player {
 public:
     std::list<Territory*>* territories; // List of territories owned by the player

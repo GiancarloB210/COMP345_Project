@@ -1,5 +1,6 @@
 #ifndef ORDERS_H
 #define ORDERS_H
+#include <cstdint>
 #include <string>
 #include <list>
 
