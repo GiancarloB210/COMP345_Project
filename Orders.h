@@ -70,7 +70,7 @@ public:
 	Order& operator=(const Order& order);
 
 	//Deconstructor
-	~Order();
+	virtual ~Order();
 
 	//Accessors
 	std::string getType();
@@ -78,8 +78,8 @@ public:
 	std::string getEffect();
 
 	//Methods
-	bool validate();
-	std::string execute();
+	virtual bool validate();
+	virtual std::string execute();
 
 	//Although the class can access the string values of an order, it cannot modify them since they are static, and only change it the order type itself is changed. 
 	//It is possible to modify the type and automatically redefine the description and effect, but it is inefficient, thus making more easier to simply make a NEW Order
@@ -98,8 +98,8 @@ public:
 	~DeployOrder();
 
 	//methods
-	bool validate();
-	std::string execute();
+	bool validate() override;
+	std::string execute() override;
 };
 class AdvanceOrder : public Order {
 public:
@@ -114,8 +114,8 @@ public:
 	~AdvanceOrder();
 
 	//methods
-	bool validate();
-	std::string execute();
+	bool validate() override;
+	std::string execute() override;
 };
 class BombOrder : public Order {
 public:
@@ -130,8 +130,8 @@ public:
 	~BombOrder();
 
 	//methods
-	bool validate();
-	std::string execute();
+	bool validate() override;
+	std::string execute() override;
 };
 class BlockadeOrder : public Order {
 public:
@@ -146,8 +146,8 @@ public:
 	~BlockadeOrder();
 
 	//methods
-	bool validate();
-	std::string execute();
+	bool validate() override;
+	std::string execute() override;
 };
 class AirliftOrder : public Order {
 public:
@@ -162,8 +162,8 @@ public:
 	~AirliftOrder();
 
 	//methods
-	bool validate();
-	std::string execute();
+	bool validate() override;
+	std::string execute() override;
 };
 class NegotiateOrder : public Order {
 public:
@@ -178,8 +178,8 @@ public:
 	~NegotiateOrder();
 
 	//methods
-	bool validate();
-	std::string execute();
+	bool validate() override;
+	std::string execute() override;
 };
 
 #endif

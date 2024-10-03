@@ -22,7 +22,7 @@ void testOrdersLists()
 	for (Order* ord : orders.getList())
 	{
 
-		cout << i << "." << ord->getType() << "\n" << ord->getDescription() << "\n" << ord->getEffect() << "\n" << ord->execute() << "\n";
+		cout << i << "." << ord->getType() << "\nDescription: " << ord->getDescription() << "\nEffect: " << ord->getEffect() << "\nExecution: " << ord->execute() << "\n";
 		i++;
 	}
 	i = 1;
@@ -33,7 +33,7 @@ void testOrdersLists()
 	for (Order* ord : orders.getList())
 	{
 
-		cout << i << "." << ord->getType() << "\n" << ord->getDescription() << "\n" << ord->getEffect() << "\n" << ord->execute() << "\n";
+		cout << i << "." << ord->getType() << "\nDescription: " << ord->getDescription() << "\nEffect: " << ord->getEffect() << "\nExecution: " << ord->execute() << "\n";
 		i++;
 	}
 	i = 1;
@@ -43,7 +43,7 @@ void testOrdersLists()
 	for (Order* ord : orders.getList())
 	{
 
-		cout << i << "." << ord->getType() << "\n" << ord->getDescription() << "\n" << ord->getEffect() << "\n" << ord->execute() << "\n";
+		cout << i << "." << ord->getType() << "\nDescription: " << ord->getDescription() << "\nEffect: " << ord->getEffect() << "\nExecution: " << ord->execute() << "\n";
 		i++;
 	}
 	i = 1;
