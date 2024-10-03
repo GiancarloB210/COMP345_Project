@@ -20,6 +20,8 @@ add_executable(COMP345_Project
         PlayerDriver.h
         PlayerDriver.cpp
         MainDriver.cpp
-        MainDriver.h)
+        MainDriver.h
+        GameEngine.cpp
+        GameEngineDriver.cpp)
 
 

@@ -6,6 +6,8 @@
 #include "CardsDriver.h"
 #include "MapDriver.h"
 #include "PlayerDriver.h"
+#include "GameEngineDriver.h"
+#include "GameEngine.h"
 #include "Map.h"
 #include "Player.h"
 #include "Cards.h"
@@ -17,6 +19,7 @@ int main() {
     testPlayers();
     CardsDriver* cardsDriver = new CardsDriver();
     cardsDriver->testCards();
+    testGameStates();
 
     return 0;
 }

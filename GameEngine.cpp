@@ -33,15 +33,23 @@ void GameEngine::setupTransitions() {
     // Transitions for the play phase
     stateTransitions[State::PLAYERS_ADDED]["assigncountries"] = State::ASSIGN_REINFORCEMENT;
     stateTransitions[State::ASSIGN_REINFORCEMENT]["issueorder"] = State::ISSUE_ORDERS;
-    stateTransitions[State::ISSUE_ORDERS]["execorder"] = State::EXECUTE_ORDERS;
+    stateTransitions[State::ISSUE_ORDERS]["endissueorders"] = State::EXECUTE_ORDERS;
     stateTransitions[State::EXECUTE_ORDERS]["win"] = State::WIN;
+    stateTransitions[State::EXECUTE_ORDERS]["endexecorders"] = State::ASSIGN_REINFORCEMENT;
 
     // End the game
     stateTransitions[State::WIN]["end"] = State::END;
 
+    // Restart the game
+    stateTransitions[State::WIN]["play"] = State::START;
+
     // Loop for issuing and executing orders
     stateTransitions[State::ISSUE_ORDERS]["issueorder"] = State::ISSUE_ORDERS;
     stateTransitions[State::EXECUTE_ORDERS]["execorder"] = State::EXECUTE_ORDERS;
+
+    // Loop for loading maps and adding players
+    stateTransitions[State::MAP_LOADED]["loadmap"] = State::MAP_LOADED;
+    stateTransitions[State::PLAYERS_ADDED]["addplayer"] = State::PLAYERS_ADDED;
 }
 
 // handle user input commands and transition game states
@@ -63,32 +71,114 @@ bool GameEngine::isValidCommand(const std::string& command) const {
 // print the current state of the game to the console
 void GameEngine::printState() const {
     switch (currentState) {
-        case State::START:
+        case State::START: {
             std::cout << "Current state: START" << std::endl;
+            std::cout << "valid commands are: " << std::endl;
+            for (const auto & stateTransition : stateTransitions) {
+                if (stateTransition.first == currentState) {
+                    for (const auto & i : stateTransition.second) {
+                        std::cout << i.first << std::endl;
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
             break;
-        case State::MAP_LOADED:
+        case State::MAP_LOADED: {
             std::cout << "Current state: MAP LOADED" << std::endl;
+            std::cout << "valid commands are: " << std::endl;
+            for (const auto & stateTransition : stateTransitions) {
+                if (stateTransition.first == currentState) {
+                    for (const auto & i : stateTransition.second) {
+                        std::cout << i.first << std::endl;
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
             break;
-        case State::MAP_VALIDATED:
+        case State::MAP_VALIDATED: {
             std::cout << "Current state: MAP VALIDATED" << std::endl;
+            std::cout << "valid commands are: " << std::endl;
+            for (const auto & stateTransition : stateTransitions) {
+                if (stateTransition.first == currentState) {
+                    for (const auto & i : stateTransition.second) {
+                        std::cout << i.first << std::endl;
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
             break;
-        case State::PLAYERS_ADDED:
+        case State::PLAYERS_ADDED: {
             std::cout << "Current state: PLAYERS ADDED" << std::endl;
+            std::cout << "valid commands are: " << std::endl;
+            for (const auto & stateTransition : stateTransitions) {
+                if (stateTransition.first == currentState) {
+                    for (const auto & i : stateTransition.second) {
+                        std::cout << i.first << std::endl;
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
             break;
-        case State::ASSIGN_REINFORCEMENT:
+        case State::ASSIGN_REINFORCEMENT: {
             std::cout << "Current state: ASSIGN REINFORCEMENT" << std::endl;
+            std::cout << "valid commands are: " << std::endl;
+            for (const auto & stateTransition : stateTransitions) {
+                if (stateTransition.first == currentState) {
+                    for (const auto & i : stateTransition.second) {
+                        std::cout << i.first << std::endl;
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
             break;
-        case State::ISSUE_ORDERS:
+        case State::ISSUE_ORDERS: {
             std::cout << "Current state: ISSUE ORDERS" << std::endl;
+            std::cout << "valid commands are: " << std::endl;
+            for (const auto & stateTransition : stateTransitions) {
+                if (stateTransition.first == currentState) {
+                    for (const auto & i : stateTransition.second) {
+                        std::cout << i.first << std::endl;
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
             break;
-        case State::EXECUTE_ORDERS:
+        case State::EXECUTE_ORDERS: {
             std::cout << "Current state: EXECUTE ORDERS" << std::endl;
+            std::cout << "valid commands are: " << std::endl;
+            for (const auto & stateTransition : stateTransitions) {
+                if (stateTransition.first == currentState) {
+                    for (const auto & i : stateTransition.second) {
+                        std::cout << i.first << std::endl;
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
             break;
-        case State::WIN:
+        case State::WIN: {
             std::cout << "Current state: WIN" << std::endl;
+            std::cout << "valid commands are: " << std::endl;
+            for (const auto & stateTransition : stateTransitions) {
+                if (stateTransition.first == currentState) {
+                    for (const auto & i : stateTransition.second) {
+                        std::cout << i.first << std::endl;
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
             break;
-        case State::END:
+        case State::END: {
             std::cout << "Current state: END" << std::endl;
+            std::cout << "valid commands are: \nexit\n" << std::endl;
+        }
             break;
     }
 }

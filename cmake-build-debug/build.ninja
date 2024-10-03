@@ -112,6 +112,20 @@ build CMakeFiles/COMP345_Project.dir/MainDriver.cpp.obj: CXX_COMPILER__COMP345_P
   OBJECT_DIR = CMakeFiles\COMP345_Project.dir
   OBJECT_FILE_DIR = CMakeFiles\COMP345_Project.dir
 
+build CMakeFiles/COMP345_Project.dir/GameEngine.cpp.obj: CXX_COMPILER__COMP345_Project_unscanned_Debug C$:/Users/Dugua/CLionProjects/COMP345_Project/GameEngine.cpp || cmake_object_order_depends_target_COMP345_Project
+  DEP_FILE = CMakeFiles\COMP345_Project.dir\GameEngine.cpp.obj.d
+  FLAGS = -g -std=gnu++14 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/Dugua/CLionProjects/COMP345_Project/.
+  OBJECT_DIR = CMakeFiles\COMP345_Project.dir
+  OBJECT_FILE_DIR = CMakeFiles\COMP345_Project.dir
+
+build CMakeFiles/COMP345_Project.dir/GameEngineDriver.cpp.obj: CXX_COMPILER__COMP345_Project_unscanned_Debug C$:/Users/Dugua/CLionProjects/COMP345_Project/GameEngineDriver.cpp || cmake_object_order_depends_target_COMP345_Project
+  DEP_FILE = CMakeFiles\COMP345_Project.dir\GameEngineDriver.cpp.obj.d
+  FLAGS = -g -std=gnu++14 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/Dugua/CLionProjects/COMP345_Project/.
+  OBJECT_DIR = CMakeFiles\COMP345_Project.dir
+  OBJECT_FILE_DIR = CMakeFiles\COMP345_Project.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target COMP345_Project
@@ -120,7 +134,7 @@ build CMakeFiles/COMP345_Project.dir/MainDriver.cpp.obj: CXX_COMPILER__COMP345_P
 #############################################
 # Link the executable COMP345_Project.exe
 
-build COMP345_Project.exe: CXX_EXECUTABLE_LINKER__COMP345_Project_Debug CMakeFiles/COMP345_Project.dir/Map.cpp.obj CMakeFiles/COMP345_Project.dir/MapDriver.cpp.obj CMakeFiles/COMP345_Project.dir/Cards.cpp.obj CMakeFiles/COMP345_Project.dir/CardsDriver.cpp.obj CMakeFiles/COMP345_Project.dir/Orders.cpp.obj CMakeFiles/COMP345_Project.dir/OrdersDriver.cpp.obj CMakeFiles/COMP345_Project.dir/Player.cpp.obj CMakeFiles/COMP345_Project.dir/PlayerDriver.cpp.obj CMakeFiles/COMP345_Project.dir/MainDriver.cpp.obj
+build COMP345_Project.exe: CXX_EXECUTABLE_LINKER__COMP345_Project_Debug CMakeFiles/COMP345_Project.dir/Map.cpp.obj CMakeFiles/COMP345_Project.dir/MapDriver.cpp.obj CMakeFiles/COMP345_Project.dir/Cards.cpp.obj CMakeFiles/COMP345_Project.dir/CardsDriver.cpp.obj CMakeFiles/COMP345_Project.dir/Orders.cpp.obj CMakeFiles/COMP345_Project.dir/OrdersDriver.cpp.obj CMakeFiles/COMP345_Project.dir/Player.cpp.obj CMakeFiles/COMP345_Project.dir/PlayerDriver.cpp.obj CMakeFiles/COMP345_Project.dir/MainDriver.cpp.obj CMakeFiles/COMP345_Project.dir/GameEngine.cpp.obj CMakeFiles/COMP345_Project.dir/GameEngineDriver.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\COMP345_Project.dir

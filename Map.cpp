@@ -418,7 +418,7 @@ Map *MapLoader::readFile(std::string filePath) {
     inputFileStream.open(filePath);
     // Check if the file at the provided filePath can be opened
     if (!inputFileStream.is_open()) {
-        std::cerr << "Error opening file " << filePath << std::endl;
+        std::cout << "Error opening file " << filePath << std::endl;
         return nullptr;
     }
 
