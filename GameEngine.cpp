@@ -1,52 +1,66 @@
 #include "GameEngine.h"
 #include <iostream>
 
-// Initializing the game engine & Setting up state transitions
+// Default constructor 
 GameEngine::GameEngine() : currentState(State::START) {
-    setupTransitions();  // Setup the valid state transitions
+    setupTransitions();
 }
 
-// Defining the valid state transitions
+// Copy constructor
+GameEngine::GameEngine(const GameEngine& other) {
+    // Deep copy of the current state and transitions
+    this->currentState = other.currentState;
+    this->stateTransitions = other.stateTransitions;
+}
+
+// Assignment operator
+GameEngine& GameEngine::operator=(const GameEngine& other) {
+    if (this != &other) {  // Self-assignment check
+        this->currentState = other.currentState;
+        this->stateTransitions = other.stateTransitions;
+    }
+    return *this;
+}
+
+
+// setup all valid state transitions based on commands and states
 void GameEngine::setupTransitions() {
-    // startup phase
+    // Transitions for the startup phase
     stateTransitions[State::START]["loadmap"] = State::MAP_LOADED;
     stateTransitions[State::MAP_LOADED]["validatemap"] = State::MAP_VALIDATED;
     stateTransitions[State::MAP_VALIDATED]["addplayer"] = State::PLAYERS_ADDED;
 
-    // play phase
+    // Transitions for the play phase
     stateTransitions[State::PLAYERS_ADDED]["assigncountries"] = State::ASSIGN_REINFORCEMENT;
     stateTransitions[State::ASSIGN_REINFORCEMENT]["issueorder"] = State::ISSUE_ORDERS;
     stateTransitions[State::ISSUE_ORDERS]["execorder"] = State::EXECUTE_ORDERS;
     stateTransitions[State::EXECUTE_ORDERS]["win"] = State::WIN;
 
-    // ending the game
+    // End the game
     stateTransitions[State::WIN]["end"] = State::END;
 
-    // issuing and executing orders
+    // Loop for issuing and executing orders
     stateTransitions[State::ISSUE_ORDERS]["issueorder"] = State::ISSUE_ORDERS;
     stateTransitions[State::EXECUTE_ORDERS]["execorder"] = State::EXECUTE_ORDERS;
 }
 
-// Handling Input command and transition the state
+// handle user input commands and transition game states
 void GameEngine::handleCommand(const std::string& command) {
-    // Check if the command is valid for the current state
     if (isValidCommand(command)) {
-        // Transition to the next state based on the command
         currentState = stateTransitions[currentState][command];
-        printState();  // Output the new current state
+        printState();
     } else {
-        // Invalid command, display an error message
         std::cout << "Invalid command: " << command << std::endl;
     }
 }
 
-// Check if the entered command is valid for the current state
+// check if the command is valid for the current state
 bool GameEngine::isValidCommand(const std::string& command) const {
     return stateTransitions.find(currentState) != stateTransitions.end() &&
            stateTransitions.at(currentState).find(command) != stateTransitions.at(currentState).end();
 }
 
-// Print current state of the game to console
+// print the current state of the game to the console
 void GameEngine::printState() const {
     switch (currentState) {
         case State::START:
@@ -77,4 +91,39 @@ void GameEngine::printState() const {
             std::cout << "Current state: END" << std::endl;
             break;
     }
+}
+
+// Overloaded stream insertion operator 
+std::ostream& operator<<(std::ostream& os, const GameEngine& engine) {
+    os << "Current game state: ";
+    switch (engine.currentState) {
+        case State::START:
+            os << "START";
+            break;
+        case State::MAP_LOADED:
+            os << "MAP LOADED";
+            break;
+        case State::MAP_VALIDATED:
+            os << "MAP VALIDATED";
+            break;
+        case State::PLAYERS_ADDED:
+            os << "PLAYERS ADDED";
+            break;
+        case State::ASSIGN_REINFORCEMENT:
+            os << "ASSIGN REINFORCEMENT";
+            break;
+        case State::ISSUE_ORDERS:
+            os << "ISSUE ORDERS";
+            break;
+        case State::EXECUTE_ORDERS:
+            os << "EXECUTE ORDERS";
+            break;
+        case State::WIN:
+            os << "WIN";
+            break;
+        case State::END:
+            os << "END";
+            break;
+    }
+    return os;
 }

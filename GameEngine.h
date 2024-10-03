@@ -3,34 +3,35 @@
 
 #include <string>
 #include <map>
+#include <iostream> 
 
 // All states in the game
 enum class State {
-    START,                  // Initial state before the game begins
-    MAP_LOADED,             // Map has been loaded
-    MAP_VALIDATED,          // Map has been validated
-    PLAYERS_ADDED,          // Players have been added to the game
-    ASSIGN_REINFORCEMENT,   // Reinforcements are being assigned
-    ISSUE_ORDERS,           // Players are issuing orders
-    EXECUTE_ORDERS,         // Orders are being executed
-    WIN,                    // A player has won the game
-    END                     // Game has ended
+    START,
+    MAP_LOADED,
+    MAP_VALIDATED,
+    PLAYERS_ADDED,
+    ASSIGN_REINFORCEMENT,
+    ISSUE_ORDERS,
+    EXECUTE_ORDERS,
+    WIN,
+    END
 };
 
-// All commands triggering state transitions
+// All commands that trigger state transitions
 enum class Command {
-    LOADMAP,        // Command to load a map
-    VALIDATEMAP,    // Command to validate a map
-    ADDPLAYER,      // Command to add players to the game
-    ASSIGNCOUNTRIES,// Command to assign countries/reinforcements
-    ISSUEORDER,     // Command to issue an order
-    EXECORDER,      // Command to execute an order
-    WIN,            // Command to declare a winner
-    ENDGAME,        // Command to end the game
-    INVALID         // Invalid command
+    LOADMAP,
+    VALIDATEMAP,
+    ADDPLAYER,
+    ASSIGNCOUNTRIES,
+    ISSUEORDER,
+    EXECORDER,
+    WIN,
+    ENDGAME,
+    INVALID
 };
 
-// Engine class that controls state transitions
+// Game engine that controls state transitions
 class GameEngine {
 private:
     State currentState;  // Current state of the game
@@ -38,10 +39,18 @@ private:
     void setupTransitions();  // Function to setup valid state transitions
 
 public:
-    GameEngine();  // Constructor
-    void handleCommand(const std::string& command);  // Function to handle user input commands
-    void printState() const;  // Function to print the current state of the game
-    bool isValidCommand(const std::string& command) const;  // Function to check if a command is valid
+    // Constructors
+    GameEngine();  // Default constructor
+    GameEngine(const GameEngine& other);  // Copy constructor
+    GameEngine& operator=(const GameEngine& other);  // Assignment operator
+
+    // Overloaded stream insertion operator
+    friend std::ostream& operator<<(std::ostream& os, const GameEngine& engine);
+
+    // Other functions
+    void handleCommand(const std::string& command);
+    void printState() const; 
+    bool isValidCommand(const std::string& command) const;
 };
 
 #endif

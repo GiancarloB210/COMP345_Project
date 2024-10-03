@@ -2,17 +2,17 @@
 #include <iostream>
 #include <string>
 
-// Testing game states and allow user to interact via console
+// Test the game engine state transitions based on user commands
 void testGameStates() {
     GameEngine engine; 
     std::string command;
 
-    // Looping to accept user commands and process them
+    // Continuously prompt the user for commands
     while (true) {
         std::cout << "Enter command (type 'exit' to stop): ";
         std::cin >> command;
 
-        // Break the loop if the user wants to exit
+        // Exit the loop if the user types 'exit'
         if (command == "exit") {
             break;
         }
@@ -20,6 +20,9 @@ void testGameStates() {
         
         engine.handleCommand(command);
     }
+
+    // Print the final state of the game engine
+    std::cout << engine << std::endl;
 }
 
 
