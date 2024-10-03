@@ -14,11 +14,9 @@
 #include "Orders.h"
 
 int main() {
-
     testLoadMaps();
     testPlayers();
-    CardsDriver* cardsDriver = new CardsDriver();
-    cardsDriver->testCards();
+    testCards();
     testGameStates();
 
     return 0;
