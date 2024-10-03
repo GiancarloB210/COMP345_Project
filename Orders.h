@@ -1,90 +1,185 @@
-#ifndef ORDERS_H
-#define ORDERS_H
-#include <string>
-#include <list>
+#ifndef Order_H
+#define Order_H
+#include <iostream>
+#include <vector>
 
-using namespace std;
+//Order class and OrderList class forward declarations
+class Order;
+class OrderList;
 
-static int16_t staticOrderID = 0;
+//Subclasses of Order class forward declarations
+class DeployOrder;
+class AdvanceOrder;
+class BombOrder;
+class BlockadeOrder;
+class AirliftOrder;
+class NegotiateOrder;
 
-class Order {
+//Free functions
+std::ostream& operator << (std::ostream& os, OrderList &orderlist);
+std::ostream& operator << (std::ostream& os, Order& order);
+
+
+//std::ostream& operator << (std::ostream& os, DeployOrder &order);
+//std::ostream& operator << (std::ostream& os, AdvanceOrder &order);
+//std::ostream& operator << (std::ostream& os, BombOrder &order);
+//std::ostream& operator << (std::ostream& os, BlockadeOrder &order);
+//std::ostream& operator << (std::ostream& os, AirliftOrder &order);
+//std::ostream& operator << (std::ostream& os, NegotiateOrder &order);
+
+class OrderList
+{
+private:
+	std::vector<Order*> ListofOrders;
+
 public:
-    std::string orderType;
-    bool isValid;
-    int16_t orderID;
+	//Constructors
+	OrderList();
+	OrderList(std::vector<Order*> list);
+	OrderList(OrderList& orderlist);
 
-    Order();
-    Order(std::string orderType, bool isValid);
-    Order(Order& order);
-    friend ostream& operator <<(ostream& out_stream, Order& order);
-    friend istream& operator >>(istream& in_stream, Order& order);
-    Order& operator=(Order order);
-    bool validate();
-    bool execute();
+	//Operators
+	OrderList& operator=(const OrderList &order);
+
+	//Deconstructor
+	~OrderList();
+
+	//Accessors
+	std::vector<Order*> getList();
+
+	//methods
+	void add(Order* order); //This method allows us to add an other to the list
+
+	void move(int iPos, int fPos); //This method will ask for the order's position and the position to where the order wishes to be moved to
+
+	void remove(int Pos); //This method asks for the position of the order to remove
 };
 
-class DeployOrder:public Order {
+class Order 
+{
 public:
-    DeployOrder(bool isValid);
-    DeployOrder(DeployOrder& order);
-    DeployOrder(Order& order);
+	std::string type, description, effect;
+	bool valid;
+
+	//Constructors
+	Order();
+	Order(std::string type);
+	Order(Order& order);
+
+	//Operators
+	Order& operator=(const Order& order);
+
+	//Deconstructor
+	~Order();
+
+	//Accessors
+	std::string getType();
+	std::string getDescription();
+	std::string getEffect();
+
+	//Methods
+	bool validate();
+	std::string execute();
+
+	//Although the class can access the string values of an order, it cannot modify them since they are static, and only change it the order type itself is changed. 
+	//It is possible to modify the type and automatically redefine the description and effect, but it is inefficient, thus making more easier to simply make a NEW Order
 };
 
-class AdvanceOrder:public Order {
+class DeployOrder : public Order {
 public:
-    AdvanceOrder(bool isValid);
-    AdvanceOrder(AdvanceOrder& order);
-    AdvanceOrder(Order& order);
+	//Constructors
+	DeployOrder();
+	DeployOrder(DeployOrder& order);
+
+	//Operators
+	DeployOrder& operator=(const DeployOrder& order);
+
+	//Deconstructor
+	~DeployOrder();
+
+	//methods
+	bool validate();
+	std::string execute();
+};
+class AdvanceOrder : public Order {
+public:
+	//Constructors
+	AdvanceOrder();
+	AdvanceOrder(AdvanceOrder& order);
+
+	//Operators
+	AdvanceOrder& operator=(const AdvanceOrder& order);
+
+	//Deconstructor
+	~AdvanceOrder();
+
+	//methods
+	bool validate();
+	std::string execute();
+};
+class BombOrder : public Order {
+public:
+	//Constructors
+	BombOrder();
+	BombOrder(BombOrder& order);
+
+	//Operators
+	BombOrder& operator=(const BombOrder& order);
+
+	//Deconstructor
+	~BombOrder();
+
+	//methods
+	bool validate();
+	std::string execute();
+};
+class BlockadeOrder : public Order {
+public:
+	//Constructors
+	BlockadeOrder();
+	BlockadeOrder(BlockadeOrder& order);
+
+	//Operators
+	BlockadeOrder& operator=(const BlockadeOrder& order);
+
+	//Deconstructor
+	~BlockadeOrder();
+
+	//methods
+	bool validate();
+	std::string execute();
+};
+class AirliftOrder : public Order {
+public:
+	//Constructors
+	AirliftOrder();
+	AirliftOrder(AirliftOrder& order);
+
+	//Operators
+	AirliftOrder& operator=(const AirliftOrder& order);
+
+	//Deconstructor
+	~AirliftOrder();
+
+	//methods
+	bool validate();
+	std::string execute();
+};
+class NegotiateOrder : public Order {
+public:
+	//Constructors
+	NegotiateOrder();
+	NegotiateOrder(NegotiateOrder& order);
+
+	//Operators
+	NegotiateOrder& operator=(const NegotiateOrder& order);
+
+	//Deconstructor
+	~NegotiateOrder();
+
+	//methods
+	bool validate();
+	std::string execute();
 };
 
-class BombOrder:public Order {
-public:
-    BombOrder(bool isValid);
-    BombOrder(BombOrder& order);
-    BombOrder(Order& order);
-};
-
-class BlockadeOrder:public Order {
-public:
-    BlockadeOrder(bool isValid);
-    BlockadeOrder(BlockadeOrder& order);
-    BlockadeOrder(Order& order);
-};
-
-class AirliftOrder:public Order {
-public:
-    AirliftOrder(bool isValid);
-    AirliftOrder(AirliftOrder& order);
-    AirliftOrder(Order& order);
-};
-
-class NegotiateOrder:public Order {
-public:
-    NegotiateOrder(bool isValid);
-    NegotiateOrder(NegotiateOrder& order);
-    NegotiateOrder(Order& order);
-};
-
-class OtherSpecialOrder:public Order {
-public:
-    OtherSpecialOrder(std::string orderType, bool isValid);
-    OtherSpecialOrder(OtherSpecialOrder& order);
-    OtherSpecialOrder(Order& order);
-    bool validate();
-};
-
-class OrdersList {
-public:
-    std::list<Order*> orders;
-
-    OrdersList();
-    OrdersList(std::list<Order*> orders);
-    OrdersList(OrdersList& orderList);
-    friend ostream& operator <<(ostream& out_stream, OrdersList& orderList);
-    friend istream& operator >>(istream& in_stream, OrdersList& orderList);
-    OrdersList& operator=(OrdersList order);
-    void add(Order* newOrder);
-    void remove(int targetPosition);
-    void move(int originalIndex, int targetPosition);
-};
-#endif //ORDERS_H
+#endif

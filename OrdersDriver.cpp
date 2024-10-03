@@ -1,22 +1,55 @@
 #include "OrdersDriver.h"
-
 #include "Orders.h"
+#include <iostream>
 
-OrdersDriver::OrdersDriver() {
+using namespace std;
 
+void testOrdersLists()
+{
+	OrderList orders;
+	orders.add(new Order("Attack"));
+	orders.add(new DeployOrder()); 
+	orders.add(new AdvanceOrder());
+	orders.add(new Order("Defend"));
+	orders.add(new BlockadeOrder()); 
+	orders.add(new NegotiateOrder());
+	orders.add(new Order("Sleep"));
+	orders.add(new BombOrder());
+	orders.add(new Order("Pass"));
+	orders.add(new AirliftOrder());
+	
+	int i = 1;
+	for (Order* ord : orders.getList())
+	{
+
+		cout << i << "." << ord->getType() << "\n" << ord->getDescription() << "\n" << ord->getEffect() << "\n" << ord->execute() << "\n";
+		i++;
+	}
+	i = 1;
+
+	cout << "\n2nd Test";
+	orders.move(2, 6);
+	cout << "\nOrder has been moved\n";
+	for (Order* ord : orders.getList())
+	{
+
+		cout << i << "." << ord->getType() << "\n" << ord->getDescription() << "\n" << ord->getEffect() << "\n" << ord->execute() << "\n";
+		i++;
+	}
+	i = 1;
+
+	orders.remove(4);
+	cout << "\nOrder has been removed\n";
+	for (Order* ord : orders.getList())
+	{
+
+		cout << i << "." << ord->getType() << "\n" << ord->getDescription() << "\n" << ord->getEffect() << "\n" << ord->execute() << "\n";
+		i++;
+	}
+	i = 1;
 }
 
-void OrdersDriver::testOrdersLists() {
-    OrdersList orderList;
-    orderList.add(new BombOrder(true));
-    orderList.add(new DeployOrder(true));
-    orderList.add(new AdvanceOrder(true));
-    orderList.add(new BlockadeOrder(true));
-    orderList.add(new AirliftOrder(true));
-    orderList.add(new NegotiateOrder(true));
-    orderList.remove(1); //removes Deploy order.
-    orderList.move(2, 4); //2 -> AdvanceOrder
-    for (Order* o : orderList.orders) {
-        o->execute();
-    }
+int main()
+{
+	testOrdersLists();
 }
