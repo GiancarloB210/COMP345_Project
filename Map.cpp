@@ -603,7 +603,3 @@ Map* MapLoader::readFile(std::string filePath) {
         return new Map(mapName,mapImage, mapIsWrappable, mapScrollsVertically, mapAuthor, mapIncludeWarnings,
             mapContinents, mapTerritories, mapTerritoriesAreValid);
 }
-
-
-
-
