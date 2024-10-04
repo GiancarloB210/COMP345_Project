@@ -6,14 +6,14 @@
 Player::Player(std::list<Territory*>* territories, Hand* hand) {
     this->territories = new std::list<Territory*>(*territories);
     this->hand = new Hand(*hand);
-    this->orders = new OrdersList();
+    this->orders = new OrderList();
 }
 
 // Copy constructor (deep copy)
 Player::Player(const Player& player) {
     this->territories = new std::list<Territory*>(*player.territories);
     this->hand = new Hand(*player.hand);
-    this->orders = new OrdersList(*player.orders);
+    this->orders = new OrderList(*player.orders);
 }
 
 // Destructor to clean up dynamic memory
@@ -34,7 +34,7 @@ Player& Player::operator=(const Player& player) {
         // Allocate new memory and copy the content
         this->territories = new std::list<Territory*>(*player.territories);
         this->hand = new Hand(*player.hand);
-        this->orders = new OrdersList(*player.orders);
+        this->orders = new OrderList(*player.orders);
     }
     return *this;
 }
@@ -76,7 +76,7 @@ std::list<Territory*>* Player::toAttack() {
 
 // Method to issue an order and add it to the player's list of orders
 void Player::issueOrder() {
-    Order* newOrder = new DeployOrder(true);
+    Order* newOrder = new DeployOrder();
     orders->add(newOrder);
     std::cout << "Issued a DeployOrder.\n";
 }

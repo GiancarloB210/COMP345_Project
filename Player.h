@@ -13,7 +13,7 @@ class Player {
 public:
     std::list<Territory*>* territories; // List of territories owned by the player
     Hand* hand;                         // Pointer to the player's hand of cards
-    OrdersList* orders;                 // Pointer to the player's list of orders
+    OrderList* orders;                 // Pointer to the player's list of orders
 
     // Constructors
     Player(std::list<Territory*>* territories, Hand* hand); // Parameterized constructor

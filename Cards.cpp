@@ -99,22 +99,22 @@ Order* Card::play() {
     switch(*type) {
         case BOMB:
             cout<<"Opposing territory bombed."<<endl;
-            return new BombOrder(true);
+            return new BombOrder();
         case REINFORCEMENT:
             cout<<"Calling for reinforcements."<<endl;
-            return new OtherSpecialOrder("Reinforcement", true);
+            return new DeployOrder();
         case BLOCKADE:
             cout<<"Establishing a blockade."<<endl;
-            return new BlockadeOrder(true);
+            return new BlockadeOrder();
         case AIRLIFT:
             cout<<"Calling for an airlift."<<endl;
-            return new AirliftOrder(true);
+            return new AirliftOrder();
         case DIPLOMACY:
             cout<<"Establishing a diplomacy."<<endl;
-            return new OtherSpecialOrder("Diplomacy", true);
+            return new NegotiateOrder();
         default:
             cout<<"Invalid type."<<endl;
-            return new OtherSpecialOrder("Invalid", false);
+            throw runtime_error("Invalid card type entered");
     }
 }
 

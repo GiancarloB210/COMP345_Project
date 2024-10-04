@@ -1,290 +1,405 @@
+
 #include "Orders.h"
-
 #include <iostream>
-#include <ostream>
-using namespace std;
 
-Order::Order() {
-    this->orderID = staticOrderID;
-    staticOrderID++;
-    this->orderType = "No Type";
-    this->isValid = false;
+
+//OrderList Class
+//--------------------------------------------------------------------------------------------------------
+
+//Constructors
+OrderList::OrderList()
+{
+	this->ListofOrders = std::vector<Order*> ();
+}
+OrderList::OrderList(std::vector<Order*> list)
+{
+	ListofOrders = list;
+}
+OrderList::OrderList(OrderList &orderlist)
+{
+	ListofOrders = orderlist.ListofOrders;
 }
 
-Order::Order(std::string orderType, bool isValid) {
-    this->orderID = staticOrderID;
-    staticOrderID++;
-    this->orderType = orderType;
-    this->isValid = isValid;
+//Deconstructor
+OrderList::~OrderList(){}
+
+//Accessors
+std::vector<Order*> OrderList::getList() 
+{
+	return ListofOrders;
 }
 
-Order::Order(Order& order) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
+//Methods
+void OrderList::add(Order* order)
+{
+	ListofOrders.push_back(order);
 }
 
-Order& Order::operator=(Order order) {
-    swap(this->orderID, order.orderID);
-    swap(this->orderType, order.orderType);
-    swap(this->isValid, order.isValid);
-    return *this;
+void OrderList::move(int iPos, int fPos)
+{
+	bool block = true;
+	std::vector<Order*> newList;
+	Order* OrdertoMove = ListofOrders.at(iPos - 1);
+
+	for (int i = 0; i < ListofOrders.size(); i++)
+	{
+		if ((i == fPos - 1) && block)
+		{
+			newList.push_back(OrdertoMove);
+			i--;
+			block = false;
+		}
+		else if (i == iPos - 1) 
+		{
+			//Does nothing, just skips index
+		}
+		else
+		{
+			newList.push_back(ListofOrders.at(i));
+		}
+	}
+	ListofOrders = newList;
+	//throw std::invalid_argument("Error: The provided order index is invalid or not reachable in the list.");
 }
 
-bool Order::validate() {
-    return this->isValid;
+void OrderList::remove(int Pos)
+{
+	std::vector<Order*> newList;
+
+	for (int i = 0; i < ListofOrders.size(); i++)
+	{
+		if (i == Pos - 1)
+		{
+			//Does nothing, just skips index
+		}
+		else
+		{
+			newList.push_back(ListofOrders.at(i));
+		}
+	}
+	ListofOrders = newList;
+	//throw std::invalid_argument("Error: The provided order index is invalid or not reachable in the list.");
 }
 
-bool Order::execute() {
-    if (this->validate() == true) {
-        cout<<"Order of type "<<this->orderType<<" validated & executed."<<endl;
-    }
+//Operators
+std::ostream& operator << (std::ostream& os, OrderList &orderlist)
+{
+	std::string ListNames;
+	for (int i = 0; i < orderlist.getList().size(); i++)
+	{
+		ListNames.append("\n\t" + (i + 1) + orderlist.getList().at(i)->getType());
+	}
+	return (os << "List of Orders:\n" << ListNames);
+}
+OrderList& OrderList::operator=(const OrderList &order) = default;
+
+//Order Class
+//--------------------------------------------------------------------------------------------------------
+
+//Constructors
+Order::Order() {}
+Order::Order(std::string type) 
+{
+	this->type = type;
+	description = "This order has the name " + type + " and it is unsupported";
+	effect = "This order does not to anything";
+	valid = false;
+}
+Order::Order(Order& order) 
+{
+	type = order.type;
+	description = order.description;
+	effect = order.effect;
+	valid = order.valid;
 }
 
-DeployOrder::DeployOrder(bool isValid): Order("Deploy", isValid) {
-    this->orderType = "Deploy";
-    this->isValid = isValid;
+//Deconstructor
+Order::~Order() {}
+
+//Accessors
+std::string Order::getType() {
+	return type;
+}
+std::string Order::getDescription() {
+	return description;
+}
+std::string Order::getEffect() {
+	return effect;
 }
 
-DeployOrder::DeployOrder(DeployOrder& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
+//methods
+bool Order::validate()
+{
+	return valid;
+}
+std::string Order::execute()
+{
+	if (validate())
+	{
+		return "Nope";
+	}
+	else
+	{
+		return "Order no valid";
+	}
 }
 
-DeployOrder::DeployOrder(Order& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
+//Operators
+std::ostream& operator << (std::ostream& os, Order& order)
+{
+	return (os << "Order: " << order.getType() << "\nDescription: " << order.getDescription() << "\nEffect: " << order.getEffect());
+}
+Order& Order::operator=(const Order& order) = default;
+
+
+//DeployOrder Subclass
+//--------------------------------------------------------------------------------------------------------
+
+//Constructors
+DeployOrder::DeployOrder()
+{
+	type = "Deploy";
+	description = "Add a set number of troops to a location in the map";
+	effect = "Adds a number to the value of present troops in a territory";
+	valid = true;
+}
+DeployOrder::DeployOrder(DeployOrder& order)
+{
+	type = order.type;
+	description = order.description;
+	effect = order.effect;
+	valid = order.valid;
 }
 
-AdvanceOrder::AdvanceOrder(bool isValid): Order("Advance", isValid) {
-    this->orderType = "Advance";
-    this->isValid = isValid;
+//Deconstructor
+DeployOrder::~DeployOrder() {}
+
+//methods
+bool DeployOrder::validate()
+{
+	return valid;
+}
+std::string DeployOrder::execute()
+{
+	if (validate())
+	{
+		return "Deploying Troops...";
+	}
+	else
+	{
+		return "Order no valid";
+	}
 }
 
-AdvanceOrder::AdvanceOrder(AdvanceOrder& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
+//Operators
+DeployOrder& DeployOrder::operator=(const DeployOrder& order) = default;
+
+//AdvanceOrder Subclass
+//--------------------------------------------------------------------------------------------------------
+
+//Constructors
+AdvanceOrder::AdvanceOrder()
+{
+	type = "Advance";
+	description = "Move a group of units from a territory to the other. Battle will take place if the destination is an enemy territory or neutral territory";
+	effect = "Remove a number of troops from the initial territory, then add the same number to the next territory. Battle functions will be launch the destination is not friendly";
+	valid = true;
+}
+AdvanceOrder::AdvanceOrder(AdvanceOrder& order)
+{
+	type = order.type;
+	description = order.description;
+	effect = order.effect;
+	valid = order.valid;
 }
 
-AdvanceOrder::AdvanceOrder(Order& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
+//Deconstructor
+AdvanceOrder::~AdvanceOrder() {}
+
+//methods
+bool AdvanceOrder::validate()
+{
+	return valid;
+}
+std::string AdvanceOrder::execute()
+{
+	if (validate())
+	{
+		return "Moving troops...";
+	}
+	else
+	{
+		return "Order no valid";
+	}
 }
 
-BombOrder::BombOrder(bool isValid): Order("Bomb", isValid) {
-    this->orderType = "Bomb";
-    this->isValid = isValid;
+//Operators
+AdvanceOrder& AdvanceOrder::operator=(const AdvanceOrder& order) = default;
+
+//BombOrder Subclass
+//--------------------------------------------------------------------------------------------------------
+
+//Constructors
+BombOrder::BombOrder()
+{
+	type = "Bomb";
+	description = "Does damage to the units in the target territory";
+	effect = "Removes a number of hostile troops on a selected territory";
+	valid = true;
+}
+BombOrder::BombOrder(BombOrder& order)
+{
+	type = order.type;
+	description = order.description;
+	effect = order.effect;
+	valid = order.valid;
 }
 
-BombOrder::BombOrder(BombOrder& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
+//Deconstructor
+BombOrder::~BombOrder() {}
+
+//methods
+bool BombOrder::validate()
+{
+	return valid;
+}
+std::string BombOrder::execute()
+{
+	if (validate())
+	{
+		return "BOOM!!!";
+	}
+	else
+	{
+		return "Order no valid";
+	}
 }
 
-BombOrder::BombOrder(Order& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
+//Operators
+BombOrder& BombOrder::operator=(const BombOrder& order) = default;
+
+//BlockadeOrder Subclass
+//--------------------------------------------------------------------------------------------------------
+
+//Constructors
+BlockadeOrder::BlockadeOrder()
+{
+	type = "Blockade";
+	description = "Increase the amount of troops in a friendly territory and transforms that territory into neutral territory";
+	effect = "Triples the value of troops in a owned territory and changes designation to neutral";
+	valid = true;
+}
+BlockadeOrder::BlockadeOrder(BlockadeOrder& order)
+{
+	type = order.type;
+	description = order.description;
+	effect = order.effect;
+	valid = order.valid;
 }
 
-BlockadeOrder::BlockadeOrder(bool isValid): Order("Blockade", isValid) {
-    this->orderType = "Blockade";
-    this->isValid = isValid;
+//Deconstructor
+BlockadeOrder::~BlockadeOrder() {}
+
+//methods
+bool BlockadeOrder::validate()
+{
+	return valid;
+}
+std::string BlockadeOrder::execute()
+{
+	if (validate())
+	{
+		return "You.... Shall... Not.... PASS!!!";
+	}
+	else
+	{
+		return "Order no valid";
+	}
 }
 
-BlockadeOrder::BlockadeOrder(BlockadeOrder& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
+//Operators
+BlockadeOrder& BlockadeOrder::operator=(const BlockadeOrder& order) = default;
+
+//AirliftOrder Subclass
+//--------------------------------------------------------------------------------------------------------
+
+//Constructors
+AirliftOrder::AirliftOrder()
+{
+	type = "Airlift";
+	description = "Uses planes to move troops from a destination to another in a single turn";
+	effect = "Removes troops from a territory and adds that value to the existing one in another one, regardless if both territories are connected";
+	valid = true;
+}
+AirliftOrder::AirliftOrder(AirliftOrder& order)
+{
+	type = order.type;
+	description = order.description;
+	effect = order.effect;
+	valid = order.valid;
 }
 
-BlockadeOrder::BlockadeOrder(Order& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
+//Deconstructor
+AirliftOrder::~AirliftOrder() {}
+
+//methods
+bool AirliftOrder::validate()
+{
+	return valid;
+}
+std::string AirliftOrder::execute()
+{
+	if (validate())
+	{
+		return "Airlifting troops towards target";
+	}
+	else
+	{
+		return "Order no valid";
+	}
 }
 
-AirliftOrder::AirliftOrder(bool isValid): Order("Airlift", isValid) {
-    this->orderType = "Airlift";
-    this->isValid = isValid;
+//Operators
+AirliftOrder& AirliftOrder::operator=(const AirliftOrder& order) = default;
+
+//NegotiateOrder Subclass
+//--------------------------------------------------------------------------------------------------------
+
+//Constructors
+NegotiateOrder::NegotiateOrder()
+{
+	type = "Negotiate";
+	description = "Initiates diplomacy with another player";
+	effect = "Interacts with another player";
+	valid = true;
+}
+NegotiateOrder::NegotiateOrder(NegotiateOrder& order)
+{
+	type = order.type;
+	description = order.description;
+	effect = order.effect;
+	valid = order.valid;
 }
 
-AirliftOrder::AirliftOrder(AirliftOrder& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
+//Deconstructor
+NegotiateOrder::~NegotiateOrder() {}
+
+//methods
+bool NegotiateOrder::validate()
+{
+	return valid;
+}
+std::string NegotiateOrder::execute()
+{
+	if (validate())
+	{
+		return "So uncivilised...";
+	}
+	else
+	{
+		return "Order no valid";
+	}
 }
 
-AirliftOrder::AirliftOrder(Order& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
-}
-
-NegotiateOrder::NegotiateOrder(bool isValid): Order("Negotiate", isValid) {
-    this->orderType = "Negotiate";
-    this->isValid = isValid;
-}
-
-NegotiateOrder::NegotiateOrder(NegotiateOrder& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
-}
-
-NegotiateOrder::NegotiateOrder(Order& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
-}
-
-OtherSpecialOrder::OtherSpecialOrder(std::string orderType, bool isValid): Order(orderType, isValid) {
-    this->orderType = orderType;
-    this->isValid = isValid;
-}
-
-OtherSpecialOrder::OtherSpecialOrder(OtherSpecialOrder& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
-}
-
-OtherSpecialOrder::OtherSpecialOrder(Order& order): Order(order.orderType, order.isValid) {
-    this->orderType = order.orderType;
-    this->isValid = order.isValid;
-}
-
-bool OtherSpecialOrder::validate() {
-    if (this->isValid == true && (this->orderType == "Reinforcement" || this->orderType == "Democracy")) {
-        return true;
-    }
-    return false;
-}
-
-ostream& operator << (ostream &out_stream, Order &order) {
-    out_stream<<"Order ID: "<<order.orderID<<" | Type: "<<order.orderType<<" | Validity: "<<(order.isValid ? "Valid" : "Invalid")<<endl;
-    return out_stream;
-}
-
-istream& operator >> (istream &in_stream, Order &order) {
-    cout<<"What type of order would you like to create?"<<endl;
-    string typeInput;
-    in_stream>>typeInput;
-    for (char& ch : typeInput) {
-        ch = tolower(ch, locale());
-    }
-    if (typeInput == "deploy") {
-        order.orderType = "Deploy";
-        DeployOrder d_order(order);
-        order = d_order;
-    }
-    else if (typeInput == "advance") {
-        order.orderType = "Advance";
-        AdvanceOrder ad_order(order);
-        order = ad_order;
-    }
-    else if (typeInput == "bomb") {
-        order.orderType = "Bomb";
-        BombOrder bo_order(order);
-        order = bo_order;
-    }
-    else if (typeInput == "blockade") {
-        order.orderType = "Blockade";
-        BlockadeOrder bl_order(order);
-        order = bl_order;
-    }
-    else if (typeInput == "airlift") {
-        order.orderType = "Airlift";
-        AirliftOrder air_order(order);
-        order = air_order;
-    }
-    else if (typeInput == "negotiate") {
-        order.orderType = "Negotiate";
-        NegotiateOrder n_order(order);
-        order = n_order;
-    }
-    else {
-        throw std::invalid_argument("Invalid card type entered");
-    }
-    cout<<"Is this order valid (Yes/No)?"<<endl;
-    string validInput;
-    in_stream>>validInput;
-    for (char& ch : validInput) {
-        ch = tolower(ch, locale());
-    }
-    if (validInput == "yes") {
-        order.isValid = true;
-    }
-    else if (validInput == "no") {
-        order.isValid = false;
-    } else {
-        throw std::invalid_argument("Invalid validity value entered");
-    }
-    return in_stream;
-}
-
-OrdersList::OrdersList() {
-    this->orders = std::list<Order*>{};
-}
-
-OrdersList::OrdersList(std::list<Order*> orders) {
-    this->orders = orders;
-}
-
-OrdersList::OrdersList(OrdersList& orderList) {
-    this->orders = orderList.orders;
-}
-
-OrdersList& OrdersList::operator=(OrdersList order) {
-    swap(this->orders, order.orders);
-    return *this;
-}
-
-ostream& operator << (ostream &out_stream, OrdersList &orderList) {
-    cout<<"Order List Contents:"<<endl;
-    for (Order* o : orderList.orders) {
-        if (o != nullptr) {
-            cout<<*o<<endl;
-        }
-    }
-    return out_stream;
-}
-
-istream& operator >> (istream &in_stream, OrdersList &orderList) {
-    list<Order*> newOrders;
-    cout<<"How many orders would you like to add to the list?"<<endl;
-    int numOrders;
-    in_stream>>numOrders;
-    for (int i = 0;i < numOrders;i++) {
-        Order *order;
-        in_stream>>*order;
-        newOrders.push_back(order);
-    }
-    orderList.orders = newOrders;
-    return in_stream;
-}
-
-void OrdersList::add(Order* newOrder) {
-    this->orders.insert(this->orders.end(), newOrder);
-}
-
-void OrdersList::remove(int targetPosition) {
-    int tracker = 0;
-    for (Order* o : this->orders) {
-        if (tracker == targetPosition) {
-            this->orders.remove(o);
-            return;
-        }
-        tracker++;
-    }
-    throw std::invalid_argument("Error: The provided order index is invalid or not reachable in the list.");
-}
-
-void OrdersList::move(int originalIndex, int targetPosition) {
-    Order* tempPointer = nullptr;
-    int tracker = 0;
-    for (Order* o : this->orders) {
-        if (tracker == originalIndex) {
-            Order* tempOrder(o);
-            tempPointer = tempOrder;
-            this->orders.remove(o);
-            list<Order*>::iterator listIterator = this->orders.begin();
-            advance(listIterator, targetPosition);
-            this->orders.insert(listIterator, tempPointer);
-            return;
-        }
-        tracker++;
-    }
-    throw std::invalid_argument("Error: The provided order ID does not exist in the current OrdersList.");
-}
+//Operators
+NegotiateOrder& NegotiateOrder::operator=(const NegotiateOrder& order) = default;
