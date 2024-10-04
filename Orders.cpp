@@ -2,20 +2,21 @@
 #include "Orders.h"
 #include <iostream>
 
+using namespace std;
 
 //OrderList Class
 //--------------------------------------------------------------------------------------------------------
 
 //Constructors
-OrderList::OrderList()
+OrderList::OrderList() //Default Constructor
 {
 	this->ListofOrders = std::vector<Order*> ();
 }
-OrderList::OrderList(std::vector<Order*> list)
+OrderList::OrderList(std::vector<Order*> list) //Parameter Constructor
 {
 	ListofOrders = list;
 }
-OrderList::OrderList(OrderList &orderlist)
+OrderList::OrderList(OrderList &orderlist) //Copy Constructor
 {
 	ListofOrders = orderlist.ListofOrders;
 }
@@ -30,55 +31,70 @@ std::vector<Order*> OrderList::getList()
 }
 
 //Methods
-void OrderList::add(Order* order)
+void OrderList::add(Order* order) //Adds Order to beginning of list
 {
 	ListofOrders.push_back(order);
 }
 
-void OrderList::move(int iPos, int fPos)
+void OrderList::move(int iPos, int fPos) //Moves Order in position X to go above position Y
 {
-	bool block = true;
 	std::vector<Order*> newList;
-	Order* OrdertoMove = ListofOrders.at(iPos - 1);
-
-	for (int i = 0; i < ListofOrders.size(); i++)
+	if ((iPos > 0 && iPos <= ListofOrders.size()) && (fPos > 0 && fPos <= ListofOrders.size())) //Verifies that parameters are valid
 	{
-		if ((i == fPos - 1) && block)
+		bool block = true; //Used to make a one time use if statement
+		Order* OrdertoMove = ListofOrders.at(iPos - 1);
+		for (int i = 0; i < ListofOrders.size(); i++)
 		{
-			newList.push_back(OrdertoMove);
-			i--;
-			block = false;
+			if (iPos == fPos)
+			{
+				newList.push_back(ListofOrders.at(i)); 
+			}
+			else if ((i == iPos - 1))
+			{
+				//Does nothing, just skips index
+			}
+			else if ((i == fPos - 1) && block)
+			{
+				newList.push_back(OrdertoMove);
+				i--; //There is an order already at this index, so we reduce i to repeat loop and not skip it
+				block = false;
+			}
+			else
+			{
+				newList.push_back(ListofOrders.at(i));
+			}
 		}
-		else if (i == iPos - 1) 
-		{
-			//Does nothing, just skips index
-		}
-		else
-		{
-			newList.push_back(ListofOrders.at(i));
-		}
+		ListofOrders = newList;
 	}
-	ListofOrders = newList;
-	//throw std::invalid_argument("Error: The provided order index is invalid or not reachable in the list.");
+	else
+	{
+		cout << "Error: " << iPos << " or " << fPos << " are invalid positions";
+	}
 }
 
 void OrderList::remove(int Pos)
 {
 	std::vector<Order*> newList;
 
-	for (int i = 0; i < ListofOrders.size(); i++)
+	if (Pos > 0 && Pos <= ListofOrders.size()) //Verifies that parameters are valid
 	{
-		if (i == Pos - 1)
+		for (int i = 0; i < ListofOrders.size(); i++)
 		{
-			//Does nothing, just skips index
+			if (i == Pos - 1)
+			{
+				//Does nothing, just skips index
+			}
+			else
+			{
+				newList.push_back(ListofOrders.at(i));
+			}
 		}
-		else
-		{
-			newList.push_back(ListofOrders.at(i));
-		}
+		ListofOrders = newList;
 	}
-	ListofOrders = newList;
-	//throw std::invalid_argument("Error: The provided order index is invalid or not reachable in the list.");
+	else
+	{
+		cout << "Error: " << Pos << " is an invalid position";
+	}
 }
 
 //Operators
@@ -97,15 +113,15 @@ OrderList& OrderList::operator=(const OrderList &order) = default;
 //--------------------------------------------------------------------------------------------------------
 
 //Constructors
-Order::Order() {}
-Order::Order(std::string type) 
+Order::Order() {} //Default Constructor (Used for subclasses)
+Order::Order(std::string type)  //Parameter Constructor (Used to create other orders)
 {
 	this->type = type;
 	description = "This order has the name " + type + " and it is unsupported";
 	effect = "This order does not to anything";
-	valid = false;
+	valid = false; //Every order that is not one of the subclasses will be invalid by default
 }
-Order::Order(Order& order) 
+Order::Order(Order& order) //Copy Constructor
 {
 	type = order.type;
 	description = order.description;
@@ -127,7 +143,7 @@ std::string Order::getEffect() {
 	return effect;
 }
 
-//methods
+//Methods
 bool Order::validate()
 {
 	return valid;

@@ -55,7 +55,7 @@ public:
 	void remove(int Pos); //This method asks for the position of the order to remove
 };
 
-class Order
+class Order 
 {
 public:
 	std::string type, description, effect;
@@ -81,7 +81,7 @@ public:
 	virtual bool validate();
 	virtual std::string execute();
 
-	//Although the class can access the string values of an order, it cannot modify them since they are static, and only change it the order type itself is changed.
+	//Although the class can access the string values of an order, it cannot modify them since they are static, and only change it the order type itself is changed. 
 	//It is possible to modify the type and automatically redefine the description and effect, but it is inefficient, thus making more easier to simply make a NEW Order
 };
 
