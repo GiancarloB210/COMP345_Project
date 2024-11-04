@@ -6,6 +6,11 @@ GameEngine::GameEngine() : currentState(State::START) {
     setupTransitions();
 }
 
+GameEngine::GameEngine(CommandProcessor* commandProcessor) : currentState(State::START) {
+    setupTransitions();
+    this->commandProcessor = commandProcessor;
+}
+
 // Copy constructor
 GameEngine::GameEngine(const GameEngine& other) {
     // Deep copy of the current state and transitions

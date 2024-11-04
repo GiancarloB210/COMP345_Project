@@ -3,7 +3,9 @@
 
 #include <string>
 #include <map>
-#include <iostream> 
+#include <iostream>
+
+#include "CommandProcessing.h"
 
 // All states in the game
 enum class State {
@@ -19,7 +21,7 @@ enum class State {
 };
 
 // All commands that trigger state transitions
-enum class Command {
+enum class CommandEnum {
     LOADMAP,
     VALIDATEMAP,
     ADDPLAYER,
@@ -36,11 +38,14 @@ class GameEngine {
 private:
     State currentState;  // Current state of the game
     std::map<State, std::map<std::string, State>> stateTransitions;  // Map of valid state transitions
+    CommandProcessor* commandProcessor;
     void setupTransitions();  // Function to setup valid state transitions
+
 
 public:
     // Constructors
     GameEngine();  // Default constructor
+    GameEngine(CommandProcessor* commandProcessor); // constructor
     GameEngine(const GameEngine& other);  // Copy constructor
     GameEngine& operator=(const GameEngine& other);  // Assignment operator
 

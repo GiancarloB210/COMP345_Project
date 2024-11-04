@@ -11,6 +11,10 @@ Command::Command(std::string command) {
     this->command = command;
 }
 
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string fileName) {
+    this->fileName = fileName;
+}
+
 void Command::saveEffect(std::string effect) {
     this->effect = effect;
 }
@@ -37,7 +41,7 @@ bool CommandProcessor::validate(Command* command) {
     }
 }
 
-std::string FileLineReader::readLineFromFile() {
+std::string FileLineReader::readLineFromFile(std::string fileName) {
     std::string line;
     return line;
 }
