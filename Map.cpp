@@ -4,6 +4,7 @@
 
 #include "Map.h"
 
+
 // Territory Class Copy Constructor
 Territory::Territory(Territory &territory) {
     name = territory.name;

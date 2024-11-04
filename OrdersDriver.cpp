@@ -72,8 +72,3 @@ void testOrdersLists()
 		i++;
 	}
 }
-
-int main()
-{
-	testOrdersLists();
-}
