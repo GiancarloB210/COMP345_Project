@@ -8,10 +8,11 @@ class ArmyUnit {
 public:
     int armyUnitID;
 
-    ArmyUnit();
-    ArmyUnit(ArmyUnit& other);
-    ArmyUnit& operator=(ArmyUnit other);
-    friend std::ostream& operator<<(std::ostream& os, const ArmyUnit& unit);
+    ArmyUnit(); //Basic constructor.
+    ~ArmyUnit();
+    ArmyUnit(ArmyUnit& other); //Copy constructor.
+    ArmyUnit& operator=(ArmyUnit other); //Assignment operator.
+    friend std::ostream& operator<<(std::ostream& os, const ArmyUnit& unit); //Stream insertion operator.
 };
 
 #endif //ARMYUNIT_H

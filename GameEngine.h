@@ -42,9 +42,9 @@ private:
     string currentMapPath; //Currently loaded map path.
     Map* currentMap; //Currently loaded map.
     Deck* gameDeck; //Deck which will be used for the game.
-    int numPlayers;
+    int numPlayers; //Number of players who will be playing the game.
     std::vector<Player*> gamePlayers; //Vector of players who will be playing the game.
-    std::vector<int> playerOrder;
+    std::vector<int> playerOrder; //Turn order of players who will be playing the game.
 
 public:
     // Constructors

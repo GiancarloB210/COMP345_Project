@@ -25,13 +25,12 @@ GameEngine::GameEngine(const GameEngine& other) {
     this->currentMapPath = other.currentMapPath;
     this->gameDeck = new Deck(*other.gameDeck);
     this->numPlayers = other.numPlayers;
-    //sizeof(other.gamePlayers)/sizeof(Player) will return the size of the other.gamePlayers array.
-    for (int i = 0; i < sizeof(other.gamePlayers)/sizeof(other.gamePlayers[0]); i++) {
+    for (int i = 0; i < other.gamePlayers.size(); i++) {
         Player* newPlayer = new Player(*other.gamePlayers[i]);
-        this->gamePlayers[i] = newPlayer;
+        this->gamePlayers.push_back(newPlayer);
     }
-    for (int i = 0;i < sizeof(this->playerOrder)/sizeof(this->playerOrder[0]);i++) {
-        this->playerOrder[i] = other.playerOrder[i];
+    for (int i = 0;i < this->playerOrder.size();i++) {
+        this->playerOrder.push_back(other.playerOrder[i]);
     }
 }
 
@@ -44,13 +43,12 @@ GameEngine& GameEngine::operator=(const GameEngine& other) {
         this->currentMapPath = other.currentMapPath;
         this->gameDeck = new Deck(*other.gameDeck);
         this->numPlayers = other.numPlayers;
-        //sizeof(other.gamePlayers)/sizeof(Player) will return the size of the other.gamePlayers array.
-        for (int i = 0; i < sizeof(other.gamePlayers)/sizeof(other.gamePlayers[0]); i++) {
+        for (int i = 0; i < other.gamePlayers.size(); i++) {
             Player* newPlayer = new Player(*other.gamePlayers[i]);
-            this->gamePlayers[i] = newPlayer;
+            this->gamePlayers.push_back(newPlayer);
         }
-        for (int i = 0;i < sizeof(this->playerOrder)/sizeof(this->playerOrder[0]);i++) {
-            this->playerOrder[i] = other.playerOrder[i];
+        for (int i = 0;i < this->playerOrder.size();i++) {
+            this->playerOrder.push_back(other.playerOrder[i]);
         }
     }
     return *this;
@@ -94,24 +92,62 @@ void GameEngine::handleCommand(const std::string& command) {
             //The map files are located here.
             fs::directory_iterator mapFileDir("../MapFiles");
             int i = 0;
-            string* maps = new string[4];
+
+            //There are 4 maps in the above directory.
+            std::vector<string> mapFilePaths;
+
+            //Prints the relative (not absolute) path of every map file for selection.
             for(auto& fileReference: mapFileDir) {
                 std::cout << "[" << i << "] " << fileReference.path().string() << '\n';
-                maps[i] = fileReference.path().string();
+                mapFilePaths.push_back(fileReference.path().string());
                 i++;
             }
+
+            //The user will input the number corresponding to the map file path associated
+            //with the map file they wish to select.
             int selectedMapIndex;
-            cout << "Select the number of the map which you want to load." << endl;
-            cin >> selectedMapIndex;
-            while (selectedMapIndex < 0 || selectedMapIndex > maps->length()) {
+            bool validIndexInputCheck = false;
+            while (!validIndexInputCheck) {
+                cout << "Select the number of the map which you want to load." << endl;
+                cin >> selectedMapIndex;
+                if (cin.fail() || (selectedMapIndex < 0 || selectedMapIndex >= mapFilePaths.size())) {
+                    cin.clear();
+                    cin.ignore();
+                    cout << "Invalid. Please enter a valid index." << endl;
+                }
+                else {
+                    validIndexInputCheck = true;
+                }
+            }
+
+
+            //Checks to see if the inputted index is within the appropriate range of values.
+            // if (selectedMapIndex < 0 || selectedMapIndex >= mapFilePaths.size()) {
+            //     cout << "Invalid. Please enter a valid index." << endl;
+            //     while (selectedMapIndex < 0 || selectedMapIndex >= mapFilePaths.size()) {
+            //         cin >> selectedMapIndex;
+            //         if (selectedMapIndex < 0 || selectedMapIndex >= mapFilePaths.size()) {
+            //
+            //         cout << "Invalid. Please enter a valid index." << endl;}
+            //     }
+            // }
+            while (selectedMapIndex < 0 || selectedMapIndex >= mapFilePaths.size()) {
                 cout << "Invalid. Please enter a valid index." << endl;
                 cin >> selectedMapIndex;
             }
-            this->currentMapPath = maps[selectedMapIndex];
+
+            //The file at this path will be validated in the sequentially next state.
+            this->currentMapPath = mapFilePaths[selectedMapIndex];
         }
         else if (command == "validatemap") {
+            //Validate that the map is valid. If it's invalid, return to the start state.
+            //If it's valid, continue as usual.
             MapLoader mapLoader;
+
+            //Reads the map from the map file path selected earlier.
             this->currentMap = mapLoader.readFile(this->currentMapPath);
+
+            //Return to the initial state if the map is invalid.
             if (!(currentMap->validate(currentMap))) {
                 cout << "Invalid map loaded." << endl;
                 currentState = State::START;
@@ -119,19 +155,32 @@ void GameEngine::handleCommand(const std::string& command) {
             }
         }
         else if (command == "addplayer") {
+
+            //Sets the number of players to be added to the game.
             int numberOfPlayers;
-            cout << "Enter the number of players (2-6) which you would like to add." << endl;
-            cin >> numberOfPlayers;
-            while (numberOfPlayers < 2 || numberOfPlayers > 6) {
-                cout << "Invalid number. Please enter a number from 2 to 6." << endl;
+            bool validPlayerNumberCheck = false;
+            while (!validPlayerNumberCheck) {
+                cout << "Enter the number of players (2-6) which you would like to add." << endl;
                 cin >> numberOfPlayers;
+                if (cin.fail() || (numberOfPlayers < 2 || numberOfPlayers > 6)) {
+                    cin.clear();
+                    cin.ignore();
+                    cout << "Invalid. Please enter a valid number of players (from 2 to 6)." << endl;
+                } else {
+                    validPlayerNumberCheck = true;
+                }
             }
+
+            //Every player only needs a name to be inputted, since their list of territories
+            //is empty by default and their hands all pertain to the game deck.
             for (int i = 0;i < numberOfPlayers; i++) {
                 string newPlayerName;
                 cout << "Enter the name of player " << (i + 1) << endl;
                 cin >> newPlayerName;
                 Player* p = new Player(newPlayerName, new std::list<Territory*>, new Hand(gameDeck));
                 cout << "Player created" << endl;
+
+                //Add the player to the list of game players.
                 this->gamePlayers.push_back(p);
                 cout<<"Player vector size: "<<this->gamePlayers.size()<<endl;
             }
@@ -143,14 +192,26 @@ void GameEngine::handleCommand(const std::string& command) {
             std::list<Territory *> mapTerritories= this->currentMap->getTerritories();
             cout<<"mapTerritories: "<<mapTerritories.size()<<endl;
             cout<<"Player array size: "<<this->gamePlayers.size()<<endl;
+            //Establishes how many territories each player should receive
+            //such that the distribution is fair.
             int territoriesPerPlayer = mapTerritories.size() / this->gamePlayers.size();
-            int i, playerCount = 0;
-            //for (int i = 0;i < this->gamePlayers.size();i++) {
+            cout<<"Territories per player: " << territoriesPerPlayer<<endl;
+            int i = 0, playerCount = 0;
             for (Territory* territory : mapTerritories) {
+                //Makes sure that every player receives the number of territories that each player should have
+                //in accordance with fair distribution.
                 this->gamePlayers[playerCount]->territories->push_back(territory);
                 i++;
+                //If a player has been assigned their maximum number of territories,
+                //move on to the next player (the next territory will be assigned to them).
                 if (i == territoriesPerPlayer) {
                     playerCount++;
+                    //Checks to see if enough territories can be allocated.
+                    //If not, move on to next step (shuffling player IDs for turn order determination).
+                    if ((mapTerritories.size() - (playerCount * i)) < territoriesPerPlayer) {
+                        break;
+                    }
+                    cout<<"Player count is now " << playerCount<<endl;
                     i = 0;
                 }
             }
@@ -175,6 +236,11 @@ void GameEngine::handleCommand(const std::string& command) {
                 }
             }
 
+            for (Player* p : this->gamePlayers) {
+                cout<<"Player ID " << p->playerID << ": " << p->armyUnits.size() << " units."<<endl;
+                cout<<"Player Id " << p->playerID << ": " << p->territories->size() << " territories."<<endl;
+            }
+
             cout << "Army units allocated." << endl;
 
             //Each player draws 2 cards.
@@ -187,13 +253,15 @@ void GameEngine::handleCommand(const std::string& command) {
 
             cout << "Cards drawn." << endl;
 
-            //Fix this ASAP.
-            this->currentState = State::ASSIGN_REINFORCEMENT;
-            printState();
+            //Fix this ASAP. Have it transition to a state which represents the start of the game.
+            // this->currentState = State::ASSIGN_REINFORCEMENT;
+            // printState();
         }
         else {
             std::cout << "Invalid command." << std::endl;
         }
+
+        //Transitions to the next state according to the earlier-defined list of state transitions.
         currentState = stateTransitions[currentState][command];
         printState();
     } else {
