@@ -22,11 +22,11 @@ int main(int argc, char* argv[]) {
     std::vector<std::string> args(argv, argv+argc);
     GameEngine* gameEngine;
 
-    if (args.front() == "-console") {
+    if (args[1] == "-console") {
         cout << "proceeding with console commands." << endl;
         gameEngine = new GameEngine(new CommandProcessor());
     }
-    else if (args.front() == "-file") {
+    else if (args[1] == "-file") {
         cout << "proceeding with file commands." << endl;
         std::string filename = args[2];
         gameEngine = new GameEngine(new FileCommandProcessorAdapter(filename));

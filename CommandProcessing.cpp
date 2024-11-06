@@ -4,8 +4,7 @@
 
 #include "CommandProcessing.h"
 
-#include <iostream>
-#include <utility>
+
 
 Command::Command(std::string command) {
     this->command = command;
@@ -42,7 +41,28 @@ bool CommandProcessor::validate(Command* command) {
 }
 
 std::string FileLineReader::readLineFromFile(std::string fileName) {
+    std::ifstream inputFileStream;
+    inputFileStream.open(fileName);
+    static int lineCounter = 0;
+    int tempCounter = lineCounter;
     std::string line;
+
+    // Check if the file at the provided filePath can be opened
+    if (!inputFileStream.is_open()) {
+        std::cout << "Error opening file " << fileName << std::endl;
+        return "";
+    }
+
+    while(tempCounter != 0) {
+        std::getline(inputFileStream,line);
+        tempCounter--;
+    }
+    while(std::getline(inputFileStream,line)) {
+        lineCounter++;
+        if (!line.empty())
+            break;
+    }
+    inputFileStream.close();
     return line;
 }
 
