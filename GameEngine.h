@@ -3,7 +3,9 @@
 
 #include <string>
 #include <map>
-#include <iostream> 
+#include <iostream>
+
+#include "Map.h"
 
 // All states in the game
 enum class State {
@@ -37,6 +39,12 @@ private:
     State currentState;  // Current state of the game
     std::map<State, std::map<std::string, State>> stateTransitions;  // Map of valid state transitions
     void setupTransitions();  // Function to setup valid state transitions
+    string currentMapPath; //Currently loaded map path.
+    Map* currentMap; //Currently loaded map.
+    Deck* gameDeck; //Deck which will be used for the game.
+    int numPlayers;
+    std::vector<Player*> gamePlayers; //Vector of players who will be playing the game.
+    std::vector<int> playerOrder;
 
 public:
     // Constructors

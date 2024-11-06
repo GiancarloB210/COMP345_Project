@@ -18,10 +18,10 @@
 
 int main() {
 
-    testLoadMaps();
-    testPlayers();
-    testOrdersLists();
-    testCards();
+    // testLoadMaps();
+    // testPlayers();
+    // testOrdersLists();
+    // testCards();
     testGameStates();
 
     return 0;

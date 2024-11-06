@@ -27,6 +27,8 @@ add_executable(COMP345_Project
         MainDriver.cpp
         MainDriver.h
         GameEngine.cpp
-        GameEngineDriver.cpp)
+        GameEngineDriver.cpp
+        ArmyUnit.cpp
+        ArmyUnit.h)
 
 
