@@ -199,7 +199,8 @@ void GameEngine::handleCommand(const std::string& command) {
             int i = 0, playerCount = 0;
             for (Territory* territory : mapTerritories) {
                 //Makes sure that every player receives the number of territories that each player should have
-                //in accordance with fair distribution.
+                //in accordance with fair distribution. Also, set a player's territory's associated player to that player.
+                territory->setPlayer(this->gamePlayers[playerCount]);
                 this->gamePlayers[playerCount]->territories->push_back(territory);
                 i++;
                 //If a player has been assigned their maximum number of territories,
