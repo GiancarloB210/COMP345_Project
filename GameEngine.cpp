@@ -64,11 +64,15 @@ void GameEngine::setupTransitions() {
 
     // Transitions for the play phase
     stateTransitions[State::PLAYERS_ADDED]["assigncountries"] = State::ASSIGN_REINFORCEMENT;
-    stateTransitions[State::PLAYERS_ADDED]["gamestart"] = State::ISSUE_ORDERS;
+    //stateTransitions[State::PLAYERS_ADDED]["gamestart"] = State::ISSUE_ORDERS;
+    stateTransitions[State::PLAYERS_ADDED]["gamestart"] = State::GAMESTART;
     stateTransitions[State::ASSIGN_REINFORCEMENT]["issueorder"] = State::ISSUE_ORDERS;
     stateTransitions[State::ISSUE_ORDERS]["endissueorders"] = State::EXECUTE_ORDERS;
     stateTransitions[State::EXECUTE_ORDERS]["win"] = State::WIN;
     stateTransitions[State::EXECUTE_ORDERS]["endexecorders"] = State::ASSIGN_REINFORCEMENT;
+
+    //TO DO: update game logic from this point.
+    stateTransitions[State::GAMESTART]["end"] = State::END;
 
     // End the game
     stateTransitions[State::WIN]["end"] = State::END;
@@ -139,7 +143,7 @@ void GameEngine::handleCommand(const std::string& command) {
             //The file at this path will be validated in the sequentially next state.
             this->currentMapPath = mapFilePaths[selectedMapIndex];
         }
-        else if (command == "validatemap") {
+        if (command == "validatemap") {
             //Validate that the map is valid. If it's invalid, return to the start state.
             //If it's valid, continue as usual.
             MapLoader mapLoader;
@@ -152,9 +156,10 @@ void GameEngine::handleCommand(const std::string& command) {
                 cout << "Invalid map loaded." << endl;
                 currentState = State::START;
                 printState();
+                return;
             }
         }
-        else if (command == "addplayer") {
+        if (command == "addplayer") {
 
             //Sets the number of players to be added to the game.
             int numberOfPlayers;
@@ -186,7 +191,7 @@ void GameEngine::handleCommand(const std::string& command) {
             }
             cout<<"Player vector size: "<<(this->gamePlayers.size())<<endl;
         }
-        else if (command == "gamestart") {
+        if (command == "gamestart") {
 
             //Fairly distribute the territories among players.
             std::list<Territory *> mapTerritories= this->currentMap->getTerritories();
@@ -233,13 +238,21 @@ void GameEngine::handleCommand(const std::string& command) {
             //Allocates 50 army units to each player
             for (int j = 0;j < this->gamePlayers.size();j++) {
                 for (int k = 0;k < 50;k++) {
-                    this->gamePlayers[j]->armyUnits.push_back(new ArmyUnit());
+                    this->gamePlayers[j]->armyUnits.push_back(new ArmyUnit(this->gamePlayers[j]));
                 }
             }
 
             for (Player* p : this->gamePlayers) {
                 cout<<"Player ID " << p->playerID << ": " << p->armyUnits.size() << " units."<<endl;
-                cout<<"Player Id " << p->playerID << ": " << p->territories->size() << " territories."<<endl;
+                int unitCount = 0;
+                for (ArmyUnit* u : p->armyUnits) {
+                    ArmyUnit actualUnit = *u;
+                    if (u->playerOwner->playerID == p->playerID) {
+                        unitCount++;
+                    }
+                }
+                cout<<"Number of units belonging to player with ID " << p->playerID << ": " <<unitCount<<endl;
+                cout<<"Player ID " << p->playerID << ": " << p->territories->size() << " territories."<<endl;
             }
 
             cout << "Army units allocated." << endl;
@@ -254,12 +267,10 @@ void GameEngine::handleCommand(const std::string& command) {
 
             cout << "Cards drawn." << endl;
 
-            //Fix this ASAP. Have it transition to a state which represents the start of the game.
-            // this->currentState = State::ASSIGN_REINFORCEMENT;
-            // printState();
-        }
-        else {
-            std::cout << "Invalid command." << std::endl;
+            //TO DO: update game logic from this point.
+            currentState = State::GAMESTART;
+            printState();
+            return;
         }
 
         //Transitions to the next state according to the earlier-defined list of state transitions.
@@ -383,6 +394,19 @@ void GameEngine::printState() const {
             std::cout << std::endl;
         }
             break;
+        case State::GAMESTART: {
+            std::cout << "Current state: GAMESTART" << std::endl;
+            std::cout << "valid commands are: " << std::endl;
+            for (const auto & stateTransition : stateTransitions) {
+                if (stateTransition.first == currentState) {
+                    for (const auto & i : stateTransition.second) {
+                        std::cout << i.first << std::endl;
+                    }
+                }
+            }
+            std::cout << std::endl;
+        }
+        break;
         case State::END: {
             std::cout << "Current state: END" << std::endl;
             std::cout << "valid commands are: \nexit\n" << std::endl;
