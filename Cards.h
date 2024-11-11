@@ -27,6 +27,7 @@ public:
     Card();
     Card(CardType* type);
     Card(Card& card);
+    ~Card();
     friend ostream& operator <<(ostream& out_stream, Card& card);
     friend istream& operator >>(istream& in_stream, Card& card);
     Card& operator=(Card card);
@@ -34,7 +35,6 @@ public:
     void makeUnavailableToDraw();
     Order* play();
     std::string getCardTypeStringValue(); //Gets the corresponding enum value in string format.
-    void clean();
 };
 
 class Deck {
@@ -44,23 +44,24 @@ public:
     Deck(); //Instantiates a Deck with 8 of each of the 5 types of cards.
     Deck(Card* newDeckCards[40]);
     Deck(Deck& deck);
+    ~Deck();
     friend ostream& operator <<(ostream& out_stream, Deck& deck);
     friend istream& operator >>(istream& in_stream, Deck& deck);
     Deck& operator=(Deck deck);
     Card* draw();
-    void clean();
 };
 
 class Hand {
 public:
     Card* cardsInHand[40];
     Deck* deckPlayedWith;
-    int* associatedDeckPointer;
-    int* handPointer; //Points to the first free position in the hand (one without a card).
+    int associatedDeckPosition;
+    int handPosition;
 
     Hand();
     Hand(Deck* deckInput);
     Hand(Hand& hand);
+    ~Hand();
     friend ostream& operator <<(ostream& out_stream, Hand& hand);
     friend istream& operator >>(istream& in_stream, Hand& hand);
     Hand& operator=(Hand hand);
@@ -68,6 +69,5 @@ public:
     void drawCard();
     void addToHand(Card* card);
     void displayCardsInHand();
-    void clean(); //Removes any pointers to ensure no memory leakage.
 };
 #endif //CARD_H

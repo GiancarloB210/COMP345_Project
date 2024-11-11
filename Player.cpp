@@ -10,7 +10,7 @@ Player::Player(std::list<Territory*>* territories, Hand* hand) {
     this->territories = new std::list<Territory*>(*territories);
     this->hand = new Hand(*hand);
     this->orders = new OrderList();
-    this->armyUnits = std::list<ArmyUnit*>();
+    this->armyUnits = std::vector<ArmyUnit*>();
 }
 
 // Parameterized constructor (with name input)
@@ -21,7 +21,7 @@ Player::Player(std::string newName, std::list<Territory*>* territories, Hand* ha
     this->territories = new std::list<Territory*>(*territories);
     this->hand = new Hand(*hand);
     this->orders = new OrderList();
-    this->armyUnits = std::list<ArmyUnit*>();
+    this->armyUnits = std::vector<ArmyUnit*>();
 }
 
 // Copy constructor (deep copy)
@@ -32,23 +32,32 @@ Player::Player(const Player& player) {
     this->territories = new std::list<Territory*>(*player.territories);
     this->hand = new Hand(*player.hand);
     this->orders = new OrderList(*player.orders);
-    this->armyUnits = std::list<ArmyUnit*>(player.armyUnits);
+    this->armyUnits = std::vector<ArmyUnit*>(player.armyUnits);
 }
 
 // Destructor to clean up dynamic memory
 Player::~Player() {
-    delete territories;
-    delete hand;
-    delete orders;
+    delete this->territories;
+    this->territories = NULL;
+    delete this->hand;
+    this->hand = NULL;
+    delete this->orders;
+    this->orders = NULL;
+    for (int i = 0;i < this->armyUnits.size();i++) {
+        delete this->armyUnits[i];
+        this->armyUnits[i] = NULL;
+    }
+    this->armyUnits.clear();
 }
 
 // Assignment operator (deep copy)
 Player& Player::operator=(const Player& player) {
     if (this != &player) {
         // Clean up existing dynamic memory
-        delete territories;
-        delete hand;
-        delete orders;
+        delete this->territories;
+        delete this->hand;
+        delete this->orders;
+        this->armyUnits.clear();
 
         // Allocate new memory and copy the content
         this->playerID = player.playerID;
@@ -56,7 +65,7 @@ Player& Player::operator=(const Player& player) {
         this->territories = new std::list<Territory*>(*player.territories);
         this->hand = new Hand(*player.hand);
         this->orders = new OrderList(*player.orders);
-        this->armyUnits = std::list<ArmyUnit*>(player.armyUnits);
+        this->armyUnits = std::vector<ArmyUnit*>(player.armyUnits);
     }
     return *this;
 }

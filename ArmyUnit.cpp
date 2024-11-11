@@ -19,8 +19,7 @@ ArmyUnit::ArmyUnit(Player* playerOwner) {
 
 //Destructor.
 ArmyUnit::~ArmyUnit() {
-    delete this->playerOwner;
-    playerOwner = NULL;
+    //The playerOwner pointer variable will be deleted some time after all of its armyUnit members have been deleted.
 }
 
 //Copy constructor.

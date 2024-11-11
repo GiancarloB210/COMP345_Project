@@ -5,5 +5,6 @@
 
 
 void testGameStates();
+void testStartupPhase();
 
 #endif

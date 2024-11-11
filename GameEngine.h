@@ -53,6 +53,8 @@ public:
     GameEngine(const GameEngine& other);  // Copy constructor
     GameEngine& operator=(const GameEngine& other);  // Assignment operator
 
+    ~GameEngine();  // Destructor
+
     // Overloaded stream insertion operator
     friend std::ostream& operator<<(std::ostream& os, const GameEngine& engine);
 
@@ -60,6 +62,7 @@ public:
     void handleCommand(const std::string& command);
     void printState() const; 
     bool isValidCommand(const std::string& command) const;
+    void startupPhase();
 };
 
 #endif

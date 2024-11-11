@@ -20,7 +20,7 @@ public:
     std::list<Territory*>* territories; // List of territories owned by the player
     Hand* hand;                         // Pointer to the player's hand of cards
     OrderList* orders;                 // Pointer to the player's list of orders
-    std::list<ArmyUnit*> armyUnits;    // Army units belonging to the player.
+    std::vector<ArmyUnit*> armyUnits;    // Army units belonging to the player.
 
     // Constructors
     Player(std::string newName, std::list<Territory*>* territories, Hand* hand); //Parameterized constructor with name input.

@@ -23,6 +23,7 @@ int main() {
     // testOrdersLists();
     // testCards();
     testGameStates();
+    testStartupPhase();
 
     return 0;
 }
