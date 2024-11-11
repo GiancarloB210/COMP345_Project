@@ -301,4 +301,4 @@ std::string FileCommandProcessorAdapter::toString() {
     std::stringstream ss;
     ss << *this;
     return ss.str();
-}g
+}

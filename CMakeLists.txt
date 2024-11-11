@@ -29,6 +29,8 @@ add_executable(COMP345_Project
         GameEngine.cpp
         GameEngineDriver.cpp
         CommandProcessing.cpp
-        CommandProcessing.h)
+        CommandProcessing.h
+        ArmyUnit.cpp
+        ArmyUnit.h)
 
 

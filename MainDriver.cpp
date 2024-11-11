@@ -31,6 +31,8 @@ int main(int argc, char* argv[]) {
         std::string filename = args[2];
         gameEngine = new GameEngine(new FileCommandProcessorAdapter(filename));
     }
+    testGameStates();
+    testStartupPhase();
 
     return 0;
 }

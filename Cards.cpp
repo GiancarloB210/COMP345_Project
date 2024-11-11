@@ -29,6 +29,11 @@ Card::Card(Card& card) {
     this->availableToDraw = card.availableToDraw;
 }
 
+Card::~Card() {
+    delete this->type;
+    this->type = NULL;
+}
+
 Card& Card::operator=(Card card) {
     swap(this->cardID, card.cardID);
     //Swapping pointers requires storing one swapped value in a temporary value which can then be pointed to by the other swapped value.
@@ -37,10 +42,6 @@ Card& Card::operator=(Card card) {
     *(card.type) = tempTypePointer;
     swap(this->availableToDraw, card.availableToDraw);
     return *this;
-}
-
-void Card::clean() {
-    delete this->type;
 }
 
 //Displays all important card information.
@@ -168,6 +169,13 @@ Deck::Deck(Deck& deck) {
     }
 }
 
+Deck::~Deck() {
+    for (int i = 0; i < 40; i++) {
+        delete this->cards[i];
+        this->cards[i] = NULL;
+    }
+}
+
 //Outputs all deck contents (all cards in the Deck).
 ostream& operator << (ostream &out_stream, Deck &deck) {
     out_stream<<"Deck Contents:"<<endl;
@@ -270,27 +278,19 @@ Card* Deck::draw() {
     throw runtime_error("No card in the deck is available to draw.");
 }
 
-//Deletes all deck-related pointers to avoid memory leakage.
-void Deck::clean() {
-    for (int i = 0; i < 40; i++) {
-        cards[i]->clean();
-        delete this->cards[i];
-    }
-}
-
 //Default constructor. Seeing as how all hands should be associated with a pre-initialized deck, this should never be used.
 Hand::Hand() {
     this->deckPlayedWith = new Deck();
-    this->associatedDeckPointer = new int(0);
-    this->handPointer = new int(0);
+    this->associatedDeckPosition = 0;
+    this->handPosition = 0;
 }
 
 //This constructor, aside from in instances of wanting to copy one Hand variable to another, should not be used,
 Hand::Hand(Deck* deckInput) {
     this->deckPlayedWith = deckInput;
     //int constructors are used to ensure that the integer pointers function properly.
-    this->associatedDeckPointer = new int(0);
-    this->handPointer = new int(0);
+    this->associatedDeckPosition = 0;
+    this->handPosition = 0;
 }
 
 //Copy constructor for the Hand class.
@@ -300,8 +300,12 @@ Hand::Hand(Hand& hand) {
         this->cardsInHand[i] = hand.cardsInHand[i];
     }
     this->deckPlayedWith = hand.deckPlayedWith;
-    this->associatedDeckPointer = hand.associatedDeckPointer;
-    this->handPointer = hand.handPointer;
+    this->associatedDeckPosition = hand.associatedDeckPosition;
+    this->handPosition = hand.handPosition;
+}
+
+Hand::~Hand() {
+    //The deck pointer will already have been deleted by the time this destructor is called.
 }
 
 //Displays all cards in the current hand, at their respective indexes.
@@ -338,13 +342,9 @@ Hand& Hand::operator=(Hand hand) {
     *(this->deckPlayedWith) = *(hand.deckPlayedWith);
     *(hand.deckPlayedWith) = tempDeckPlayedWithPointer;
 
-    int tempDeckPointer = *(this->associatedDeckPointer);
-    *(this->associatedDeckPointer) = *(hand.associatedDeckPointer);
-    *(hand.associatedDeckPointer) = tempDeckPointer;
+    swap(this->associatedDeckPosition, hand.associatedDeckPosition);
 
-    int tempHandPointer = *(this->handPointer);
-    *(this->handPointer) = *(hand.handPointer);
-    *(hand.handPointer) = tempHandPointer;
+    swap(this->handPosition, hand.handPosition);
 
     return *this;
 }
@@ -362,29 +362,29 @@ Order* Hand::play(int cardIndex) {
     }
     //Removes the card from the hand, and sets the next empty spot in the hand to where the most recently played card originally was.
     this->cardsInHand[cardIndex] = nullptr;
-    *handPointer = cardIndex;
+    handPosition = cardIndex;
     return order;
 }
 
 //Adds a card to the current hand. Done in conjunction with the draw() method for the Deck class, which returns a drawn card (which is added to the current hand using this method).
 void Hand::addToHand(Card* card) {
-    //Adds the card to the first available position in the hand, indicated by handPointer.
-    this->cardsInHand[*handPointer] = card;
-    //Sets handPointer to the next free position in the hand (the next one with a null pointer).
-    *handPointer = *(handPointer) + 1;
-    while (this->cardsInHand[*handPointer] != nullptr) {
-        *handPointer = *(handPointer) + 1;
+    //Adds the card to the first available position in the hand, indicated by handPosition.
+    this->cardsInHand[handPosition] = card;
+    //Sets handPosition to the next free position in the hand (the next one with a null pointer).
+    handPosition++;
+    while (this->cardsInHand[handPosition] != nullptr) {
+        handPosition++;
     }
 }
 
 //Draws a card from the associated Deck, and adds it to the current hand.
 void Hand::drawCard() {
-    //Draws a card from the associated Deck, and adds it to the first available position in the hand, indicated by handPointer.
-    this->cardsInHand[*handPointer] = this->deckPlayedWith->draw();
-    //Sets handPointer to the next free position in the hand (the next one with a null pointer).
-    *handPointer = *(handPointer) + 1;
-    while (this->cardsInHand[*handPointer] != nullptr) {
-        *handPointer = *(handPointer) + 1;
+    //Draws a card from the associated Deck, and adds it to the first available position in the hand, indicated by handPosition.
+    this->cardsInHand[handPosition] = this->deckPlayedWith->draw();
+    //Sets handPosition to the next free position in the hand (the next one with a null pointer).
+    handPosition++;
+    while (this->cardsInHand[handPosition] != nullptr) {
+        handPosition++;
     }
 }
 
@@ -398,15 +398,5 @@ void Hand::displayCardsInHand() {
             //Uses the overridden stream output operator for the Card class to display card information.
             cout<<i<<": "<<this->cardsInHand[i]<<endl;
         }
-    }
-}
-
-//Cleans up all pointers by deleting them.
-void Hand::clean() {
-    delete this->handPointer;
-    delete this->associatedDeckPointer;
-    //Since the array pointer cannot be deleted itself, all 40 pointers to its elements must be deleted instead.
-    for (int i = 0; i < 40; i++) {
-        delete(this->cardsInHand[i]);
     }
 }

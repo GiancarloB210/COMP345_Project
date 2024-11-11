@@ -95,7 +95,4 @@ void testCards() {
     //proves that all cards in the deck can be drawn (as expected).
     cout<<*hand->deckPlayedWith<<endl;
     cout<<"Drawable cards in deck (after all have been played): "<<countDrawableCards(hand)<<endl;
-    //Clean up any lingering pointers in order to avoid any memory leakage.
-    hand->deckPlayedWith->clean();
-    hand->clean();
 }
