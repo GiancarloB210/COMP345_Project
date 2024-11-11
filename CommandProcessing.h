@@ -118,7 +118,6 @@ class FileCommandProcessorAdapter: public CommandProcessor {
     // Private Methods
     std::string readCommand();
     void saveCommand(Command* command);
-    bool validate(Command* command);
 
 public:
     // Constructors
@@ -144,6 +143,8 @@ public:
 
     // Public Methods
     Command* getCommand();
+    bool validate(Command* command);
+    std::string toString();
 
 };
 

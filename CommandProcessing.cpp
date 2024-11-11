@@ -61,6 +61,13 @@ CommandProcessor::CommandProcessor(CommandProcessor& commandProcessor) {
     this->commandList = commandProcessor.commandList;
 }
 
+// CommandProcessor Class Deconstructors
+CommandProcessor::~CommandProcessor() {
+    for (auto const& command : this->commandList) {
+        delete command;
+    }
+}
+
 // CommandProcessor Class Operators
 std::ostream& operator<<(std::ostream& os, CommandProcessor& commandProcessor) {
     std::string commands;
@@ -197,9 +204,101 @@ std::string FileLineReader::toString() {
     return ss.str();
 }
 
+// FileCommandProcessorAdapter Class Constructor
 FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string fileName) {
+    this->fileName = fileName;
+    this->fileLineReader = new FileLineReader(fileName);
+}
+
+// FileCommandProcessorAdapter Class Copy Constructor
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileCommandProcessorAdapter& fileCommanProcessorAdapter) {
+    this->fileName = fileCommanProcessorAdapter.fileName;
+    this->fileLineReader = fileCommanProcessorAdapter.fileLineReader;
+}
+
+// FileCommandProcessorAdapter Class Deconstructor
+FileCommandProcessorAdapter::~FileCommandProcessorAdapter() {
+    for (auto const& i : this->commandList) {
+        delete i;
+    }
+    delete fileLineReader;
+    fileLineReader = nullptr;
+}
+
+// FileCommandProcessorAdapter Class Operators
+FileCommandProcessorAdapter& FileCommandProcessorAdapter::operator=(const FileCommandProcessorAdapter& fileCommandProcessorAdapter) = default;
+
+std::ostream& operator<<(std::ostream& os, FileCommandProcessorAdapter& fileCommandProcessorAdapter) {
+    std::string commands;
+
+    for (auto const& i : fileCommandProcessorAdapter.getCommandList()) {
+        commands.append("\n" + i->toString());
+    }
+    return os << "FileCommandProcessorAdapter:" << "\nFile Name: " << fileCommandProcessorAdapter.getFileName()
+    << "\nCommand List:" << commands << std::endl;
+}
+
+// FileCommandProcessorAdapter CLass Accessors
+std::string FileCommandProcessorAdapter::getFileName() {
+    return this->fileName;
+}
+
+std::list<Command*> FileCommandProcessorAdapter::getCommandList() {
+    return this->commandList;
+}
+
+FileLineReader* FileCommandProcessorAdapter::getFileLineReader() {
+    return this->fileLineReader;
+}
+
+// FileCommandProcessorAdapter Class Mutators
+void FileCommandProcessorAdapter::setFileName(std::string fileName) {
     this->fileName = fileName;
 }
 
+void FileCommandProcessorAdapter::setCommandList(std::list<Command *> commandList) {
+    this->commandList = commandList;
+}
 
+void FileCommandProcessorAdapter::addCommand(Command *command) {
+    this->commandList.push_back(command);
+}
 
+void FileCommandProcessorAdapter::setFileLineReader(FileLineReader *fileLineReader) {
+    this->fileLineReader = fileLineReader;
+}
+
+// FileCommandProcessorAdapter Class Private Methods
+
+// readCommand() returns the next line from the commandsFile using the readLineFromFile() from fileLineReader
+std::string FileCommandProcessorAdapter::readCommand() {
+    return this->fileLineReader->readLineFromFile();
+}
+
+// saveCommand() takes in a pointer to a command and adds it to the back of FileCommandProcessorAdapter's commandList
+void FileCommandProcessorAdapter::saveCommand(Command* command) {
+    this->commandList.push_back(command);
+}
+
+// FileCommandProcessorAdapter Class Public Methods
+
+Command* FileCommandProcessorAdapter::getCommand() {
+    Command* command = new Command(readCommand());
+    saveCommand(command);
+    return command;
+}
+
+bool FileCommandProcessorAdapter::validate(Command* command) {
+    // TODO: Link with gameEngine
+    if(false) {
+        command->saveEffect("Invalid command entered.");
+    }
+}
+
+// toString() uses the overloaded << operator to generate a formatted string containing the values of the
+// FileCommandProcessorAdapter's data members
+std::string FileCommandProcessorAdapter::toString() {
+    std::stringstream ss;
+    ss << *this;
+    return ss.str();
+}g
