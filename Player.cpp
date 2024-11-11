@@ -2,51 +2,85 @@
 #include <iostream>
 #include <algorithm>
 
-// Parameterized constructor
+// Parameterized constructor (without name input)
 Player::Player(std::list<Territory*>* territories, Hand* hand) {
+    this->playerID = staticPlayerID;
+    staticPlayerID++;
+    this->name = "No Name";
     this->territories = new std::list<Territory*>(*territories);
     this->hand = new Hand(*hand);
     this->orders = new OrderList();
+    this->armyUnits = std::vector<ArmyUnit*>();
+}
+
+// Parameterized constructor (with name input)
+Player::Player(std::string newName, std::list<Territory*>* territories, Hand* hand) {
+    this->playerID = staticPlayerID;
+    staticPlayerID++;
+    this->name = newName;
+    this->territories = new std::list<Territory*>(*territories);
+    this->hand = new Hand(*hand);
+    this->orders = new OrderList();
+    this->armyUnits = std::vector<ArmyUnit*>();
 }
 
 // Copy constructor (deep copy)
 Player::Player(const Player& player) {
+    this->playerID = staticPlayerID;
+    staticPlayerID++;
+    this->name = player.name;
     this->territories = new std::list<Territory*>(*player.territories);
     this->hand = new Hand(*player.hand);
     this->orders = new OrderList(*player.orders);
+    this->armyUnits = std::vector<ArmyUnit*>(player.armyUnits);
 }
 
 // Destructor to clean up dynamic memory
 Player::~Player() {
-    delete territories;
-    delete hand;
-    delete orders;
+    delete this->territories;
+    this->territories = NULL;
+    delete this->hand;
+    this->hand = NULL;
+    delete this->orders;
+    this->orders = NULL;
+    for (int i = 0;i < this->armyUnits.size();i++) {
+        delete this->armyUnits[i];
+        this->armyUnits[i] = NULL;
+    }
+    this->armyUnits.clear();
 }
 
 // Assignment operator (deep copy)
 Player& Player::operator=(const Player& player) {
     if (this != &player) {
         // Clean up existing dynamic memory
-        delete territories;
-        delete hand;
-        delete orders;
+        delete this->territories;
+        delete this->hand;
+        delete this->orders;
+        this->armyUnits.clear();
 
         // Allocate new memory and copy the content
+        this->playerID = player.playerID;
+        this->name = player.name;
         this->territories = new std::list<Territory*>(*player.territories);
         this->hand = new Hand(*player.hand);
         this->orders = new OrderList(*player.orders);
+        this->armyUnits = std::vector<ArmyUnit*>(player.armyUnits);
     }
     return *this;
 }
 
 // Stream insertion operator for printing player information
 std::ostream& operator<<(std::ostream& out, const Player& player) {
+    out << "Player's ID: " << player.playerID << endl;
+    out << "Player's name: " << player.name << endl;
     out << "Player's territories to defend: ";
     for (Territory* t : *(player.territories)) {
         out << t->getName() << " ";
     }
     out << "\nPlayer's hand of cards: " << *(player.hand);
     out << "\nPlayer's list of orders: " << *(player.orders);
+    out << "\nPlayer's number of army units: " << player.armyUnits.size();
     return out;
 }
 

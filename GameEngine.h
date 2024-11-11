@@ -3,7 +3,9 @@
 
 #include <string>
 #include <map>
-#include <iostream> 
+#include <iostream>
+
+#include "Map.h"
 
 // All states in the game
 enum class State {
@@ -11,6 +13,7 @@ enum class State {
     MAP_LOADED,
     MAP_VALIDATED,
     PLAYERS_ADDED,
+    GAMESTART,
     ASSIGN_REINFORCEMENT,
     ISSUE_ORDERS,
     EXECUTE_ORDERS,
@@ -37,12 +40,20 @@ private:
     State currentState;  // Current state of the game
     std::map<State, std::map<std::string, State>> stateTransitions;  // Map of valid state transitions
     void setupTransitions();  // Function to setup valid state transitions
+    string currentMapPath; //Currently loaded map path.
+    Map* currentMap; //Currently loaded map.
+    Deck* gameDeck; //Deck which will be used for the game.
+    int numPlayers; //Number of players who will be playing the game.
+    std::vector<Player*> gamePlayers; //Vector of players who will be playing the game.
+    std::vector<int> playerOrder; //Turn order of players who will be playing the game.
 
 public:
     // Constructors
     GameEngine();  // Default constructor
     GameEngine(const GameEngine& other);  // Copy constructor
     GameEngine& operator=(const GameEngine& other);  // Assignment operator
+
+    ~GameEngine();  // Destructor
 
     // Overloaded stream insertion operator
     friend std::ostream& operator<<(std::ostream& os, const GameEngine& engine);
@@ -51,6 +62,7 @@ public:
     void handleCommand(const std::string& command);
     void printState() const; 
     bool isValidCommand(const std::string& command) const;
+    void startupPhase();
 };
 
 #endif
