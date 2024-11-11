@@ -4,33 +4,102 @@
 
 using namespace std;
 
-void testOrdersLists()
+void testOrdersExecution()
 {
 	OrderList orders; //Creates empty list of orders
 
-	//Adds orders to the list using Order constructor for OTHER orders and Subclasses constructors for the other valid ones 
-	orders.add(new Order("Attack"));
-	orders.add(new DeployOrder()); 
-	orders.add(new AdvanceOrder());
-	orders.add(new Order("Defend"));
-	orders.add(new BlockadeOrder()); 
-	orders.add(new NegotiateOrder());
-	orders.add(new Order("Sleep"));
-	orders.add(new BombOrder());
-	orders.add(new Order("Pass"));
-	orders.add(new AirliftOrder());
-	
-	//Test 1: Printing all the orders
+	//Create lists of adjacent territories
+	std::list<std::string> t1Adj = { "t4", "t5", "t2" };
+	std::list<std::string> t2Adj = { "t1", "t6" };
+	std::list<std::string> t3Adj = { "t6" };
+	std::list<std::string> t4Adj = { "t1", "t8" };
+	std::list<std::string> t5Adj = { "t1", "t7" };
+	std::list<std::string> t6Adj = { "t2", "t3", "t7", "t9" };
+	std::list<std::string> t7Adj = { "t5", "t6", "t8" };
+	std::list<std::string> t8Adj = { "t4", "t7", "t10" };
+	std::list<std::string> t9Adj = { "t6", "t10" };
+	std::list<std::string> t10Adj = { "t9", "t8" };
+
+	//We create territories to use
+	Territory* t1 = new Territory("t1", "Tutuland", 0, 0, t1Adj);
+	Territory* t2 = new Territory("t2", "Tutuland", 1, 0, t2Adj);
+	Territory* t3 = new Territory("t3", "Tutuland", 2, 0, t3Adj);
+	Territory* t4 = new Territory("t4", "Tutuland", 0, 1, t4Adj);
+	Territory* t5 = new Territory("t5", "Tutuland", 1, 1, t5Adj);
+	Territory* t6 = new Territory("t6", "Tutuland", 2, 1, t6Adj);
+	Territory* t7 = new Territory("t7", "Tutuland", 0, 2, t7Adj);
+	Territory* t8 = new Territory("t8", "Tutuland", 1, 2, t8Adj);
+	Territory* t9 = new Territory("t9", "Tutuland", 2, 2, t9Adj);
+	Territory* t10 = new Territory("t10", "Tutuland", 0, 3, t10Adj);
+
+	//We create a list of territories (2 to have one for each player)
+	std::list<Territory*> territoriesList1 = { t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 };
+	std::list<Territory*> territoriesList2 = { t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 };
+
+	//We create players and a hand for them
+	Hand* hd = new Hand();
+	Player* P1 = new Player(&territoriesList1, hd);
+	Player* P2 = new Player(&territoriesList2, hd);
+
+	//We set players for each territory
+	t1->setPlayer(P1);
+	t2->setPlayer(P1);
+	t3->setPlayer(P1);
+	t4->setPlayer(P1);
+	t5->setPlayer(P1);
+	t6->setPlayer(P2);
+	t7->setPlayer(P2);
+	t8->setPlayer(P2);
+	t9->setPlayer(P2);
+	t10->setPlayer(P2);
+
+	//We set amount of armies in each territory
+	t1->setArmyCount(3);
+	t2->setArmyCount(4);
+	t3->setArmyCount(2);
+	t4->setArmyCount(2);
+	t5->setArmyCount(5);
+	t6->setArmyCount(5);
+	t7->setArmyCount(6);
+	t8->setArmyCount(2);
+	t9->setArmyCount(4);
+	t10->setArmyCount(3);
+
+
+
+
+
+	//Adds orders to the list using Orders constructors
+	orders.add(new DeployOrder(P1, t5, 8)); //We, as Player 1, add 8 armies to territory 5
+	orders.add(new AdvanceOrder(P1, t1, t5, 2)); //We, as Player 1, move 2 armies from territory 1 to territory 5
+	orders.add(new BlockadeOrder(P1, t4)); //We, as Player 1, blockade territory 4 
+	orders.add(new BombOrder(P1, t7)); //We, as Player 1, bomb territory 7
+	orders.add(new AdvanceOrder(P1, t5, t7, 15)); //We, as Player 1, move 15 armies from territory 5 to territory 7, and attack
+	orders.add(new NegotiateOrder(P1, P2)); //We negitate an armistice with Player 2
+	orders.add(new AdvanceOrder(P1, t2, t6, 4)); //We, as Player 1, move 2 armies from territory 2 to territory 6, and attack (Should be invalid due to armistice)
+	orders.add(new AirliftOrder(P1, t2, t3, 4)); //We, as Player 1, airlift 4 armies from territory 2 to territory 3
+
+	//Test 1: Printing all the orders and execute
 	cout << "---------------------------------------------------------------------------------\n1st Test\n";
 	int i = 1; //Create a integer to enumerate orders
 	for (Order* ord : orders.getList()) //Reads Order in list one by one
 	{
 		//Print name, description and effect of order. Execute function is also launch to see if it is valid
-		cout << i << "." << ord->getType() << "\nDescription: " << ord->getDescription() << "\nEffect: " << ord->getEffect() << "\nExecution: " << ord->execute() << "\n";
+		cout << i << "." << ord->getType() << "\nDescription: " << ord->getDescription() << "\nEffect: " << ord->getEffect() << "\n Executing... \n";
+		ord->execute();
+		cout << "\n\n";
 		i++;
 	}
 	i = 1;
 
+
+
+
+
+
+
+
+	/*
 	//Test 2: Move order inside list and print to see new order
 	cout << "\n\n---------------------------------------------------------------------------------\n2nd Test\n";
 	orders.move(2, 6);//Move method launched
@@ -71,9 +140,45 @@ void testOrdersLists()
 		cout << i << "." << ord->getType() << "\n";
 		i++;
 	}
+	*/
+	for (Order* ord : orders.getList()) //Reads Order in list one by one
+	{
+		delete ord;
+	}
+
+	delete P1;
+	delete P2;
+	delete hd;
+
+	delete t1;
+	delete t2;
+	delete t3;
+	delete t4;
+	delete t5;
+	delete t6;
+	delete t7;
+	delete t8;
+	delete t9;
+	delete t10;
+
+	P1 = NULL;
+	P2 = NULL;
+	hd = NULL;
+
+	t1 = NULL;
+	t2 = NULL;
+	t3 = NULL;
+	t4 = NULL;
+	t5 = NULL;
+	t6 = NULL;
+	t7 = NULL;
+	t8 = NULL;
+	t9 = NULL;
+	t10 = NULL;
+
 }
 
-// int main()
-// {
-// 	testOrdersLists();
-// }
+int main()
+{
+	testOrdersExecution();
+}
