@@ -67,12 +67,13 @@ GameEngine::~GameEngine() {
 // setup all valid state transitions based on commands and states
 void GameEngine::setupTransitions() {
     // Transitions for the startup phase
-    stateTransitions[State::START]["loadmap"] = State::MAP_LOADED;
-    stateTransitions[State::MAP_LOADED]["validatemap"] = State::MAP_VALIDATED;
-    stateTransitions[State::MAP_VALIDATED]["addplayer"] = State::PLAYERS_ADDED;
+    stateTransitions[State::START]["loadmap"] = State::MAP_LOADED; //Required for Part 2. A shortcut has been added for selecting the map from a list of files from a directory where all of the map files are
+    stateTransitions[State::MAP_LOADED]["validatemap"] = State::MAP_VALIDATED; //Required for Part 2.
+    stateTransitions[State::MAP_VALIDATED]["addplayer"] = State::PLAYERS_ADDED; //Required for Part 2. A shortcut has been taken for allowing all of the players to be added at once.
 
     // Transitions for the play phase
     stateTransitions[State::PLAYERS_ADDED]["assigncountries"] = State::ASSIGN_REINFORCEMENT;
+    stateTransitions[State::PLAYERS_ADDED]["gamestart"] = State::ASSIGN_REINFORCEMENT; //Required for Part 2.
     stateTransitions[State::ASSIGN_REINFORCEMENT]["issueorder"] = State::ISSUE_ORDERS;
     stateTransitions[State::ISSUE_ORDERS]["endissueorders"] = State::EXECUTE_ORDERS;
     stateTransitions[State::EXECUTE_ORDERS]["win"] = State::WIN;
@@ -82,7 +83,7 @@ void GameEngine::setupTransitions() {
     stateTransitions[State::WIN]["end"] = State::END;
 
     // Restart the game
-    stateTransitions[State::WIN]["play"] = State::START;
+    stateTransitions[State::WIN]["replay"] = State::START;
 
     // Loop for issuing and executing orders
     stateTransitions[State::ISSUE_ORDERS]["issueorder"] = State::ISSUE_ORDERS;
@@ -90,12 +91,27 @@ void GameEngine::setupTransitions() {
 
     // Loop for loading maps and adding players
     stateTransitions[State::MAP_LOADED]["loadmap"] = State::MAP_LOADED;
-    stateTransitions[State::PLAYERS_ADDED]["addplayer"] = State::PLAYERS_ADDED;
+    //stateTransitions[State::PLAYERS_ADDED]["addplayer"] = State::PLAYERS_ADDED; //Not needed due to all players being added at once in earlier line.
 }
 
 // handle user input commands and transition game states
 void GameEngine::handleCommand(const std::string& command) {
     if (isValidCommand(command)) {
+        if (this->currentState == State::START && command == "loadmap") {
+            loadMap();
+        }
+        if (this->currentState == State::MAP_LOADED && command == "loadmap") {
+            loadMap();
+        }
+        if (this->currentState == State::MAP_LOADED && command == "validatemap") {
+            validateMap();
+        }
+        if (this->currentState == State::MAP_VALIDATED && command == "addplayer") {
+            setUpPlayers();
+        }
+        if (this->currentState == State::PLAYERS_ADDED && command == "startGame") {
+            startGame();
+        }
         currentState = stateTransitions[currentState][command];
         printState();
     } else {
@@ -103,7 +119,7 @@ void GameEngine::handleCommand(const std::string& command) {
     }
 }
 
-void GameEngine::startupPhase() {
+void GameEngine::loadMap() {
     //The map files are located here.
     fs::directory_iterator mapFileDir("../MapFiles");
     int mapFileIndex = 0;
@@ -158,7 +174,9 @@ void GameEngine::startupPhase() {
 
     //The file at this path will be validated in the sequentially next state.
     this->currentMapPath = mapFilePaths[selectedMapIndex];
+}
 
+void GameEngine::validateMap() {
     //Validate that the map is valid. If it's invalid, return to the start state.
     //If it's valid, continue as usual.
     MapLoader mapLoader;
@@ -170,10 +188,10 @@ void GameEngine::startupPhase() {
     if (!(currentMap->validate(currentMap))) {
         cout << "Invalid map loaded." << endl;
         currentState = State::START;
-        printState();
-        return;
     }
+}
 
+void GameEngine::setUpPlayers() {
     //Sets the number of players to be added to the game.
     int numberOfPlayers;
     bool validPlayerNumberCheck = false;
@@ -258,9 +276,27 @@ void GameEngine::startupPhase() {
     }
 
     cout << "Cards drawn." << endl;
+}
 
-    //TO DO: update game logic from this point.
-    currentState = State::GAMESTART;
+void GameEngine::startGame() {
+    cout<<"The game has been started"<<endl;
+}
+
+void GameEngine::startupPhase() {
+    string inputCommand;
+    while (this->currentState != State::ASSIGN_REINFORCEMENT) {
+        if (this->currentState == State::START) {
+            this->printState();
+        }
+        std::cout << "Enter command (type 'exit' to stop): ";
+        std::cin >> inputCommand;
+        std::cout << std::endl;
+        // Exit the loop if the user types 'exit'
+        if (inputCommand == "exit") {
+            break;
+        }
+        this->handleCommand(inputCommand);
+    }
 }
 
 
@@ -437,4 +473,8 @@ std::ostream& operator<<(std::ostream& os, const GameEngine& engine) {
             break;
     }
     return os;
+}
+
+std::string GameEngine::stringToLog() {
+
 }

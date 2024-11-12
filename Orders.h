@@ -3,14 +3,19 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <list>
 
-#include "Map.h"
-#include "Player.h"
+// #include "Map.h"
+// #include "Player.h"
 #include "LogObserver.h"
+
+
 
 //using namespace std;
 
 //Order class and OrderList class forward declarations
+class Player;
+class Territory;
 class Order;
 class OrderList;
 
@@ -27,8 +32,8 @@ std::ostream& operator << (std::ostream& os, OrderList& orderlist);
 std::ostream& operator << (std::ostream& os, Order& order);
 
 //Global Variables
-bool GetCard = false;
-std::list<Player*> Armistice;
+// bool GetCard = false;
+// std::list<Player*> Armistice;
 
 class OrderList: public Subject, public ILoggable
 {

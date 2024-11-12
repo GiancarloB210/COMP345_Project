@@ -7,6 +7,8 @@
 #include "LogObserver.h" 
 
 #include "Map.h"
+#include "ILoggable.h"
+#include "Subject.h"
 
 // All states in the game
 enum class State {
@@ -79,6 +81,12 @@ public:
             std::cout << "Invalid command: " << command << std::endl;
         }
     }
+    //Startup methods
+    void loadMap();
+    void validateMap();
+    void setUpPlayers();
+    void startGame();
+
 };
 
 #endif
