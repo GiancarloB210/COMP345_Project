@@ -569,3 +569,7 @@ std::ostream& operator<<(std::ostream& os, const GameEngine& engine) {
     }
     return os;
 }
+
+std::string GameEngine::stringToLog() {  
+
+}

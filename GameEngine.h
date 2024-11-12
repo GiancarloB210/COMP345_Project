@@ -10,6 +10,9 @@
 #include "Map.h"
 #include "Player.h"
 #include "Orders.h"
+#include "ILoggable.h"
+#include "Subject.h"
+
 
 // All states in the game
 enum class State {
@@ -39,7 +42,7 @@ enum class Command {
 };
 
 // Game engine that controls state transitions
-class GameEngine {
+class GameEngine: public ILoggable, public Subject {
 private:
     State currentState;  // Current state of the game
     std::map<State, std::map<std::string, State>> stateTransitions;  // Map of valid state transitions
@@ -84,6 +87,9 @@ public:
     void issueOrdersPhase();          // Issuing orders phase function
     void executeOrdersPhase();        // Orders execution phase function
     bool isGameOver();                // Check if the game is over
+  
+    //Overridden virtual methods
+    std::string stringToLog();
 };
 
 #endif
