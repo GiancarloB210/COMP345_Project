@@ -4,21 +4,20 @@
 #include <filesystem>
 #include <random>
 
-namespace fs = std::__fs::filesystem;
+namespace fs = std::filesystem;
 using namespace std;
 
 // Default constructor 
 GameEngine::GameEngine() : currentState(State::START) {
     setupTransitions();
-    this->currentMap = nullptr; //no map initialized as of yet.
-    this->currentMapPath = ""; //no map initialized as of yet.
+    this->currentMap = nullptr;
+    this->currentMapPath = "";
     this->gameDeck = new Deck();
     this->numPlayers = 1;
 }
 
 // Copy constructor
 GameEngine::GameEngine(const GameEngine& other) {
-    // Deep copy of the current state and transitions
     this->currentState = other.currentState;
     this->stateTransitions = other.stateTransitions;
     this->currentMap = new Map(*other.currentMap);
@@ -36,7 +35,7 @@ GameEngine::GameEngine(const GameEngine& other) {
 
 // Assignment operator
 GameEngine& GameEngine::operator=(const GameEngine& other) {
-    if (this != &other) {  // Self-assignment check
+    if (this != &other) {
         this->currentState = other.currentState;
         this->stateTransitions = other.stateTransitions;
         this->currentMap = new Map(*other.currentMap);
@@ -66,58 +65,137 @@ GameEngine::~GameEngine() {
 
 // setup all valid state transitions based on commands and states
 void GameEngine::setupTransitions() {
-    // Transitions for the startup phase
-    stateTransitions[State::START]["loadmap"] = State::MAP_LOADED; //Required for Part 2. A shortcut has been added for selecting the map from a list of files from a directory where all of the map files are
-    stateTransitions[State::MAP_LOADED]["validatemap"] = State::MAP_VALIDATED; //Required for Part 2.
-    stateTransitions[State::MAP_VALIDATED]["addplayer"] = State::PLAYERS_ADDED; //Required for Part 2. A shortcut has been taken for allowing all of the players to be added at once.
-
-    // Transitions for the play phase
-    stateTransitions[State::PLAYERS_ADDED]["assigncountries"] = State::ASSIGN_REINFORCEMENT;
-    stateTransitions[State::PLAYERS_ADDED]["gamestart"] = State::ASSIGN_REINFORCEMENT; //Required for Part 2.
+    stateTransitions[State::START]["loadmap"] = State::MAP_LOADED;
+    stateTransitions[State::MAP_LOADED]["validatemap"] = State::MAP_VALIDATED;
+    stateTransitions[State::MAP_VALIDATED]["addplayer"] = State::PLAYERS_ADDED;
+    stateTransitions[State::PLAYERS_ADDED]["gamestart"] = State::ASSIGN_REINFORCEMENT;
     stateTransitions[State::ASSIGN_REINFORCEMENT]["issueorder"] = State::ISSUE_ORDERS;
     stateTransitions[State::ISSUE_ORDERS]["endissueorders"] = State::EXECUTE_ORDERS;
     stateTransitions[State::EXECUTE_ORDERS]["win"] = State::WIN;
     stateTransitions[State::EXECUTE_ORDERS]["endexecorders"] = State::ASSIGN_REINFORCEMENT;
-
-    // End the game
     stateTransitions[State::WIN]["end"] = State::END;
-
-    // Restart the game
     stateTransitions[State::WIN]["replay"] = State::START;
-
-    // Loop for issuing and executing orders
     stateTransitions[State::ISSUE_ORDERS]["issueorder"] = State::ISSUE_ORDERS;
     stateTransitions[State::EXECUTE_ORDERS]["execorder"] = State::EXECUTE_ORDERS;
-
-    // Loop for loading maps and adding players
     stateTransitions[State::MAP_LOADED]["loadmap"] = State::MAP_LOADED;
-    //stateTransitions[State::PLAYERS_ADDED]["addplayer"] = State::PLAYERS_ADDED; //Not needed due to all players being added at once in earlier line.
 }
 
-// handle user input commands and transition game states
+
+// Main Game Loop Method
+void GameEngine::mainGameLoop() {
+    while (!isGameOver()) {
+        reinforcementPhase();   // Assign reinforcements automatically
+        issueOrdersPhase();     // Players issue orders in a round-robin fashion
+        executeOrdersPhase();   // Execute orders in a round-robin fashion
+    }
+    std::cout << "Game over! The winner is " << gamePlayers[0]->getName() << "!" << std::endl;
+}
+
+// Reinforcement Phase Method
+void GameEngine::reinforcementPhase() {
+    for (Player* player : gamePlayers) {
+        // Calculate the number of reinforcements based on territories owned
+        int baseReinforcements = std::max(3, static_cast<int>(player->getTerritories().size() / 3));
+        int continentBonus = 0;
+
+        // Calculate continent bonus
+        for (const auto& continent : currentMap->getContinents()) {
+            bool ownsAll = true;
+            for (const auto& territory : continent->getTerritories()) {
+                if (territory->getPlayer() != player) {
+                    ownsAll = false;
+                    break;
+                }
+            }
+            if (ownsAll) {
+                continentBonus += continent->getScore();
+            }
+        }
+
+        // Total reinforcements
+        int totalReinforcements = baseReinforcements + continentBonus;
+        player->addToReinforcementPool(totalReinforcements);
+
+        // Output message about reinforcements
+        std::cout << player->getName() << " receives " << totalReinforcements << " army units." << std::endl;
+    }
+
+    // After reinforcements, explicitly transition to the next phase (Issue Orders)
+    currentState = State::ISSUE_ORDERS;  // Transition to the issue orders phase
+    std::cout << "Transitioning to the Issue Orders Phase." << std::endl;
+}
+
+
+
+// Issue Orders Phase Method
+void GameEngine::issueOrdersPhase() {
+    bool ordersPending;
+    do {
+        ordersPending = false;
+        for (Player* player : gamePlayers) {
+            if (player->reinforcementPool > 0 || player->hasMoreOrders()) {
+                player->issueOrder();
+                ordersPending = true;
+            }
+        }
+    } while (ordersPending);
+}
+
+// Execute Orders Phase Method
+void GameEngine::executeOrdersPhase() {
+    bool ordersLeft;
+    do {
+        ordersLeft = false;
+        for (Player* player : gamePlayers) {
+            if (player->hasMoreOrders()) {
+                player->getNextOrder()->execute();
+                ordersLeft = true;
+            }
+        }
+    } while (ordersLeft);
+}
+
+// Check if the game is over
+bool GameEngine::isGameOver() {
+    int activePlayers = 0;
+    for (Player* player : gamePlayers) {
+        if (player->ownsTerritory()) {
+            activePlayers++;
+        }
+    }
+    return activePlayers <= 1;
+}
+
 void GameEngine::handleCommand(const std::string& command) {
     if (isValidCommand(command)) {
         if (this->currentState == State::START && command == "loadmap") {
             loadMap();
         }
-        if (this->currentState == State::MAP_LOADED && command == "loadmap") {
-            loadMap();
-        }
-        if (this->currentState == State::MAP_LOADED && command == "validatemap") {
+        else if (this->currentState == State::MAP_LOADED && command == "validatemap") {
             validateMap();
         }
-        if (this->currentState == State::MAP_VALIDATED && command == "addplayer") {
-            setUpPlayers();
+        else if (this->currentState == State::MAP_VALIDATED && command == "addplayer") {
+            setUpPlayers();  // Only add players, don't set the state here since setUpPlayers handles it
         }
-        if (this->currentState == State::PLAYERS_ADDED && command == "startGame") {
-            startGame();
+        else if (this->currentState == State::PLAYERS_ADDED && command == "gamestart") {
+            startGame();  // Transition from PLAYERS_ADDED to ASSIGN_REINFORCEMENT
+            mainGameLoop();  // Begin the main game loop
         }
-        currentState = stateTransitions[currentState][command];
-        printState();
+        // handle transitions for ISSUE_ORDERS phase
+        else if (this->currentState == State::ISSUE_ORDERS && command == "issueorder") {
+            issueOrdersPhase();  // Start issuing orders
+        }
+
+        // Update the state after the command execution if there was no internal state change
+        if (stateTransitions[currentState].find(command) != stateTransitions[currentState].end()) {
+            currentState = stateTransitions[currentState][command];
+        }
     } else {
         std::cout << "Invalid command: " << command << std::endl;
     }
 }
+
+
 
 void GameEngine::loadMap() {
     //The map files are located here.
@@ -192,11 +270,11 @@ void GameEngine::validateMap() {
 }
 
 void GameEngine::setUpPlayers() {
-    //Sets the number of players to be added to the game.
+    // Sets the number of players to be added to the game.
     int numberOfPlayers;
     bool validPlayerNumberCheck = false;
 
-    //Prevents the user from inputting a non-numerical input or invalid number of players.
+    // Prevents the user from inputting a non-numerical input or invalid number of players.
     while (!validPlayerNumberCheck) {
         cout << "Enter the number of players (2-6) which you would like to add." << endl;
         cin >> numberOfPlayers;
@@ -209,85 +287,102 @@ void GameEngine::setUpPlayers() {
         }
     }
 
-    //Every player only needs a name to be inputted, since their list of territories
-    //is empty by default and their hands all pertain to the game deck.
-    for (int i = 0;i < numberOfPlayers; i++) {
+    // Every player only needs a name to be inputted.
+    for (int i = 0; i < numberOfPlayers; i++) {
         string newPlayerName;
         cout << "Enter the name of player " << (i + 1) << endl;
         cin >> newPlayerName;
         Player* p = new Player(newPlayerName, new std::list<Territory*>, new Hand(gameDeck));
 
-        //Add the player to the list of game players.
+        // Add the player to the list of game players.
         this->gamePlayers.push_back(p);
     }
 
-    //Fairly distribute the territories among players.
-    std::list<Territory *> mapTerritories= this->currentMap->getTerritories();
-    cout<<"mapTerritories: "<<mapTerritories.size()<<endl;
-    cout<<"Number of players: "<<this->gamePlayers.size()<<endl;
-    //Establishes how many territories each player should receive
-    //such that the distribution is fair.
+    // Transition state to PLAYERS_ADDED once players are added
+    currentState = State::PLAYERS_ADDED;
+    cout << "Players added. Now, issue the gamestart command to start the game!" << endl;
+}
+
+
+
+void GameEngine::distributeTerritories() {
+    std::list<Territory *> mapTerritories = this->currentMap->getTerritories();
     int territoriesPerPlayer = mapTerritories.size() / this->gamePlayers.size();
-    cout<<"Territories per player: " << territoriesPerPlayer<<endl;
     int territoryCounter = 0, playerCount = 0;
+
     for (Territory* territory : mapTerritories) {
-        //Makes sure that every player receives the number of territories that each player should have
-        //in accordance with fair distribution. Also, set a player's territory's associated player to that player.
         territory->setPlayer(this->gamePlayers[playerCount]);
         this->gamePlayers[playerCount]->territories->push_back(territory);
         territoryCounter++;
-        //If a player has been assigned their maximum number of territories,
-        //move on to the next player (the next territory will be assigned to them).
+
         if (territoryCounter == territoriesPerPlayer) {
             playerCount++;
-            //Checks to see if enough territories can be allocated.
-            //If not, move on to next step (shuffling player IDs for turn order determination).
-            if ((mapTerritories.size() - (playerCount * territoryCounter)) < territoriesPerPlayer) {
-                break;
-            }
             territoryCounter = 0;
         }
     }
-    cout << "Territories distributed" << endl;
+    cout << "Territories distributed to players." << endl;
+}
 
-    //Randomly determines player order.
-    std::vector<int> playerIDs;
+void GameEngine::determinePlayerOrder() {
+    // Randomly shuffle the player order
+    std::vector<int> playerIDs(this->gamePlayers.size());
+    for (int i = 0; i < this->gamePlayers.size(); i++) {
+        playerIDs[i] = i;
+    }
 
-    cout << "Player IDs added" << endl;
+    shuffle(playerIDs.begin(), playerIDs.end(), std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()));
 
-    //Code for shuffling an array and obtaining a true random generation using a time-oriented seed sourced from: https://cplusplus.com/reference/algorithm/shuffle/
-    shuffle(std::begin(this->playerOrder), std::end(this->playerOrder), std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()));
+    // Store the shuffled player order
+    for (int id : playerIDs) {
+        this->playerOrder.push_back(id);
+    }
+    cout << "Player order randomized." << endl;
+}
 
-    cout << "Player IDs shuffled" << endl;
-
-    //Allocates 50 army units to each player
-    for (int j = 0;j < this->gamePlayers.size();j++) {
-        for (int k = 0;k < 50;k++) {
+void GameEngine::allocateInitialArmies() {
+    for (int j = 0; j < this->gamePlayers.size(); j++) {
+        for (int k = 0; k < 50; k++) {
             this->gamePlayers[j]->armyUnits.push_back(new ArmyUnit(this->gamePlayers[j]));
         }
     }
+    cout << "Army units allocated to players." << endl;
+}
 
-    cout << "Army units allocated." << endl;
-
-    //Each player draws 2 cards.
-    for (int i = 0;i < this->gamePlayers.size();i++) {
+void GameEngine::drawInitialCards() {
+    for (int i = 0; i < this->gamePlayers.size(); i++) {
         this->gamePlayers[i]->hand->drawCard();
         this->gamePlayers[i]->hand->drawCard();
     }
-
-    cout << "Cards drawn." << endl;
+    cout << "Initial cards drawn for players." << endl;
 }
+
+
 
 void GameEngine::startGame() {
-    cout<<"The game has been started"<<endl;
+    cout << "The game has been started." << endl;
+
+    // Fairly distribute all the territories to the players
+    distributeTerritories();
+
+    // Randomly determine the order of play
+    determinePlayerOrder();
+
+    // Give 50 initial army units to each player
+    allocateInitialArmies();
+
+    // Let each player draw 2 initial cards from the deck
+    drawInitialCards();
+
+    // Switch the game to the play phase
+    currentState = State::ASSIGN_REINFORCEMENT; // Ready for reinforcement phase
+    cout << "Game started. It's now time for the reinforcement phase!" << endl;
 }
+
 
 void GameEngine::startupPhase() {
     string inputCommand;
     while (this->currentState != State::ASSIGN_REINFORCEMENT) {
-        if (this->currentState == State::START) {
-            this->printState();
-        }
+        this->printState();
         std::cout << "Enter command (type 'exit' to stop): ";
         std::cin >> inputCommand;
         std::cout << std::endl;
@@ -434,7 +529,7 @@ void GameEngine::printState() const {
     }
 }
 
-// Overloaded stream insertion operator 
+// Overloaded stream insertion operator
 std::ostream& operator<<(std::ostream& os, const GameEngine& engine) {
     os << "Current game state: ";
     switch (engine.currentState) {
@@ -475,6 +570,6 @@ std::ostream& operator<<(std::ostream& os, const GameEngine& engine) {
     return os;
 }
 
-std::string GameEngine::stringToLog() {
+std::string GameEngine::stringToLog() {  
 
 }
