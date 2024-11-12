@@ -285,7 +285,9 @@ void GameEngine::startGame() {
 void GameEngine::startupPhase() {
     string inputCommand;
     while (this->currentState != State::ASSIGN_REINFORCEMENT) {
-        this->printState();
+        if (this->currentState == State::START) {
+            this->printState();
+        }
         std::cout << "Enter command (type 'exit' to stop): ";
         std::cin >> inputCommand;
         std::cout << std::endl;
