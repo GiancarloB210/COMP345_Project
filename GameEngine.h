@@ -73,7 +73,7 @@ public:
     void startGame();
 
     //Overridden virtual methods
-    virtual std::string stringToLog();
+    std::string stringToLog();
 };
 
 #endif

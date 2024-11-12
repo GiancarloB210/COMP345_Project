@@ -476,5 +476,5 @@ std::ostream& operator<<(std::ostream& os, const GameEngine& engine) {
 }
 
 std::string GameEngine::stringToLog() {
-    
+
 }
