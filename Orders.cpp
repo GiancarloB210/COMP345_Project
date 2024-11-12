@@ -1,4 +1,3 @@
-
 #include "Orders.h"
 #include "Map.h"
 
@@ -31,6 +30,17 @@ OrderList::~OrderList() {}
 std::vector<Order*> OrderList::getList()
 {
 	return ListofOrders;
+}
+
+//Returns the global variable accessors
+std::list<Player*> OrderList::getArmistice()
+{
+	return Armistice;
+}
+
+bool OrderList::isGettingCard()
+{
+	return GetCard;
 }
 
 //Methods
@@ -100,6 +110,8 @@ void OrderList::remove(int Pos)
 	}
 }
 
+
+
 //Operators
 std::ostream& operator << (std::ostream& os, OrderList& orderlist)
 {
@@ -118,7 +130,7 @@ OrderList& OrderList::operator=(const OrderList& order) = default;
 //--------------------------------------------------------------------------------------------------------
 
 //Constructors
-Order::Order() { isDefaultOrder = true;} //Default Constructor (Used for subclasses)
+Order::Order() { isDefaultOrder = true; } //Default Constructor (Used for subclasses)
 Order::Order(Player* CurrentPlayer, std::string type)  //Parameter Constructor (Used to create other orders)
 {
 	this->CurrentPlayer = CurrentPlayer;
@@ -226,7 +238,7 @@ bool DeployOrder::validate()
 void DeployOrder::execute()
 {
 	if (isDefaultOrder)
-		cout << "This order is default and invalid";
+		cout << "This order is default and invalid\n";
 	else if (validate())
 	{
 		int TotalArmies = ArmiesToAdd + target->getArmyCount();
@@ -234,7 +246,7 @@ void DeployOrder::execute()
 	}
 	else
 	{
-		cout << "Deploy Order is not valid";
+		cout << "Deploy Order is not valid\n";
 	}
 }
 
@@ -301,7 +313,7 @@ void AdvanceOrder::execute()
 {
 	if (isDefaultOrder)
 	{
-		cout << "This order is default and invalid";
+		cout << "This order is default and invalid\n";
 		return;
 	}
 	int TotalArmies;
@@ -331,7 +343,7 @@ void AdvanceOrder::execute()
 			{
 				if (target->getPlayer() == p)
 				{
-					cout << "Order is invalid since we are attacking a player that has a not agression pact with us this turn";
+					cout << "Order is invalid since we are attacking a player that has a not agression pact with us this turn\n";
 					return;
 				}
 			}
@@ -358,7 +370,7 @@ void AdvanceOrder::execute()
 			}
 
 			//After battle, we see if attacker won and has troups left. Else, nothing happens
-			if (TargetArmies == 0 || ArmiesToAdvance != 0)
+			if (TargetArmies == 0 && ArmiesToAdvance != 0)
 			{
 				target->setArmyCount(ArmiesToAdvance);
 				target->setPlayer(CurrentPlayer);
@@ -369,7 +381,7 @@ void AdvanceOrder::execute()
 	}
 	else
 	{
-		cout << "Order to Advance is not valid";
+		cout << "Order to Advance is not valid\n";
 	}
 }
 
@@ -417,7 +429,7 @@ bool BombOrder::validate()
 {
 	if (CurrentPlayer != target->getPlayer()) //First, we check if player of source territory is NOT the same as the current player
 	{
-		//Then, we check through the list of adjacent territories of the taret and see if one is the territory of the Current player
+		//Then, we check through the list of adjacent territories of the target and see if one is the territory of the Current player
 		for (Territory* x : target->getAdjacentTerritories())
 		{
 			if (x->getPlayer() == CurrentPlayer)
@@ -432,7 +444,7 @@ bool BombOrder::validate()
 void BombOrder::execute()
 {
 	if (isDefaultOrder)
-		cout << "This order is default and invalid";
+		cout << "This order is default and invalid\n";
 	else if (validate())
 	{
 		//We check if we have an agreement with the current holder of the target territory
@@ -440,7 +452,7 @@ void BombOrder::execute()
 		{
 			if (target->getPlayer() == p)
 			{
-				cout << "Order is invalid since we are attacking a player that has a not agression pact with us this turn";
+				cout << "Order is invalid since we are attacking a player that has a not agression pact with us this turn\n";
 				return;
 			}
 		}
@@ -451,7 +463,7 @@ void BombOrder::execute()
 	}
 	else
 	{
-		cout << "Order to bomb is not valid";
+		cout << "Order to bomb is not valid\n";
 	}
 }
 
@@ -508,7 +520,7 @@ bool BlockadeOrder::validate()
 void BlockadeOrder::execute()
 {
 	if (isDefaultOrder)
-		cout << "This order is default and invalid";
+		cout << "This order is default and invalid\n";
 	else if (validate())
 	{
 		int TotalArmies = target->getArmyCount();
@@ -518,7 +530,7 @@ void BlockadeOrder::execute()
 	}
 	else
 	{
-		cout << "Order to Blockadde is not valid";
+		cout << "Order to Blockadde is not valid\n";
 	}
 }
 
@@ -578,7 +590,7 @@ void AirliftOrder::execute()
 {
 	if (isDefaultOrder)
 	{
-		cout << "This order is default and invalid";
+		cout << "This order is default and invalid\n";
 		return;
 	}
 	int TotalArmies;
@@ -593,7 +605,7 @@ void AirliftOrder::execute()
 	}
 	else
 	{
-		cout << "Order to airlift is not valid";
+		cout << "Order to airlift is not valid\n";
 	}
 }
 
@@ -648,14 +660,14 @@ bool NegotiateOrder::validate()
 void NegotiateOrder::execute()
 {
 	if (isDefaultOrder)
-		cout << "This order is default and invalid";
+		cout << "This order is default and invalid\n";
 	else if (validate())
 	{
 		Armistice.push_front(TargetPlayer);
 	}
 	else
 	{
-		cout << "Order to negotiate is not valid";
+		cout << "Order to negotiate is not valid\n";
 	}
 }
 
