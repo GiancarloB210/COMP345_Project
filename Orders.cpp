@@ -112,6 +112,7 @@ void OrderList::remove(int Pos)
 
 
 
+
 //Operators
 std::ostream& operator << (std::ostream& os, OrderList& orderlist)
 {
@@ -674,3 +675,11 @@ void NegotiateOrder::execute()
 //Operators
 NegotiateOrder& NegotiateOrder::operator=(const NegotiateOrder& order) = default;
 #pragma endregion
+
+std::string OrderList::stringToLog() {
+	return "";
+}
+
+std::string Order::stringToLog() {
+	return "";
+}

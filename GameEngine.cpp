@@ -323,6 +323,7 @@ void GameEngine::setUpPlayers() {
 void GameEngine::distributeTerritories() {
     std::list<Territory *> mapTerritories = this->currentMap->getTerritories();
     int territoriesPerPlayer = mapTerritories.size() / this->gamePlayers.size();
+    std::cout << "Territories per Player: " << territoriesPerPlayer << endl;
     int territoryCounter = 0, playerCount = 0;
 
     for (Territory* territory : mapTerritories) {
@@ -332,6 +333,9 @@ void GameEngine::distributeTerritories() {
 
         if (territoryCounter == territoriesPerPlayer) {
             playerCount++;
+            if ((mapTerritories.size() - (playerCount * territoryCounter)) < territoriesPerPlayer) {
+                break;
+            }
             territoryCounter = 0;
         }
     }
@@ -400,8 +404,8 @@ void GameEngine::startupPhase() {
         this->printState();
         std::cout << "Enter command (type 'exit' to stop): ";
 
-        //std::cin >> inputCommand;
-        //std::cout << std::endl;
+        std::cin >> inputCommand;
+        std::cout << std::endl;
         // Exit the loop if the user types 'exit'
         if (inputCommand == "exit") {
             break;
@@ -587,5 +591,5 @@ std::ostream& operator<<(std::ostream& os, const GameEngine& engine) {
 }
 
 std::string GameEngine::stringToLog() {  
-
+    return "";
 }

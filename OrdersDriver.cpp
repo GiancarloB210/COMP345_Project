@@ -316,10 +316,3 @@ void testOrdersExecution()
 	id += 1;
 
 }
-
- int main()
- {
- 	testOrdersExecution();
-	 cout << "\n\n\n\n Test Finish";
-	 return 0;
- }

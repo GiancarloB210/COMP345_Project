@@ -77,19 +77,7 @@ public:
 
 
     // Override stringToLog() for logging
-    std::string stringToLog() const override {
-        return "GameEngine State: " + std::to_string(static_cast<int>(currentState));
-    }
-
-    void handleCommand(const std::string& command) {
-        if (isValidCommand(command)) {
-            currentState = stateTransitions[currentState][command];
-            notify(*this);  // Notify observers when state changes
-            printState();
-        } else {
-            std::cout << "Invalid command: " << command << std::endl;
-        }
-    }
+    std::string stringToLog() override;
 
     // Startup methods
     void loadMap();
@@ -109,8 +97,6 @@ public:
     void executeOrdersPhase();        // Orders execution phase function
     bool isGameOver();                // Check if the game is over
 
-    //Overridden virtual methods
-    std::string stringToLog();
 };
 
 #endif

@@ -4,6 +4,7 @@
 #include <vector>
 #include <random>
 #include <list>
+#include <Subject.h>
 
 #include "LogObserver.h"
 
@@ -56,17 +57,10 @@ public:
 	void remove(int Pos); //This method asks for the position of the order to remove
 
 	// Override stringToLog() for logging
-	std::string stringToLog() const override {
-		return "OrderList has " + std::to_string(ListofOrders.size()) + " orders.";
-	}
-
-	void add(Order* order) {
-		ListofOrders.push_back(order);
-		notify(*this);  // Notify observers when an order is added
-	}
+	std::string stringToLog() override;
 };
 
-class Order
+class Order: public Subject, public ILoggable
 {
 public:
 	std::string type, description, effect;
@@ -98,20 +92,7 @@ public:
 	//It is possible to modify the type and automatically redefine the description and effect, but it is inefficient, thus making more easier to simply make a NEW Order
 
 	// Override stringToLog() for logging
-	std::string stringToLog() const override {
-		return "Order: " + type + ", Effect: " + effect;
-	}
-
-	std::string execute() override {
-		if (validate()) {
-			effect = "Executed " + type + " order.";
-			notify(*this);  // Notify observers after execution
-			return effect;
-		}
-		else {
-			return "Order not valid";
-		}
-	}
+	std::string stringToLog() override;
 };
 
 class DeployOrder : public Order {

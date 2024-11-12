@@ -11,26 +11,13 @@ private:
 
 public:
     // Constructor to open the log file
-    LogObserver(const std::string& filename) {
-        logFile.open(filename, std::ios::app);
-        if (!logFile.is_open()) {
-            std::cerr << "Failed to open log file: " << filename << std::endl;
-        }
-    }
+    LogObserver(const std::string& filename);
 
     // Destructor to close the log file
-    ~LogObserver() {
-        if (logFile.is_open()) {
-            logFile.close();
-        }
-    }
+    ~LogObserver();
 
     // Override update method to log information from ILoggable objects
-    void update(const ILoggable& loggable) override {
-        if (logFile.is_open()) {
-            logFile << loggable.stringToLog() << std::endl;
-        }
-    }
+    void update(ILoggable& loggable) override;
 };
 
 #endif

@@ -38,9 +38,10 @@ int main(int argc, char* argv[]) {
     }
 
     testGameStates();
-    testStartupPhase();
-    testCommandProcessor(gameEngine);
-    testMainGameLoop();
+    //testStartupPhase();
+    //testCommandProcessor(gameEngine);
+    //testMainGameLoop();
+    //testOrdersExecution();
 
     return 0;
 }

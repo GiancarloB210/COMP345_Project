@@ -11,21 +11,13 @@ private:
 
 public:
     // Attach an observer to the subject
-    void attach(Observer* observer) {
-        observers.push_back(observer);
-    }
+    void attach(Observer* observer);
 
     // Detach an observer from the subject
-    void detach(Observer* observer) {
-        observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
-    }
+    void detach(Observer* observer);
 
     // Notify all attached observers about an update
-    void notify(const ILoggable& loggable) {
-        for (Observer* observer : observers) {
-            observer->update(loggable);
-        }
-    }
+    void notify(ILoggable &loggable);
 };
 
 #endif
