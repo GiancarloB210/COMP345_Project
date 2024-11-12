@@ -65,6 +65,7 @@ public:
     void printState() const; 
     bool isValidCommand(const std::string& command) const;
     void startupPhase();
+    CommandProcessor* getCommandProcessor();
 };
 
 #endif

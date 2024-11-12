@@ -19,12 +19,17 @@ GameEngine::GameEngine() : currentState(State::START) {
 GameEngine::GameEngine(CommandProcessor* commandProcessor) : currentState(State::START) {
     setupTransitions();
     this->commandProcessor = commandProcessor;
+    this->currentMap = nullptr; //no map initialized as of yet.
+    this->currentMapPath = ""; //no map initialized as of yet.
+    this->gameDeck = new Deck();
+    this->numPlayers = 1;
 }
 
 // Copy constructor
 GameEngine::GameEngine(const GameEngine& other) {
     // Deep copy of the current state and transitions
     this->currentState = other.currentState;
+    this->commandProcessor = other.commandProcessor;
     this->stateTransitions = other.stateTransitions;
     this->currentMap = new Map(*other.currentMap);
     this->currentMapPath = other.currentMapPath;
@@ -67,6 +72,11 @@ GameEngine::~GameEngine() {
         delete this->gamePlayers[i];
         this->gamePlayers[i] = NULL;
     }
+}
+
+// Accessor
+CommandProcessor* GameEngine::getCommandProcessor() {
+    return this->commandProcessor;
 }
 
 // setup all valid state transitions based on commands and states

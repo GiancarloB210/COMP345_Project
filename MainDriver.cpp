@@ -16,6 +16,7 @@
 #include "Player.h"
 #include "Cards.h"
 #include "CommandProcessing.h"
+#include "CommandProcessingDriver.h"
 #include "Orders.h"
 
 int main(int argc, char* argv[]) {
@@ -31,8 +32,14 @@ int main(int argc, char* argv[]) {
         std::string filename = args[2];
         gameEngine = new GameEngine(new FileCommandProcessorAdapter(filename));
     }
+    else {
+        cout << "no command line arguments detected, proceeding with console commands" << endl;
+        gameEngine = new GameEngine(new CommandProcessor());
+    }
+
     testGameStates();
     testStartupPhase();
+    testCommandProcessor(gameEngine);
 
     return 0;
 }

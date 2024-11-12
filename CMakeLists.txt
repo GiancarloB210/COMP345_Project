@@ -31,6 +31,8 @@ add_executable(COMP345_Project
         CommandProcessing.cpp
         CommandProcessing.h
         ArmyUnit.cpp
-        ArmyUnit.h)
+        ArmyUnit.h
+        CommandProcessingDriver.cpp
+        CommandProcessingDriver.h)
 
 
