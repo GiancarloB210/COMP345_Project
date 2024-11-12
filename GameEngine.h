@@ -4,10 +4,15 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 #include "Map.h"
+#include "Player.h"
+#include "Orders.h"
 #include "ILoggable.h"
 #include "Subject.h"
+
 
 // All states in the game
 enum class State {
@@ -42,19 +47,18 @@ private:
     State currentState;  // Current state of the game
     std::map<State, std::map<std::string, State>> stateTransitions;  // Map of valid state transitions
     void setupTransitions();  // Function to setup valid state transitions
-    string currentMapPath; //Currently loaded map path.
-    Map* currentMap; //Currently loaded map.
-    Deck* gameDeck; //Deck which will be used for the game.
-    int numPlayers; //Number of players who will be playing the game.
-    std::vector<Player*> gamePlayers; //Vector of players who will be playing the game.
-    std::vector<int> playerOrder; //Turn order of players who will be playing the game.
+    std::string currentMapPath; // Currently loaded map path
+    Map* currentMap; // Currently loaded map
+    Deck* gameDeck; // Deck used for the game
+    int numPlayers; // Number of players in the game
+    std::vector<Player*> gamePlayers; // Vector of players in the game
+    std::vector<int> playerOrder; // Turn order of players in the game
 
 public:
     // Constructors
     GameEngine();  // Default constructor
     GameEngine(const GameEngine& other);  // Copy constructor
     GameEngine& operator=(const GameEngine& other);  // Assignment operator
-
     ~GameEngine();  // Destructor
 
     // Overloaded stream insertion operator
@@ -62,16 +66,28 @@ public:
 
     // Other functions
     void handleCommand(const std::string& command);
-    void printState() const; 
+    void printState() const;
     bool isValidCommand(const std::string& command) const;
     void startupPhase();
 
-    //Startup methods
+    // Startup methods
     void loadMap();
     void validateMap();
     void setUpPlayers();
     void startGame();
 
+    void distributeTerritories();
+    void determinePlayerOrder();
+    void allocateInitialArmies();
+    void drawInitialCards();
+
+    // Main game loop methods
+    void mainGameLoop();             // Main game loop function
+    void reinforcementPhase();        // Reinforcement phase function
+    void issueOrdersPhase();          // Issuing orders phase function
+    void executeOrdersPhase();        // Orders execution phase function
+    bool isGameOver();                // Check if the game is over
+  
     //Overridden virtual methods
     std::string stringToLog();
 };
