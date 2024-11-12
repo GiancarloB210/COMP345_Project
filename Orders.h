@@ -2,8 +2,17 @@
 #define Order_H
 #include <iostream>
 #include <vector>
+#include <random>
+#include <list>
+
+// #include "Map.h"
+// #include "Player.h"
+
+//using namespace std;
 
 //Order class and OrderList class forward declarations
+class Player;
+class Territory;
 class Order;
 class OrderList;
 
@@ -16,16 +25,12 @@ class AirliftOrder;
 class NegotiateOrder;
 
 //Free functions
-std::ostream& operator << (std::ostream& os, OrderList &orderlist);
+std::ostream& operator << (std::ostream& os, OrderList& orderlist);
 std::ostream& operator << (std::ostream& os, Order& order);
 
-
-//std::ostream& operator << (std::ostream& os, DeployOrder &order);
-//std::ostream& operator << (std::ostream& os, AdvanceOrder &order);
-//std::ostream& operator << (std::ostream& os, BombOrder &order);
-//std::ostream& operator << (std::ostream& os, BlockadeOrder &order);
-//std::ostream& operator << (std::ostream& os, AirliftOrder &order);
-//std::ostream& operator << (std::ostream& os, NegotiateOrder &order);
+//Global Variables
+// bool GetCard = false;
+// std::list<Player*> Armistice;
 
 class OrderList
 {
@@ -39,7 +44,7 @@ public:
 	OrderList(OrderList& orderlist);
 
 	//Operators
-	OrderList& operator=(const OrderList &order);
+	OrderList& operator=(const OrderList& order);
 
 	//Deconstructor
 	~OrderList();
@@ -55,15 +60,17 @@ public:
 	void remove(int Pos); //This method asks for the position of the order to remove
 };
 
-class Order 
+class Order
 {
 public:
 	std::string type, description, effect;
+	Player* CurrentPlayer;
 	bool valid;
+	bool isDefaultOrder;
 
 	//Constructors
 	Order();
-	Order(std::string type);
+	Order(Player* CurrentPlayer, std::string type);
 	Order(Order& order);
 
 	//Operators
@@ -79,16 +86,21 @@ public:
 
 	//Methods
 	virtual bool validate();
-	virtual std::string execute();
+	virtual void execute();
 
 	//Although the class can access the string values of an order, it cannot modify them since they are static, and only change it the order type itself is changed. 
 	//It is possible to modify the type and automatically redefine the description and effect, but it is inefficient, thus making more easier to simply make a NEW Order
 };
 
 class DeployOrder : public Order {
+private:
+	Territory* target;
+	int ArmiesToAdd;
+
 public:
 	//Constructors
 	DeployOrder();
+	DeployOrder(Player* CurrentPlayer, Territory* target, int ATD);
 	DeployOrder(DeployOrder& order);
 
 	//Operators
@@ -99,12 +111,17 @@ public:
 
 	//methods
 	bool validate() override;
-	std::string execute() override;
+	void execute() override;
 };
 class AdvanceOrder : public Order {
+private:
+	Territory* source;
+	Territory* target;
+	int ArmiesToAdvance;
 public:
 	//Constructors
 	AdvanceOrder();
+	AdvanceOrder(Player* CurrentPlayer, Territory* source, Territory* target, int ATA);
 	AdvanceOrder(AdvanceOrder& order);
 
 	//Operators
@@ -115,12 +132,15 @@ public:
 
 	//methods
 	bool validate() override;
-	std::string execute() override;
+	void execute() override;
 };
 class BombOrder : public Order {
+private:
+	Territory* target;
 public:
 	//Constructors
 	BombOrder();
+	BombOrder(Player* CurrentPlayer, Territory* target);
 	BombOrder(BombOrder& order);
 
 	//Operators
@@ -131,12 +151,15 @@ public:
 
 	//methods
 	bool validate() override;
-	std::string execute() override;
+	void execute() override;
 };
 class BlockadeOrder : public Order {
+private:
+	Territory* target;
 public:
 	//Constructors
 	BlockadeOrder();
+	BlockadeOrder(Player* CurrentPlayer, Territory* target);
 	BlockadeOrder(BlockadeOrder& order);
 
 	//Operators
@@ -147,12 +170,17 @@ public:
 
 	//methods
 	bool validate() override;
-	std::string execute() override;
+	void execute() override;
 };
 class AirliftOrder : public Order {
+private:
+	Territory* source;
+	Territory* target;
+	int ArmiesToAirlift;
 public:
 	//Constructors
 	AirliftOrder();
+	AirliftOrder(Player* CurrentPlayer, Territory* source, Territory* target, int ATA);
 	AirliftOrder(AirliftOrder& order);
 
 	//Operators
@@ -163,12 +191,15 @@ public:
 
 	//methods
 	bool validate() override;
-	std::string execute() override;
+	void execute() override;
 };
 class NegotiateOrder : public Order {
+private:
+	Player* TargetPlayer;
 public:
 	//Constructors
 	NegotiateOrder();
+	NegotiateOrder(Player* CurrentPlayer, Player* TargetPlayer);
 	NegotiateOrder(NegotiateOrder& order);
 
 	//Operators
@@ -179,7 +210,7 @@ public:
 
 	//methods
 	bool validate() override;
-	std::string execute() override;
+	void execute() override;
 };
 
 #endif
