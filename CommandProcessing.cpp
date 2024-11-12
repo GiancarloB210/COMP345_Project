@@ -119,7 +119,9 @@ bool CommandProcessor::validate(Command* command) {
     //TODO: Link this up with GameEngine
     if(false) {
         command->saveEffect("Invalid command entered.");
+        return false;
     }
+    return true;
 }
 
 // toString() uses the overloaded << operator to generate a formatted string containing the values of the
@@ -141,9 +143,7 @@ FileLineReader::FileLineReader(FileLineReader& fileLineReader) {
 }
 
 // FileLineReader Class Deconstructor
-FileLineReader::~FileLineReader() {
-    delete this->inputFileStream;
-}
+FileLineReader::~FileLineReader() = default;
 
 // FileLineReader Class Operators
 std::ostream& operator<<(std::ostream& os, FileLineReader& fileLineReader) {
@@ -151,7 +151,13 @@ std::ostream& operator<<(std::ostream& os, FileLineReader& fileLineReader) {
     return os << fileLineReader.getFileName() << std::endl;
 }
 
-FileLineReader& FileLineReader::operator=(const FileLineReader& fileLineReader) = default;
+FileLineReader& FileLineReader::operator=(const FileLineReader& fileLineReader) {
+    if (this != &fileLineReader) {
+        this->fileName = fileLineReader.fileName;
+        this->inputFileStream = std::ifstream(fileName);
+    }
+    return *this;
+};
 
 // FileLineReader Class Accessors
 std::ifstream FileLineReader::getFile() {
@@ -292,7 +298,9 @@ bool FileCommandProcessorAdapter::validate(Command* command) {
     // TODO: Link with gameEngine
     if(false) {
         command->saveEffect("Invalid command entered.");
+        return false;
     }
+    return true;
 }
 
 // toString() uses the overloaded << operator to generate a formatted string containing the values of the
