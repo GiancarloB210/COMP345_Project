@@ -6,6 +6,7 @@
 
 #include "Map.h"
 #include "Player.h"
+#include "LogObserver.h"
 
 //using namespace std;
 
@@ -29,7 +30,7 @@ std::ostream& operator << (std::ostream& os, Order& order);
 bool GetCard = false;
 std::list<Player*> Armistice;
 
-class OrderList
+class OrderList: public Subject, public ILoggable
 {
 private:
 	std::vector<Order*> ListofOrders;
@@ -55,6 +56,15 @@ public:
 	void move(int iPos, int fPos); //This method will ask for the order's position and the position to where the order wishes to be moved to
 
 	void remove(int Pos); //This method asks for the position of the order to remove
+
+	 // Override stringToLog() for logging
+    std::string stringToLog() const override {
+        return "OrderList has " + std::to_string(ListofOrders.size()) + " orders.";
+    }
+
+    void add(Order* order) {
+        ListofOrders.push_back(order);
+        notify(*this);  // Notify observers when an order is added
 };
 
 class Order
@@ -87,6 +97,21 @@ public:
 
 	//Although the class can access the string values of an order, it cannot modify them since they are static, and only change it the order type itself is changed. 
 	//It is possible to modify the type and automatically redefine the description and effect, but it is inefficient, thus making more easier to simply make a NEW Order
+
+	// Override stringToLog() for logging
+    std::string stringToLog() const override {
+        return "Order: " + type + ", Effect: " + effect;
+    }
+
+    std::string execute() override {
+        if (validate()) {
+            effect = "Executed " + type + " order.";
+            notify(*this);  // Notify observers after execution
+            return effect;
+        } else {
+            return "Order not valid";
+        }
+    }
 };
 
 class DeployOrder : public Order {
