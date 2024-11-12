@@ -284,6 +284,7 @@ std::string FileCommandProcessorAdapter::readCommand() {
 // saveCommand() takes in a pointer to a command and adds it to the back of FileCommandProcessorAdapter's commandList
 void FileCommandProcessorAdapter::saveCommand(Command* command) {
     this->commandList.push_back(command);
+    //TODO:Notify(this);
 }
 
 // FileCommandProcessorAdapter Class Public Methods

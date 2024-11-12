@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <random>
 
-namespace fs = std::__fs::filesystem;
+namespace fs = std::filesystem;
 using namespace std;
 
 // Default constructor 
