@@ -63,6 +63,7 @@ public:
 	void add(Order* order) {
 		ListofOrders.push_back(order);
 		notify(*this);  // Notify observers when an order is added
+	}
 };
 
 class Order
