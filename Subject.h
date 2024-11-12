@@ -11,7 +11,7 @@ private:
 public:
     void attach(Observer* observer);
     void detach(Observer* observer);
-    void notify(const ILoggable& loggable);
+    void notify(ILoggable &loggable);
 };
 
 #endif

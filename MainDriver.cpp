@@ -25,16 +25,16 @@ int main(int argc, char* argv[]) {
 
     if (args[1] == "-console") {
         cout << "proceeding with console commands." << endl;
-        gameEngine = new GameEngine(new CommandProcessor());
+        gameEngine = new GameEngine(new CommandProcessor(gameEngine));
     }
     else if (args[1] == "-file") {
         cout << "proceeding with file commands." << endl;
         std::string filename = args[2];
-        gameEngine = new GameEngine(new FileCommandProcessorAdapter(filename));
+        gameEngine = new GameEngine(new FileCommandProcessorAdapter(filename, gameEngine));
     }
     else {
         cout << "no command line arguments detected, proceeding with console commands" << endl;
-        gameEngine = new GameEngine(new CommandProcessor());
+        gameEngine = new GameEngine(new CommandProcessor(gameEngine));
     }
 
     testGameStates();

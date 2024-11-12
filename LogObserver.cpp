@@ -14,7 +14,7 @@ LogObserver::~LogObserver() {
     }
 }
 
-void LogObserver::update(const ILoggable& loggable) {
+void LogObserver::update(ILoggable& loggable) {
     if (logFile.is_open()) {
         logFile << loggable.stringToLog() << std::endl;
     }

@@ -304,8 +304,9 @@ void GameEngine::startupPhase() {
             this->printState();
         }
         std::cout << "Enter command (type 'exit' to stop): ";
-        std::cin >> inputCommand;
-        std::cout << std::endl;
+
+        //std::cin >> inputCommand;
+        //std::cout << std::endl;
         // Exit the loop if the user types 'exit'
         if (inputCommand == "exit") {
             break;

@@ -11,7 +11,7 @@ private:
 public:
     LogObserver(const std::string& filename);
     ~LogObserver();
-    void update(const ILoggable& loggable) override;
+    void update(ILoggable& loggable) override;
 };
 
 #endif

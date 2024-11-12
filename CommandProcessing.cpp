@@ -54,7 +54,9 @@ std::string Command::toString() {
 }
 
 // CommandProcessor Class Constructor
-CommandProcessor::CommandProcessor()= default;
+CommandProcessor::CommandProcessor(GameEngine* gameEngine) {
+    this->gameEngine = gameEngine;
+}
 
 // CommandProcessor Class Copy Constructor
 CommandProcessor::CommandProcessor(CommandProcessor& commandProcessor) {
@@ -211,13 +213,13 @@ std::string FileLineReader::toString() {
 }
 
 // FileCommandProcessorAdapter Class Constructor
-FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string fileName) {
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string fileName, GameEngine* gameEngine): CommandProcessor(gameEngine) {
     this->fileName = fileName;
     this->fileLineReader = new FileLineReader(fileName);
 }
 
 // FileCommandProcessorAdapter Class Copy Constructor
-FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileCommandProcessorAdapter& fileCommanProcessorAdapter) {
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileCommandProcessorAdapter& fileCommanProcessorAdapter): CommandProcessor(fileCommanProcessorAdapter.gameEngine) {
     this->fileName = fileCommanProcessorAdapter.fileName;
     this->fileLineReader = fileCommanProcessorAdapter.fileLineReader;
 }
@@ -284,7 +286,7 @@ std::string FileCommandProcessorAdapter::readCommand() {
 // saveCommand() takes in a pointer to a command and adds it to the back of FileCommandProcessorAdapter's commandList
 void FileCommandProcessorAdapter::saveCommand(Command* command) {
     this->commandList.push_back(command);
-    //TODO:Notify(this);
+    //notify(*this);
 }
 
 // FileCommandProcessorAdapter Class Public Methods
@@ -296,12 +298,7 @@ Command* FileCommandProcessorAdapter::getCommand() {
 }
 
 bool FileCommandProcessorAdapter::validate(Command* command) {
-    // TODO: Link with gameEngine
-    if(false) {
-        command->saveEffect("Invalid command entered.");
-        return false;
-    }
-    return true;
+    return gameEngine->isValidCommand(command->getCommand());
 }
 
 // toString() uses the overloaded << operator to generate a formatted string containing the values of the

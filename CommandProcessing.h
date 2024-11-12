@@ -7,9 +7,12 @@
 #include <list>
 #include <string>
 #include <fstream>
+#include "GameEngine.h"
+#include <ILoggable.h>
 #include <iostream>
 #include <utility>
 #include <sstream>
+#include <Subject.h>
 
 // Forward Declarations
 class Command;
@@ -23,7 +26,7 @@ std::ostream& operator << (std::ostream& os, const CommandProcessor& commandProc
 std::ostream& operator << (std::ostream& os, const FileLineReader& fileLineReader);
 std::ostream& operator << (std::ostream& os, const FileCommandProcessorAdapter& fileCommandProcessorAdapter);
 
-class Command {
+class Command/*: public ILoggable, public Subject*/  {
     // Data Members
     std::string command;
     std::string effect;
@@ -51,9 +54,11 @@ public:
     std::string toString();
 };
 
-class CommandProcessor {
+class CommandProcessor/*: public ILoggable, public Subject*/ {
     // Data Members
     std::list<Command*> commandList;
+protected:
+    GameEngine* gameEngine;
 
     // Private Methods
     std::string readCommand();
@@ -61,7 +66,7 @@ class CommandProcessor {
 
 public:
     // Constructors
-    CommandProcessor();
+    CommandProcessor(GameEngine* gameEngine);
     CommandProcessor(CommandProcessor& commandProcessor);
 
     // Operators
@@ -121,7 +126,7 @@ class FileCommandProcessorAdapter: public CommandProcessor {
 
 public:
     // Constructors
-    FileCommandProcessorAdapter(std::string fileName);
+    FileCommandProcessorAdapter(std::string fileName, GameEngine* gameEngine);
     FileCommandProcessorAdapter(FileCommandProcessorAdapter& fileCommandProcessor);
 
     // Operators

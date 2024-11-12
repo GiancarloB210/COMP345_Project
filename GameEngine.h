@@ -4,10 +4,11 @@
 #include <string>
 #include <map>
 #include <iostream>
-#include "CommandProcessing.h"
 #include "Map.h"
 #include "ILoggable.h"
 #include "Subject.h"
+
+class CommandProcessor;
 
 // All states in the game
 enum class State {
