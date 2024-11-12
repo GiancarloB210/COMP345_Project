@@ -97,7 +97,7 @@ void testOrdersExecution()
 	//Adds orders to the list using Orders constructors
 	orders.add(new DeployOrder(P1, t5, 8)); //We, as Player 1, add 8 armies to territory 5
 	orders.add(new AdvanceOrder(P1, t1, t5, 2)); //We, as Player 1, move 2 armies from territory 1 to territory 5
-	orders.add(new BlockadeOrder(P1, t4)); //We, as Player 1, blockade territory 4 
+	orders.add(new BlockadeOrder(P1, t4)); //We, as Player 1, blockade territory 4
 	orders.add(new BombOrder(P1, t7)); //We, as Player 1, bomb territory 7
 	orders.add(new AdvanceOrder(P1, t5, t7, 15)); //We, as Player 1, move 15 armies from territory 5 to territory 7, and attack
 	orders.add(new NegotiateOrder(P1, P2)); //We negitate an armistice with Player 2

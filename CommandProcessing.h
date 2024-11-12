@@ -7,11 +7,12 @@
 #include <list>
 #include <string>
 #include <fstream>
+#include "GameEngine.h"
+#include <ILoggable.h>
 #include <iostream>
 #include <utility>
 #include <sstream>
-#include "LogObserver.h"  // Include LogObserver
-
+#include <Subject.h>
 
 // Forward Declarations
 class Command;
@@ -25,7 +26,7 @@ std::ostream& operator << (std::ostream& os, const CommandProcessor& commandProc
 std::ostream& operator << (std::ostream& os, const FileLineReader& fileLineReader);
 std::ostream& operator << (std::ostream& os, const FileCommandProcessorAdapter& fileCommandProcessorAdapter);
 
-class Command: public Subject, public ILoggable {
+class Command/*: public ILoggable, public Subject*/  {
     // Data Members
     std::string command;
     std::string effect;
@@ -51,15 +52,13 @@ public:
 
     // Methods
     std::string toString();
-
-    // Override stringToLog() for logging
-    std::string stringToLog() const override {
-        return "Command: " + command + ", Effect: " + effect;
 };
 
-class CommandProcessor {
+class CommandProcessor/*: public ILoggable, public Subject*/ {
     // Data Members
     std::list<Command*> commandList;
+protected:
+    GameEngine* gameEngine;
 
     // Private Methods
     std::string readCommand();
@@ -67,7 +66,7 @@ class CommandProcessor {
 
 public:
     // Constructors
-    CommandProcessor();
+    CommandProcessor(GameEngine* gameEngine);
     CommandProcessor(CommandProcessor& commandProcessor);
 
     // Operators
@@ -86,20 +85,6 @@ public:
     Command* getCommand();
     bool validate(Command* command);
     std::string toString();
-
-        // Override stringToLog() for logging
-    std::string stringToLog() const override {
-        std::string log = "CommandProcessor: Commands - ";
-        for (auto const& cmd : commandList) {
-            log += cmd->toString() + "; ";
-        }
-        return log;
-    }
-
-    void saveCommand(Command* command) {
-        this->commandList.push_back(command);
-        notify(*this);  // Notify observers when a command is saved
-    }
 };
 
 class FileLineReader {
@@ -141,7 +126,7 @@ class FileCommandProcessorAdapter: public CommandProcessor {
 
 public:
     // Constructors
-    FileCommandProcessorAdapter(std::string fileName);
+    FileCommandProcessorAdapter(std::string fileName, GameEngine* gameEngine);
     FileCommandProcessorAdapter(FileCommandProcessorAdapter& fileCommandProcessor);
 
     // Operators

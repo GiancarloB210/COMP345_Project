@@ -5,6 +5,7 @@
 #include "MainDriver.h"
 
 #include <OrdersDriver.h>
+#include <string.h>
 
 #include "CardsDriver.h"
 #include "MapDriver.h"
@@ -14,16 +15,31 @@
 #include "Map.h"
 #include "Player.h"
 #include "Cards.h"
+#include "CommandProcessing.h"
+#include "CommandProcessingDriver.h"
 #include "Orders.h"
 
-int main() {
+int main(int argc, char* argv[]) {
+    std::vector<std::string> args(argv, argv+argc);
+    GameEngine* gameEngine;
 
-    // testLoadMaps();
-    // testPlayers();
-    // testOrdersLists();
-    // testCards();
-    // testGameStates();
-    // testStartupPhase();
+    if (args[1] == "-console") {
+        cout << "proceeding with console commands." << endl;
+        gameEngine = new GameEngine(new CommandProcessor(gameEngine));
+    }
+    else if (args[1] == "-file") {
+        cout << "proceeding with file commands." << endl;
+        std::string filename = args[2];
+        gameEngine = new GameEngine(new FileCommandProcessorAdapter(filename, gameEngine));
+    }
+    else {
+        cout << "no command line arguments detected, proceeding with console commands" << endl;
+        gameEngine = new GameEngine(new CommandProcessor(gameEngine));
+    }
+
+    testGameStates();
+    testStartupPhase();
+    testCommandProcessor(gameEngine);
     testMainGameLoop();
 
     return 0;

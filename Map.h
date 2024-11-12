@@ -4,15 +4,11 @@
 
 #ifndef MAP_H
 #define MAP_H
-#include <cstdint>
-#include <iostream>
-#include <sstream>
 #include <list>
 #include <fstream>
 #include <vector>
-#include <set>
-#include <algorithm>
 #include "Player.h"
+#include <sstream>
 
 // Forward Declarations
 class Map;

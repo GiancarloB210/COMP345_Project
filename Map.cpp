@@ -4,6 +4,7 @@
 
 #include "Map.h"
 
+
 // Territory Class Copy Constructor
 Territory::Territory(Territory &territory) {
     name = territory.name;
@@ -369,7 +370,7 @@ bool Map::validate(Map* map) {
 
 // MapLoader Class Copy Constructor
 MapLoader::MapLoader(MapLoader &mapLoader) {
-    (loadedMaps = mapLoader.loadedMaps);
+    loadedMaps = mapLoader.loadedMaps;
 }
 
 // MapLoader Class Default Constructor

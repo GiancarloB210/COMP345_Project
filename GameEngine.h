@@ -12,7 +12,9 @@
 #include "Orders.h"
 #include "ILoggable.h"
 #include "Subject.h"
-#include "LogObserver.h" 
+#include "LogObserver.h"
+
+class CommandProcessor;
 
 // All states in the game
 enum class State {
@@ -29,7 +31,7 @@ enum class State {
 };
 
 // All commands that trigger state transitions
-enum class Command {
+enum class CommandEnum {
     LOADMAP,
     VALIDATEMAP,
     ADDPLAYER,
@@ -46,6 +48,7 @@ class GameEngine: public Subject, public ILoggable {
 private:
     State currentState;  // Current state of the game
     std::map<State, std::map<std::string, State>> stateTransitions;  // Map of valid state transitions
+    CommandProcessor* commandProcessor;
     void setupTransitions();  // Function to setup valid state transitions
     std::string currentMapPath; // Currently loaded map path
     Map* currentMap; // Currently loaded map
@@ -57,6 +60,7 @@ private:
 public:
     // Constructors
     GameEngine();  // Default constructor
+    GameEngine(CommandProcessor* commandProcessor); // constructor
     GameEngine(const GameEngine& other);  // Copy constructor
     GameEngine& operator=(const GameEngine& other);  // Assignment operator
     ~GameEngine();  // Destructor
@@ -69,6 +73,7 @@ public:
     void printState() const;
     bool isValidCommand(const std::string& command) const;
     void startupPhase();
+    CommandProcessor* getCommandProcessor();
 
 
     // Override stringToLog() for logging
@@ -103,7 +108,7 @@ public:
     void issueOrdersPhase();          // Issuing orders phase function
     void executeOrdersPhase();        // Orders execution phase function
     bool isGameOver();                // Check if the game is over
-  
+
     //Overridden virtual methods
     std::string stringToLog();
 };

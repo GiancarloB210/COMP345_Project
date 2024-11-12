@@ -9,7 +9,7 @@ void Subject::detach(Observer* observer) {
     observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
 }
 
-void Subject::notify(const ILoggable& loggable) {
+void Subject::notify(ILoggable &loggable) {
     for (Observer* observer : observers) {
         observer->update(loggable);
     }

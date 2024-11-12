@@ -54,7 +54,9 @@ std::string Command::toString() {
 }
 
 // CommandProcessor Class Constructor
-CommandProcessor::CommandProcessor()= default;
+CommandProcessor::CommandProcessor(GameEngine* gameEngine) {
+    this->gameEngine = gameEngine;
+}
 
 // CommandProcessor Class Copy Constructor
 CommandProcessor::CommandProcessor(CommandProcessor& commandProcessor) {
@@ -119,7 +121,9 @@ bool CommandProcessor::validate(Command* command) {
     //TODO: Link this up with GameEngine
     if(false) {
         command->saveEffect("Invalid command entered.");
+        return false;
     }
+    return true;
 }
 
 // toString() uses the overloaded << operator to generate a formatted string containing the values of the
@@ -141,9 +145,7 @@ FileLineReader::FileLineReader(FileLineReader& fileLineReader) {
 }
 
 // FileLineReader Class Deconstructor
-FileLineReader::~FileLineReader() {
-    delete this->inputFileStream;
-}
+FileLineReader::~FileLineReader() = default;
 
 // FileLineReader Class Operators
 std::ostream& operator<<(std::ostream& os, FileLineReader& fileLineReader) {
@@ -151,7 +153,13 @@ std::ostream& operator<<(std::ostream& os, FileLineReader& fileLineReader) {
     return os << fileLineReader.getFileName() << std::endl;
 }
 
-FileLineReader& FileLineReader::operator=(const FileLineReader& fileLineReader) = default;
+FileLineReader& FileLineReader::operator=(const FileLineReader& fileLineReader) {
+    if (this != &fileLineReader) {
+        this->fileName = fileLineReader.fileName;
+        this->inputFileStream = std::ifstream(fileName);
+    }
+    return *this;
+};
 
 // FileLineReader Class Accessors
 std::ifstream FileLineReader::getFile() {
@@ -205,13 +213,13 @@ std::string FileLineReader::toString() {
 }
 
 // FileCommandProcessorAdapter Class Constructor
-FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string fileName) {
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(std::string fileName, GameEngine* gameEngine): CommandProcessor(gameEngine) {
     this->fileName = fileName;
     this->fileLineReader = new FileLineReader(fileName);
 }
 
 // FileCommandProcessorAdapter Class Copy Constructor
-FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileCommandProcessorAdapter& fileCommanProcessorAdapter) {
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileCommandProcessorAdapter& fileCommanProcessorAdapter): CommandProcessor(fileCommanProcessorAdapter.gameEngine) {
     this->fileName = fileCommanProcessorAdapter.fileName;
     this->fileLineReader = fileCommanProcessorAdapter.fileLineReader;
 }
@@ -278,6 +286,7 @@ std::string FileCommandProcessorAdapter::readCommand() {
 // saveCommand() takes in a pointer to a command and adds it to the back of FileCommandProcessorAdapter's commandList
 void FileCommandProcessorAdapter::saveCommand(Command* command) {
     this->commandList.push_back(command);
+    //notify(*this);
 }
 
 // FileCommandProcessorAdapter Class Public Methods
@@ -289,10 +298,7 @@ Command* FileCommandProcessorAdapter::getCommand() {
 }
 
 bool FileCommandProcessorAdapter::validate(Command* command) {
-    // TODO: Link with gameEngine
-    if(false) {
-        command->saveEffect("Invalid command entered.");
-    }
+    return gameEngine->isValidCommand(command->getCommand());
 }
 
 // toString() uses the overloaded << operator to generate a formatted string containing the values of the
