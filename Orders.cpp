@@ -1,9 +1,11 @@
 
 #include "Orders.h"
+#include "Map.h"
 
 
 using namespace std;
-
+bool GetCard = false;
+std::list<Player*> Armistice;
 #pragma region OrderListClass
 //OrderList Class
 //--------------------------------------------------------------------------------------------------------
