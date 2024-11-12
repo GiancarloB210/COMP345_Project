@@ -12,7 +12,7 @@
 #include "Orders.h"
 #include "ILoggable.h"
 #include "Subject.h"
-
+#include "LogObserver.h" 
 
 // All states in the game
 enum class State {
@@ -42,7 +42,7 @@ enum class Command {
 };
 
 // Game engine that controls state transitions
-class GameEngine: public ILoggable, public Subject {
+class GameEngine: public Subject, public ILoggable {
 private:
     State currentState;  // Current state of the game
     std::map<State, std::map<std::string, State>> stateTransitions;  // Map of valid state transitions
@@ -69,6 +69,22 @@ public:
     void printState() const;
     bool isValidCommand(const std::string& command) const;
     void startupPhase();
+
+
+    // Override stringToLog() for logging
+    std::string stringToLog() const override {
+        return "GameEngine State: " + std::to_string(static_cast<int>(currentState));
+    }
+
+    void handleCommand(const std::string& command) {
+        if (isValidCommand(command)) {
+            currentState = stateTransitions[currentState][command];
+            notify(*this);  // Notify observers when state changes
+            printState();
+        } else {
+            std::cout << "Invalid command: " << command << std::endl;
+        }
+    }
 
     // Startup methods
     void loadMap();
