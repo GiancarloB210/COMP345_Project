@@ -4,9 +4,15 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <vector>
+#include <algorithm>
+
 #include "Map.h"
+#include "Player.h"
+#include "Orders.h"
 #include "ILoggable.h"
 #include "Subject.h"
+#include "LogObserver.h"
 
 class CommandProcessor;
 
@@ -38,18 +44,18 @@ enum class CommandEnum {
 };
 
 // Game engine that controls state transitions
-class GameEngine: public ILoggable, public Subject {
+class GameEngine: public Subject, public ILoggable {
 private:
     State currentState;  // Current state of the game
     std::map<State, std::map<std::string, State>> stateTransitions;  // Map of valid state transitions
     CommandProcessor* commandProcessor;
     void setupTransitions();  // Function to setup valid state transitions
-    string currentMapPath; //Currently loaded map path.
-    Map* currentMap; //Currently loaded map.
-    Deck* gameDeck; //Deck which will be used for the game.
-    int numPlayers; //Number of players who will be playing the game.
-    std::vector<Player*> gamePlayers; //Vector of players who will be playing the game.
-    std::vector<int> playerOrder; //Turn order of players who will be playing the game.
+    std::string currentMapPath; // Currently loaded map path
+    Map* currentMap; // Currently loaded map
+    Deck* gameDeck; // Deck used for the game
+    int numPlayers; // Number of players in the game
+    std::vector<Player*> gamePlayers; // Vector of players in the game
+    std::vector<int> playerOrder; // Turn order of players in the game
 
 public:
     // Constructors
@@ -57,7 +63,6 @@ public:
     GameEngine(CommandProcessor* commandProcessor); // constructor
     GameEngine(const GameEngine& other);  // Copy constructor
     GameEngine& operator=(const GameEngine& other);  // Assignment operator
-
     ~GameEngine();  // Destructor
 
     // Overloaded stream insertion operator
@@ -65,16 +70,44 @@ public:
 
     // Other functions
     void handleCommand(const std::string& command);
-    void printState() const; 
+    void printState() const;
     bool isValidCommand(const std::string& command) const;
     void startupPhase();
     CommandProcessor* getCommandProcessor();
 
-    //Startup methods
+
+    // Override stringToLog() for logging
+    std::string stringToLog() const override {
+        return "GameEngine State: " + std::to_string(static_cast<int>(currentState));
+    }
+
+    void handleCommand(const std::string& command) {
+        if (isValidCommand(command)) {
+            currentState = stateTransitions[currentState][command];
+            notify(*this);  // Notify observers when state changes
+            printState();
+        } else {
+            std::cout << "Invalid command: " << command << std::endl;
+        }
+    }
+
+    // Startup methods
     void loadMap();
     void validateMap();
     void setUpPlayers();
     void startGame();
+
+    void distributeTerritories();
+    void determinePlayerOrder();
+    void allocateInitialArmies();
+    void drawInitialCards();
+
+    // Main game loop methods
+    void mainGameLoop();             // Main game loop function
+    void reinforcementPhase();        // Reinforcement phase function
+    void issueOrdersPhase();          // Issuing orders phase function
+    void executeOrdersPhase();        // Orders execution phase function
+    bool isGameOver();                // Check if the game is over
 
     //Overridden virtual methods
     std::string stringToLog();

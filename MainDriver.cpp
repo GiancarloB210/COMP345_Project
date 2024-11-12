@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
     testGameStates();
     testStartupPhase();
     testCommandProcessor(gameEngine);
+    testMainGameLoop();
 
     return 0;
 }
