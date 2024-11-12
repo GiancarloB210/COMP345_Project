@@ -22,17 +22,40 @@ void testOrdersExecution()
 	std::list<std::string> t9Adj = { "t6", "t10" };
 	std::list<std::string> t10Adj = { "t9", "t8" };
 
+	Territory* t1;
+	Territory* t2;
+	Territory* t3;
+	Territory* t4;
+	Territory* t5;
+	Territory* t6;
+	Territory* t7;
+	Territory* t8;
+	Territory* t9;
+	Territory* t10;
+
 	//We create territories to use
-	Territory* t1 = new Territory("t1", "Tutuland", 0, 0, t1Adj);
-	Territory* t2 = new Territory("t2", "Tutuland", 1, 0, t2Adj);
-	Territory* t3 = new Territory("t3", "Tutuland", 2, 0, t3Adj);
-	Territory* t4 = new Territory("t4", "Tutuland", 0, 1, t4Adj);
-	Territory* t5 = new Territory("t5", "Tutuland", 1, 1, t5Adj);
-	Territory* t6 = new Territory("t6", "Tutuland", 2, 1, t6Adj);
-	Territory* t7 = new Territory("t7", "Tutuland", 0, 2, t7Adj);
-	Territory* t8 = new Territory("t8", "Tutuland", 1, 2, t8Adj);
-	Territory* t9 = new Territory("t9", "Tutuland", 2, 2, t9Adj);
-	Territory* t10 = new Territory("t10", "Tutuland", 0, 3, t10Adj);
+	t1 = new Territory("t1", "Tutuland", 0, 0, t1Adj);
+	t2 = new Territory("t2", "Tutuland", 1, 0, t2Adj);
+	t3 = new Territory("t3", "Tutuland", 2, 0, t3Adj);
+	t4 = new Territory("t4", "Tutuland", 0, 1, t4Adj);
+	t5 = new Territory("t5", "Tutuland", 1, 1, t5Adj);
+	t6 = new Territory("t6", "Tutuland", 2, 1, t6Adj);
+	t7 = new Territory("t7", "Tutuland", 0, 2, t7Adj);
+	t8 = new Territory("t8", "Tutuland", 1, 2, t8Adj);
+	t9 = new Territory("t9", "Tutuland", 2, 2, t9Adj);
+	t10 = new Territory("t10", "Tutuland", 0, 3, t10Adj);
+
+	//Setting to each territory, a list of adjacent territories
+	t1->setAdjacentTerritories({t2, t4, t5});
+	t2->setAdjacentTerritories({t1, t6});
+	t3->setAdjacentTerritories({t6});
+	t4->setAdjacentTerritories({t1, t8});
+	t5->setAdjacentTerritories({t1, t7});
+	t6->setAdjacentTerritories({t2, t3, t7, t9});
+	t7->setAdjacentTerritories({t5, t6, t8});
+	t8->setAdjacentTerritories({t4, t7, t10});
+	t9->setAdjacentTerritories({t6, t10});
+	t10->setAdjacentTerritories({t8, t9});
 
 	//We create a list of territories (2 to have one for each player)
 	std::list<Territory*> territoriesList1 = { t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 };
@@ -68,7 +91,7 @@ void testOrdersExecution()
 	t10->setArmyCount(3);
 
 
-
+	std::list<Territory*> Continent = { t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 };
 
 
 	//Adds orders to the list using Orders constructors
@@ -83,14 +106,69 @@ void testOrdersExecution()
 
 	//Test 1: Printing all the orders and execute
 	cout << "---------------------------------------------------------------------------------\n1st Test\n";
+	int territoryID = 1;
+	//Prints beginning state of territories
+	cout << "----------------------------------------------------------Territory At the Beginning--------------------------------------------------------------\n";
+	cout << "Current Player --> Player 1 \n";
+	for (Territory* t : Continent)
+	{
+		cout << "Territory #" << territoryID << " --> Owner: ";
+		if (t->getPlayer() == P1)
+			cout << "Player 1";
+		else if (t->getPlayer() == P2)
+			cout << "Player 2";
+		else if (t->getPlayer() == nullptr)
+			cout << "Neutral";
+		cout << " || # of Armies in Territory: " << t->getArmyCount() << "\n";
+		territoryID += 1;
+	}
+	cout << "Current Armistice: |";
+	for (Player* p : orders.getArmistice())
+		if (p == P2)
+			cout << "Player 2";
+	cout << "| \n";
+
+	if (orders.isGettingCard())
+		cout << "Player IS getting a card at the end of turn\n";
+	else if (!orders.isGettingCard())
+		cout << "Player IS NOT getting a card at the end of turn\n";
+	cout << "-------------------------------------------------------------------------------------------------------------------------------------------------\n\n\n";
+
 	int i = 1; //Create a integer to enumerate orders
 	for (Order* ord : orders.getList()) //Reads Order in list one by one
 	{
 		//Print name, description and effect of order. Execute function is also launch to see if it is valid
 		cout << i << "." << ord->getType() << "\nDescription: " << ord->getDescription() << "\nEffect: " << ord->getEffect() << "\n Executing... \n";
 		ord->execute();
-		cout << "\n\n";
+		cout << "Order Executed successfully\n\n";
 		i++;
+
+		territoryID = 1;
+		cout << "----------------------------------------------------------Territory Changes after " << ord->getType() << " Order----------------------------------------------------------------------\n";
+		cout << "Current Player --> Player 1 \n";
+		for (Territory* t : Continent)
+		{
+			cout << "Territory #" << territoryID << " --> Owner: ";
+			if (t->getPlayer() == P1)
+				cout << "Player 1";
+			else if (t->getPlayer() == P2)
+				cout << "Player 2";
+			else if (t->getPlayer() == nullptr)
+				cout << "Neutral";
+			cout << " || # of Armies in Territory: " << t->getArmyCount() << "\n";
+			territoryID += 1;
+		}
+		cout << "Current Armistice: |";
+		for (Player* p : orders.getArmistice())
+			if (p == P2)
+				cout << "Player 2";
+		cout << "| \n";
+
+		if (orders.isGettingCard())
+			cout << "Player IS getting a card at the end of turn\n";
+		else if (!orders.isGettingCard())
+			cout << "Player IS NOT getting a card at the end of turn\n";
+		cout << "------------------------------------------------------------------------------------------------------------------------------------------------------\n";
 	}
 	i = 1;
 
@@ -143,44 +221,105 @@ void testOrdersExecution()
 		i++;
 	}
 	*/
+
+	cout << "Now deleting pointers and values to avoid memory leak.... \n\n";
+	int id = 1;
 	for (Order* ord : orders.getList()) //Reads Order in list one by one
 	{
 		delete ord;
+		cout << "Delete #" << id << " executed successfully\n";
+		id += 1;
 	}
+	
 
 	delete P1;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete P2;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete hd;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 
-	delete t1;
+	/*delete t1;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete t2;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete t3;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete t4;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete t5;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete t6;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete t7;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete t8;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete t9;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;
 	delete t10;
+	cout << "Delete #" << id << " executed successfully\n";
+	id += 1;*/
 
+
+	id = 1;
 	P1 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	P2 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	hd = NULL;
-
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	t1 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	t2 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	t3 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1; 
 	t4 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	t5 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	t6 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	t7 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	t8 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	t9 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 	t10 = NULL;
+	cout << "NULL #" << id << " executed successfully\n";
+	id += 1;
 
 }
 
-// int main()
-// {
-// 	testOrdersExecution();
-// }
+ int main()
+ {
+ 	testOrdersExecution();
+	 cout << "\n\n\n\n Test Finish";
+	 return 0;
+ }

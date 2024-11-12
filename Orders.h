@@ -5,13 +5,7 @@
 #include <random>
 #include <list>
 
-// #include "Map.h"
-// #include "Player.h"
 #include "LogObserver.h"
-
-
-
-//using namespace std;
 
 //Order class and OrderList class forward declarations
 class Player;
@@ -31,11 +25,8 @@ class NegotiateOrder;
 std::ostream& operator << (std::ostream& os, OrderList& orderlist);
 std::ostream& operator << (std::ostream& os, Order& order);
 
-//Global Variables
-// bool GetCard = false;
-// std::list<Player*> Armistice;
 
-class OrderList: public Subject, public ILoggable
+class OrderList : public Subject, public ILoggable
 {
 private:
 	std::vector<Order*> ListofOrders;
@@ -54,6 +45,8 @@ public:
 
 	//Accessors
 	std::vector<Order*> getList();
+	std::list<Player*> getArmistice();
+	bool isGettingCard();
 
 	//methods
 	void add(Order* order); //This method allows us to add an other to the list
@@ -62,14 +55,14 @@ public:
 
 	void remove(int Pos); //This method asks for the position of the order to remove
 
-	 // Override stringToLog() for logging
-    std::string stringToLog() const override {
-        return "OrderList has " + std::to_string(ListofOrders.size()) + " orders.";
-    }
+	// Override stringToLog() for logging
+	std::string stringToLog() const override {
+		return "OrderList has " + std::to_string(ListofOrders.size()) + " orders.";
+	}
 
-    void add(Order* order) {
-        ListofOrders.push_back(order);
-        notify(*this);  // Notify observers when an order is added
+	void add(Order* order) {
+		ListofOrders.push_back(order);
+		notify(*this);  // Notify observers when an order is added
 };
 
 class Order
@@ -104,19 +97,20 @@ public:
 	//It is possible to modify the type and automatically redefine the description and effect, but it is inefficient, thus making more easier to simply make a NEW Order
 
 	// Override stringToLog() for logging
-    std::string stringToLog() const override {
-        return "Order: " + type + ", Effect: " + effect;
-    }
+	std::string stringToLog() const override {
+		return "Order: " + type + ", Effect: " + effect;
+	}
 
-    std::string execute() override {
-        if (validate()) {
-            effect = "Executed " + type + " order.";
-            notify(*this);  // Notify observers after execution
-            return effect;
-        } else {
-            return "Order not valid";
-        }
-    }
+	std::string execute() override {
+		if (validate()) {
+			effect = "Executed " + type + " order.";
+			notify(*this);  // Notify observers after execution
+			return effect;
+		}
+		else {
+			return "Order not valid";
+		}
+	}
 };
 
 class DeployOrder : public Order {
