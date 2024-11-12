@@ -81,22 +81,20 @@ void GameEngine::setupTransitions() {
 }
 
 
-
 // Main Game Loop Method
 void GameEngine::mainGameLoop() {
     while (!isGameOver()) {
         reinforcementPhase();   // Assign reinforcements automatically
         issueOrdersPhase();     // Players issue orders in a round-robin fashion
         executeOrdersPhase();   // Execute orders in a round-robin fashion
-        std::cout << "Game round complete." << std::endl; // Debug message
     }
     std::cout << "Game over! The winner is " << gamePlayers[0]->getName() << "!" << std::endl;
 }
 
-
 // Reinforcement Phase Method
 void GameEngine::reinforcementPhase() {
     for (Player* player : gamePlayers) {
+        // Calculate the number of reinforcements based on territories owned
         int baseReinforcements = std::max(3, static_cast<int>(player->getTerritories().size() / 3));
         int continentBonus = 0;
 
@@ -117,14 +115,15 @@ void GameEngine::reinforcementPhase() {
         // Total reinforcements
         int totalReinforcements = baseReinforcements + continentBonus;
         player->addToReinforcementPool(totalReinforcements);
+
+        // Output message about reinforcements
         std::cout << player->getName() << " receives " << totalReinforcements << " army units." << std::endl;
     }
 
     // After reinforcements, explicitly transition to the next phase (Issue Orders)
-    currentState = State::ISSUE_ORDERS;
-    std::cout << "Transitioning to the Issue Orders Phase." << std::endl; // Debug message
+    currentState = State::ISSUE_ORDERS;  // Transition to the issue orders phase
+    std::cout << "Transitioning to the Issue Orders Phase." << std::endl;
 }
-
 
 
 
@@ -176,11 +175,11 @@ void GameEngine::handleCommand(const std::string& command) {
             validateMap();
         }
         else if (this->currentState == State::MAP_VALIDATED && command == "addplayer") {
-            setUpPlayers();  // Add players, don't set state here since setUpPlayers handles it
+            setUpPlayers();  // Only add players, don't set the state here since setUpPlayers handles it
         }
         else if (this->currentState == State::PLAYERS_ADDED && command == "gamestart") {
             startGame();  // Transition from PLAYERS_ADDED to ASSIGN_REINFORCEMENT
-            mainGameLoop();
+            mainGameLoop();  // Begin the main game loop
         }
         // handle transitions for ISSUE_ORDERS phase
         else if (this->currentState == State::ISSUE_ORDERS && command == "issueorder") {
@@ -195,7 +194,6 @@ void GameEngine::handleCommand(const std::string& command) {
         std::cout << "Invalid command: " << command << std::endl;
     }
 }
-
 
 
 
@@ -376,7 +374,7 @@ void GameEngine::startGame() {
     drawInitialCards();
 
     // Switch the game to the play phase
-    currentState = State::ASSIGN_REINFORCEMENT;
+    currentState = State::ASSIGN_REINFORCEMENT; // Ready for reinforcement phase
     cout << "Game started. It's now time for the reinforcement phase!" << endl;
 }
 
@@ -384,9 +382,7 @@ void GameEngine::startGame() {
 void GameEngine::startupPhase() {
     string inputCommand;
     while (this->currentState != State::ASSIGN_REINFORCEMENT) {
-        if (this->currentState == State::START) {
-            this->printState();
-        }
+        this->printState();
         std::cout << "Enter command (type 'exit' to stop): ";
         std::cin >> inputCommand;
         std::cout << std::endl;
@@ -533,7 +529,7 @@ void GameEngine::printState() const {
     }
 }
 
-// Overloaded stream insertion operator 
+// Overloaded stream insertion operator
 std::ostream& operator<<(std::ostream& os, const GameEngine& engine) {
     os << "Current game state: ";
     switch (engine.currentState) {
@@ -572,8 +568,4 @@ std::ostream& operator<<(std::ostream& os, const GameEngine& engine) {
             break;
     }
     return os;
-}
-
-std::string GameEngine::stringToLog() {
-
 }
