@@ -6,6 +6,8 @@
 #include <iostream>
 
 #include "Map.h"
+#include "ILoggable.h"
+#include "Subject.h"
 
 // All states in the game
 enum class State {
@@ -35,7 +37,7 @@ enum class Command {
 };
 
 // Game engine that controls state transitions
-class GameEngine {
+class GameEngine: public ILoggable, public Subject {
 private:
     State currentState;  // Current state of the game
     std::map<State, std::map<std::string, State>> stateTransitions;  // Map of valid state transitions
@@ -69,6 +71,9 @@ public:
     void validateMap();
     void setUpPlayers();
     void startGame();
+
+    //Overridden virtual methods
+    virtual std::string stringToLog();
 };
 
 #endif
