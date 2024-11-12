@@ -22,8 +22,9 @@ int main() {
     // testPlayers();
     // testOrdersLists();
     // testCards();
-    testGameStates();
-    testStartupPhase();
+    // testGameStates();
+    // testStartupPhase();
+    testMainGameLoop();
 
     return 0;
 }
