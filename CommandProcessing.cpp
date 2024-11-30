@@ -117,13 +117,16 @@ Command* CommandProcessor::getCommand() {
 }
 
 // validate
-bool CommandProcessor::validate(Command* command) {
-    //TODO: Link this up with GameEngine
-    if(false) {
-        command->saveEffect("Invalid command entered.");
-        return false;
-    }
-    return true;
+bool CommandProcessor::validate(std::string commandString) {
+    cout << commandString << endl;
+    const std::string& command = commandString;
+    cout << "entering GameEngine::isValidCommand()" << endl;
+    return gameEngine->isValidCommand(command);
+}
+
+std::vector<std::vector<std::string>> CommandProcessor::processTournamentCommand(std::string commandString) {
+    cout << "Entering processTournamentCommandString()" << endl;
+    return processTournamentCommandString(commandString);
 }
 
 // toString() uses the overloaded << operator to generate a formatted string containing the values of the
@@ -180,7 +183,7 @@ void FileLineReader::setFile(std::ifstream file) {
 // readLineFromFile() opens the inputFileStream and reads/returns the next line while keeping track of
 // Where in the file the fileLineReader is
 std::string FileLineReader::readLineFromFile() {
-    this->inputFileStream.open(fileName);
+    this->inputFileStream.open("command.txt");
     static int lineCounter = 0;
     int tempCounter = lineCounter;
     std::string line;
@@ -297,8 +300,12 @@ Command* FileCommandProcessorAdapter::getCommand() {
     return command;
 }
 
-bool FileCommandProcessorAdapter::validate(Command* command) {
-    return gameEngine->isValidCommand(command->getCommand());
+bool FileCommandProcessorAdapter::validate(std::string commandString) {
+    return gameEngine->isValidCommand(commandString);
+}
+
+std::vector<std::vector<std::string>> FileCommandProcessorAdapter::processTournamentCommand(std::string commandString) {
+    return processTournamentCommandString(commandString);
 }
 
 // toString() uses the overloaded << operator to generate a formatted string containing the values of the
@@ -307,4 +314,68 @@ std::string FileCommandProcessorAdapter::toString() {
     std::stringstream ss;
     ss << *this;
     return ss.str();
+}
+
+std::vector<std::vector<std::string>> processTournamentCommandString(std::string commandString) {
+    std::string delimiter = " ";
+    std::vector<std::string> tokens;
+    std::string token;
+    size_t pos = 0;
+    int counter = 0;
+    while ((pos = commandString.find(delimiter)) != std::string::npos) {
+        token = commandString.substr(0, pos);
+        token.erase(std::remove(token.begin(), token.end(), ' '), token.end());
+        tokens.push_back(token);
+        commandString.erase(0, pos + delimiter.length());
+    }
+    tokens.push_back(commandString);
+    tokens.erase(tokens.begin());
+
+    cout << "Exited with " << tokens.size() << " commands" << endl;
+    std::vector<std::vector<std::string>> tournamentCommandResult;
+    std::vector<std::string> mVector;
+    std::vector<std::string> pVector;
+    std::vector<std::string> gVector;
+    std::vector<std::string> dVector;
+    tournamentCommandResult.push_back(mVector);
+    tournamentCommandResult.push_back(pVector);
+    tournamentCommandResult.push_back(gVector);
+    tournamentCommandResult.push_back(dVector);
+
+    for (auto token : tokens) {
+        cout << token << endl;
+    }
+
+    for (auto const& i : tokens) {
+
+        if (i == "-M") {
+        } else if (i == "-P") {
+            counter++;
+        } else if (i == "-G") {
+            counter++;
+        } else if (i == "-D") {
+            counter++;
+        } else {
+            tournamentCommandResult.at(counter).push_back(i);
+        }
+    }
+
+    cout << "Created tournamentCommandResult vector of  string vectors." << endl;
+    return tournamentCommandResult;
+}
+
+bool validateTournamentInputs(std::vector<std::vector<std::string>> tournamentInputs) {
+    if (tournamentInputs.at(0).size() < 1 || tournamentInputs.at(0).size() > 5)
+        return false;
+
+    if(tournamentInputs.at(1).size() < 2 || tournamentInputs.at(1).size() > 4)
+        return false;
+
+    if(stoi(tournamentInputs.at(2).at(0)) < 1 || stoi(tournamentInputs.at(2).at(0)) > 5)
+        return false;
+
+    if(stoi(tournamentInputs.at(3).at(0)) < 10 || stoi(tournamentInputs.at(3).at(0)) > 50)
+        return false;
+
+    return true;
 }

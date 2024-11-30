@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 
+#include "CommandProcessing.h"
 #include "Map.h"
 #include "Player.h"
 #include "Orders.h"
@@ -27,7 +28,8 @@ enum class State {
     ISSUE_ORDERS,
     EXECUTE_ORDERS,
     WIN,
-    END
+    END,
+    TOURNAMENT
 };
 
 // All commands that trigger state transitions
@@ -68,13 +70,22 @@ public:
     // Overloaded stream insertion operator
     friend std::ostream& operator<<(std::ostream& os, const GameEngine& engine);
 
+    // Accessors
+    std::string getCurrentMapPath();
+    Map* getCurrentMap();
+
+    // Mutators
+    void setCurrentMapPath(std::string path);
+    void setCurrentMap(Map* map);
+
+
     // Other functions
     void handleCommand(const std::string& command);
     void printState() const;
     bool isValidCommand(const std::string& command) const;
     void startupPhase();
     CommandProcessor* getCommandProcessor();
-
+    void tournamentMode(const string & command);
 
     // Override stringToLog() for logging
     std::string stringToLog() override;
@@ -97,6 +108,10 @@ public:
     void executeOrdersPhase();        // Orders execution phase function
     bool isGameOver();                // Check if the game is over
 
+public:
+    State getCurrentState();
+
+    void setCurrentState(State state);
 };
 
 #endif

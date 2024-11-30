@@ -1,0 +1,8 @@
+loadmap USA.map
+validatemap
+addplayer Dan
+addplayer Joe
+addplayer Kev
+gamestart
+replay
+quit

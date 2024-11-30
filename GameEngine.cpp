@@ -78,6 +78,33 @@ CommandProcessor* GameEngine::getCommandProcessor() {
     return this->commandProcessor;
 }
 
+State GameEngine::getCurrentState() {
+    return this->currentState;
+}
+
+std::string GameEngine::getCurrentMapPath()
+{
+    return currentMapPath;
+}
+
+Map *GameEngine::getCurrentMap() {
+    return this->currentMap;
+}
+
+
+// Mutator
+void GameEngine::setCurrentState(State state) {
+    this->currentState = state;
+}
+
+void GameEngine::setCurrentMapPath(std::string path) {
+    this->currentMapPath = path;
+}
+
+void GameEngine::setCurrentMap(Map* map) {
+    this->currentMap = map;
+}
+
 // setup all valid state transitions based on commands and states
 void GameEngine::setupTransitions() {
     stateTransitions[State::START]["loadmap"] = State::MAP_LOADED;
@@ -93,6 +120,7 @@ void GameEngine::setupTransitions() {
     stateTransitions[State::ISSUE_ORDERS]["issueorder"] = State::ISSUE_ORDERS;
     stateTransitions[State::EXECUTE_ORDERS]["execorder"] = State::EXECUTE_ORDERS;
     stateTransitions[State::MAP_LOADED]["loadmap"] = State::MAP_LOADED;
+    stateTransitions[State::START]["tournament"] = State::TOURNAMENT;
 }
 
 
@@ -199,6 +227,9 @@ void GameEngine::handleCommand(const std::string& command) {
         // handle transitions for ISSUE_ORDERS phase
         else if (this->currentState == State::ISSUE_ORDERS && command == "issueorder") {
             issueOrdersPhase();  // Start issuing orders
+        } else if (this->currentState == State::START && command.find("tournament") != std::string::npos) {
+            cout << "entering tournamentMode method." << endl;
+            tournamentMode(command);
         }
 
         // Update the state after the command execution if there was no internal state change
@@ -399,12 +430,12 @@ void GameEngine::startGame() {
 
 
 void GameEngine::startupPhase() {
-    string inputCommand;
+    char inputCommand[500];
     while (this->currentState != State::ASSIGN_REINFORCEMENT) {
         this->printState();
         std::cout << "Enter command (type 'exit' to stop): ";
 
-        std::cin >> inputCommand;
+        std::cin.getline(inputCommand,500);
         std::cout << std::endl;
         // Exit the loop if the user types 'exit'
         if (inputCommand == "exit") {
@@ -417,6 +448,10 @@ void GameEngine::startupPhase() {
 
 // check if the command is valid for the current state
 bool GameEngine::isValidCommand(const std::string& command) const {
+    cout << command << endl;
+    if (command.find("tournament", 0) != std::string::npos) {
+        return true;
+    }
     return stateTransitions.find(currentState) != stateTransitions.end() &&
            stateTransitions.at(currentState).find(command) != stateTransitions.at(currentState).end();
 }
@@ -589,6 +624,102 @@ std::ostream& operator<<(std::ostream& os, const GameEngine& engine) {
     }
     return os;
 }
+
+void GameEngine::tournamentMode(const string & command) {
+    std::vector<std::vector<std::string>> tournamentCommand;
+    std::string tournamentInputsLog;
+
+    // Validate the tournament command input
+    if (this->commandProcessor->validate(command)) {
+        cout << "CommandProcessor::validate() was true" << endl;
+        cout << "Entering CommandProcessor::processTournamentCommand" << endl;
+        tournamentCommand = this->commandProcessor->processTournamentCommand(command);
+    } else {
+        std::cout << "Invalid command" << std::endl;
+        this->startupPhase();
+    }
+
+    tournamentInputsLog.append("\nTournament mode:\n");
+    tournamentInputsLog.append("M: ");
+    for (const auto & tournamentCommand : tournamentCommand.at(0)) {
+        tournamentInputsLog.append(tournamentCommand + " ");
+    }
+    tournamentInputsLog.append("\nP: ");
+    for (const auto & tournamentCommand : tournamentCommand.at(1)) {
+        tournamentInputsLog.append(tournamentCommand + " ");
+    }
+    tournamentInputsLog.append("\nG: ");
+    for (const auto & tournamentCommand : tournamentCommand.at(2)) {
+        tournamentInputsLog.append(tournamentCommand + " ");
+    }
+    tournamentInputsLog.append("\nD: ");
+    for (const auto & tournamentCommand : tournamentCommand.at(3)) {
+        tournamentInputsLog.append(tournamentCommand + " ");
+    }
+
+    if (validateTournamentInputs(tournamentCommand)) {
+        cout << "validateTournamentInputs() was true" << endl;
+
+        // Load all the maps in the input and validate them
+        MapLoader mapLoader;
+        setCurrentMapPath("../MapFiles/");
+        for (const auto & map : tournamentCommand.at(0)) {
+            cout << getCurrentMapPath() << map << endl;
+            mapLoader.addMap(mapLoader.readFile(getCurrentMapPath() + map));
+        }
+
+        for (const auto & map : mapLoader.getMaps()) {
+            cout << "\nValidating map: " << map->getName() << endl;
+            if(!map->validate(map)) {
+                cout << "Invalid map validation" << endl;
+                startupPhase();
+            }
+        }
+
+        std::string tournamentResultsLog;
+        tournamentResultsLog.append("\nResults:");
+
+        // Start the automated game process
+        for (const auto & map : mapLoader.getMaps()) {
+            setCurrentMap(map);
+            tournamentResultsLog.append("\nMap " + map->getName() + ":");
+            for (int i = 1; i <= stoi(tournamentCommand.at(2).at(0)); i++) {
+                tournamentResultsLog.append("\n\tGame " + std::to_string(i) + ": ");
+                //set-up counters for turns
+                int turnCounter = 1;
+                int maxTurns = stoi(tournamentCommand.at(3).at(0));
+
+                // Set-up Players
+                for (const auto & player : tournamentCommand.at(1)) {
+                    gamePlayers.push_back(new Player(player, new std::list<Territory*>, new Hand(gameDeck)));
+                }
+
+                distributeTerritories();
+                determinePlayerOrder();
+                allocateInitialArmies();
+                drawInitialCards();
+
+                while(!isGameOver()) {
+                    if (turnCounter > maxTurns) {
+                        break;
+                    }
+                    reinforcementPhase();
+                    issueOrdersPhase();
+                    executeOrdersPhase();
+                    turnCounter++;
+                }
+                tournamentResultsLog.append(gamePlayers[0]->getName());
+            }
+        }
+
+
+        //TODO: Log this
+        cout << tournamentInputsLog << endl;
+        cout << tournamentResultsLog << endl;
+    }
+
+
+};
 
 std::string GameEngine::stringToLog() {  
     return "";
