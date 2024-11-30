@@ -3,11 +3,11 @@
 #include <algorithm>
 
 // Parameterized constructor (without name input)
-Player::Player(std::list<Territory*>* territories, Hand* hand) {
+Player::Player(std::vector<Territory*>* territories, Hand* hand) {
     this->playerID = staticPlayerID;
     staticPlayerID++;
     this->name = "No Name";
-    this->territories = new std::list<Territory*>(*territories);
+    this->territories = new std::vector<Territory*>(*territories);
     this->hand = new Hand(*hand);
     this->orders = new OrderList();
     this->armyUnits = std::vector<ArmyUnit*>();
@@ -15,11 +15,11 @@ Player::Player(std::list<Territory*>* territories, Hand* hand) {
 }
 
 // Parameterized constructor (with name input)
-Player::Player(std::string newName, std::list<Territory*>* territories, Hand* hand) {
+Player::Player(std::string newName, std::vector<Territory*>* territories, Hand* hand) {
     this->playerID = staticPlayerID;
     staticPlayerID++;
     this->name = newName;
-    this->territories = new std::list<Territory*>(*territories);
+    this->territories = new std::vector<Territory*>(*territories);
     this->hand = new Hand(*hand);
     this->orders = new OrderList();
     this->armyUnits = std::vector<ArmyUnit*>();
@@ -31,11 +31,12 @@ Player::Player(const Player& player) {
     this->playerID = staticPlayerID;
     staticPlayerID++;
     this->name = player.name;
-    this->territories = new std::list<Territory*>(*player.territories);
+    this->territories = new std::vector<Territory*>(*player.territories);
     this->hand = new Hand(*player.hand);
     this->orders = new OrderList(*player.orders);
     this->armyUnits = std::vector<ArmyUnit*>(player.armyUnits);
     this->reinforcementPool = player.reinforcementPool;
+    this->currentGame = player.currentGame;
 }
 
 // Destructor to clean up dynamic memory
@@ -63,11 +64,12 @@ Player& Player::operator=(const Player& player) {
 
         this->playerID = player.playerID;
         this->name = player.name;
-        this->territories = new std::list<Territory*>(*player.territories);
+        this->territories = new std::vector<Territory*>(*player.territories);
         this->hand = new Hand(*player.hand);
         this->orders = new OrderList(*player.orders);
         this->armyUnits = std::vector<ArmyUnit*>(player.armyUnits);
         this->reinforcementPool = player.reinforcementPool;
+        this->currentGame = new GameEngine(*player.currentGame);
     }
     return *this;
 }
@@ -91,44 +93,215 @@ std::string Player::getName() const {
     return name;
 }
 
-const std::list<Territory*>& Player::getTerritories() const {
+const std::vector<Territory*>& Player::getTerritories() const {
     return *territories;
 }
 
-// Method to return a list of all territories to defend (returns the pointer to the list)
-std::list<Territory*>* Player::toDefend() {
-    auto* defendList = new std::list<Territory*>;
-
-    for (Territory* t : *territories) {
-        defendList->push_back(t);
-    }
-
-    return defendList;
+// Method to return a list of all territories which defend can be defended.
+std::vector<Territory*> Player::toDefend() {
+    return this->ps->toDefend();
 }
 
-// Method to return a list of all territories to attack (returns the pointer to the list)
-std::list<Territory*>* Player::toAttack() {
-    auto* attackList = new std::list<Territory*>;
-
-    for (auto it = territories->rbegin(); it != territories->rend(); ++it) {
-        attackList->push_back(*it);
-    }
-
-    return attackList;
+std::vector<Territory*> Player::toAttack() {
+    return this->ps->toAttack();
 }
 
 // Method to issue an order and add it to the player's list of orders
 void Player::issueOrder() {
-    if (reinforcementPool > 0) {
-        // Deploy all remaining reinforcement units to a territory in toDefend list
-        Territory* territory = *toDefend()->begin();
-        orders->add(new DeployOrder(this, territory, reinforcementPool));
-        reinforcementPool = 0;  // Use up reinforcements
-    } else if (!toAttack()->empty()) {
-        // Switch to AdvanceOrder for attacking once reinforcements are depleted
-        Territory* target = *toAttack()->begin();
-        orders->add(new AdvanceOrder(this, target, target, 3));
+    this->ps->issueOrder();
+}
+
+void Player::playCard(int handIndex) {
+    Order* returnedOrder = this->hand->play(handIndex);
+    BombOrder* bo = dynamic_cast<BombOrder*>(returnedOrder);
+    if (bo != NULL) {
+        std::vector<Territory*> bombList;
+        int iterator = 0;
+        cout<<"List of territories that can be bombed by player "<<playerID<<endl;
+        for (int i = 0;i < this->territories->size();i++) {
+            for (int j = 0;j < (*this->territories)[i]->getAdjacentTerritories().size();j++) {
+                //Only return an adjacent territory if it doesn't belong to the current player.
+                if ((*this->territories)[i]->getAdjacentTerritories()[j]->getPlayer() != this) {
+                    if (std::find(bombList.begin(), bombList.end(), (*this->territories)[i]->getAdjacentTerritories()[j]) == bombList.end()) {
+                        bombList.push_back((*this->territories)[i]->getAdjacentTerritories()[j]);
+                        cout<<"["<<iterator<<"] "<<(*this->territories)[i]->getAdjacentTerritories()[j]->getName()<<endl;
+                        iterator++;
+                    }
+                }
+            }
+        }
+        int bombedIndex = 0;
+        bool validBombOrder = false;
+        while (!validBombOrder) {
+            cout << "Enter the index corresponding to the opposing territory you wish to bomb."<<endl;
+            cin >> bombedIndex;
+            if (cin.fail() || (bombedIndex < 0 || bombedIndex > bombList.size())) {
+                cin.clear();
+                cin.ignore();
+                cout << "Invalid. Please enter a valid number of army units." << endl;
+            } else {
+                validBombOrder = true;
+                orders->add(new BombOrder(this, bombList[bombedIndex]));
+            }
+        }
+        return;
     }
+    //Reinforcement card played -> give current player 10 extra units.
+    DeployOrder* d_order = dynamic_cast<DeployOrder*>(returnedOrder);
+    if (d_order != NULL) {
+        for (int i = 1;i < 10;i++) {
+            this->armyUnits.push_back(new ArmyUnit(this));
+        }
+        this->reinforcementPool += 10;
+        return;
+    }
+    BlockadeOrder* bl_order = dynamic_cast<BlockadeOrder*>(returnedOrder);
+    if (bl_order != NULL) {
+        std::vector<Territory*> blockadeList = toDefend();
+        cout<<"Enter the index corresponding to the territory which you would like to set up a blockade for."<<endl;
+        cout<<"Note that ownership of the territory will transfer to a Neutral player."<<endl;
+        int iterator = 0;
+        int blockadeIndex = 0;
+        bool validBlockadeCheck = false;
+        while (!validBlockadeCheck) {
+            cout << "Enter the index of the territory which you would like to defend." << endl;
+            cin >> blockadeIndex;
+            if (cin.fail() || (blockadeIndex < 0 || blockadeIndex > blockadeList.size())) {
+                cin.clear();
+                cin.ignore();
+                cout << "Invalid. Please enter a valid index." << endl;
+            } else {
+                validBlockadeCheck = true;
+                orders->add(new BlockadeOrder(this, blockadeList[blockadeIndex]));
+            }
+        }
+        return;
+    }
+    AirliftOrder* ao = dynamic_cast<AirliftOrder*>(returnedOrder);
+    if (ao != NULL) {
+        std::vector<TempTerritoryUnitInfo> infoList = getTempTerritoryUnitInfo();
+        int fromIndex_Airlift = 0;
+            int toIndex_Airlift = 0;
+            Territory* fromTerritory = NULL;
+            Territory* toTerritory = NULL;
+            int numUnitsOfFromTerritory = 0;
+            int numUnitsSent = 0;
+            bool validAirliftCommandCheck = false;
+            bool validFromIndexCheck = false;
+            bool validToIndexCheck = false;
+            bool validUnitsSentCheck = false;
+            while (!validAirliftCommandCheck) {
+                cout<<"List of owned territories of player "<<playerID<<" with units in them:"<<endl;
+                int indexer = 0;
+                std::vector<Territory*> territoriesWithUnits;
+                for (int i = 0;i < infoList.size();i++) {
+                    if (infoList[i].numUnitsThere > 0) {
+                        territoriesWithUnits.push_back(infoList[i].territory);
+                        cout<<"["<<indexer<<"] "<<infoList[i].territory->getName()<<" (with "<<infoList[i].numUnitsThere<<" units)"<<endl;
+                        indexer++;
+                    }
+                }
+                while (!validFromIndexCheck) {
+                    cout << "Enter the index of the territory which you would like to deploy units from" << endl;
+                    cin >> fromIndex_Airlift;
+                    if (cin.fail() || (fromIndex_Airlift < 0 || fromIndex_Airlift > territoriesWithUnits.size())) {
+                        cin.clear();
+                        cin.ignore();
+                        cout << "Invalid. Please enter a valid index." << endl;
+                    } else {
+                        validFromIndexCheck = true;
+                        fromTerritory = territoriesWithUnits[fromIndex_Airlift];
+                    }
+                }
+
+
+                indexer = 0;
+                std::vector<Territory*> adjTerritoriesToFrom;
+                for (int i = 0;i < (*this->territories).size();i++) {
+                    std::vector<Territory*> adjacentToCurrent = (*this->territories)[i]->getAdjacentTerritories();
+                    //If any territory in the defend list is found in the adjacent territories list
+                    if (std::find(adjacentToCurrent.begin(), adjacentToCurrent.end(), fromTerritory) != adjacentToCurrent.end()) {
+                        //If the player owns both the territory where units are being sent from and the territory to defend, but the territories are not the same.
+                        if (fromTerritory->getPlayer() == (*this->territories)[i]->getPlayer() && fromTerritory->getName() != (*this->territories)[i]->getName()) {
+                            //If the territory is not already in the list.
+                            if (std::find(adjTerritoriesToFrom.begin(), adjTerritoriesToFrom.end(), (*this->territories)[i]) == adjTerritoriesToFrom.end()) {
+                                adjTerritoriesToFrom.push_back((*this->territories)[i]);
+                                cout<<"["<<indexer<<"] "<<(*this->territories)[i]->getName()<<endl;
+                                indexer++;
+                            }
+                        }
+                    }
+                }
+                while (!validToIndexCheck) {
+                    cout << "Enter the index of the territory which you would like to deploy units to" << endl;
+                    cin >> toIndex_Airlift;
+                    if (cin.fail() || (toIndex_Airlift < 0 || toIndex_Airlift > adjTerritoriesToFrom.size())) {
+                        cin.clear();
+                        cin.ignore();
+                        cout << "Invalid. Please enter a valid index." << endl;
+                    } else {
+                        validToIndexCheck = true;
+                        toTerritory = adjTerritoriesToFrom[toIndex_Airlift];
+                    }
+                }
+
+                for (int i = 0;i < infoList.size();i++) {
+                    if (infoList[i].territory->getName() == fromTerritory->getName()) {
+                        numUnitsOfFromTerritory = infoList[i].numUnitsThere;
+                    }
+                }
+                while (!validUnitsSentCheck) {
+                    cout << "Enter the number of units you would like to send." << endl;
+                    cin >> numUnitsSent;
+                    if (cin.fail() || (numUnitsSent < 0 || numUnitsSent > numUnitsOfFromTerritory)) {
+                        cin.clear();
+                        cin.ignore();
+                        cout << "Invalid. Please enter a valid index." << endl;
+                    } else {
+                        validUnitsSentCheck = true;
+                        for (int j = 0;j < infoList.size();j++) {
+                            if (infoList[j].territory->getName() == fromTerritory->getName()) {
+                                infoList[j].numUnitsThere -= numUnitsSent;
+                            }
+                            if (infoList[j].territory->getName() == toTerritory->getName()) {
+                                infoList[j].numUnitsThere += numUnitsSent;
+                            }
+                        }
+                        cout<<"Deploying "<<numUnitsSent<<" from "<<fromTerritory->getName() << " to "<<toTerritory->getName()<<endl;
+                        this->orders->add(new AirliftOrder(this, fromTerritory, toTerritory, numUnitsSent));
+                    }
+                }
+            }
+        return;
+    }
+    NegotiateOrder* no = dynamic_cast<NegotiateOrder*>(returnedOrder);
+    if (no != NULL) {
+        int indexer = 0;
+        std::vector<int> playerIDs;
+        for (int i = 0;i < playerIDs.size();i++) {
+
+        }
+    }
+}
+
+std::vector<TempTerritoryUnitInfo> Player::getTempTerritoryUnitInfo() {
+    std::vector<TempTerritoryUnitInfo> infoList;
+    for (int i = 0;i < this->territories->size();i++) {
+        TempTerritoryUnitInfo newInfo;
+        int deployedThere = (*this->territories)[i]->getArmyCount();
+        std::vector<Order*> orderList = this->orders->getList();
+        for (int j = 0;j < orderList.size();j++) {
+            if (dynamic_cast<DeployOrder*>(orderList[j]) != nullptr) {
+                if (dynamic_cast<DeployOrder*>(orderList[j])->getTarget() == (*this->territories)[i]) {
+                    deployedThere += dynamic_cast<DeployOrder*>(orderList[j])->getArmiesToAdd();
+                }
+            }
+        }
+        newInfo.territory = (*this->territories)[i];
+        newInfo.numUnitsThere = deployedThere;
+        infoList.push_back(newInfo);
+    }
+    return infoList;
 }
 
 // Adds units to the reinforcement pool
@@ -149,8 +322,15 @@ bool Player::ownsTerritory() const {
 // Retrieves and removes the next order from the player's orders list
 Order* Player::getNextOrder() {
     if (!orders->getList().empty()) {
+        cout<<"Player "<<this->playerID<<" has "<<orders->getList().size()<<" order(s) left."<<endl;
+        for (int i = 0;i < orders->getList().size();i++) {
+            cout<<"["<<i<<"] "<<orders->getList()[i]->getType()<<endl;
+        }
         Order* nextOrder = orders->getList().front();
-        orders->getList().erase(orders->getList().begin());
+        //Remove the first order from the list, as it is set to be returned and executed.
+        std::vector<Order*> list = orders->getList();
+        list.erase(list.begin());
+        orders->setList(list);
         return nextOrder;
     }
     return nullptr; // Return nullptr if there are no orders

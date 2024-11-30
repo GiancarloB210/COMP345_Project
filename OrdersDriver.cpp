@@ -11,16 +11,16 @@ void testOrdersExecution()
 	OrderList orders; //Creates empty list of orders
 
 	//Create lists of adjacent territories
-	std::list<std::string> t1Adj = { "t4", "t5", "t2" };
-	std::list<std::string> t2Adj = { "t1", "t6" };
-	std::list<std::string> t3Adj = { "t6" };
-	std::list<std::string> t4Adj = { "t1", "t8" };
-	std::list<std::string> t5Adj = { "t1", "t7" };
-	std::list<std::string> t6Adj = { "t2", "t3", "t7", "t9" };
-	std::list<std::string> t7Adj = { "t5", "t6", "t8" };
-	std::list<std::string> t8Adj = { "t4", "t7", "t10" };
-	std::list<std::string> t9Adj = { "t6", "t10" };
-	std::list<std::string> t10Adj = { "t9", "t8" };
+	std::vector<std::string> t1Adj = { "t4", "t5", "t2" };
+	std::vector<std::string> t2Adj = { "t1", "t6" };
+	std::vector<std::string> t3Adj = { "t6" };
+	std::vector<std::string> t4Adj = { "t1", "t8" };
+	std::vector<std::string> t5Adj = { "t1", "t7" };
+	std::vector<std::string> t6Adj = { "t2", "t3", "t7", "t9" };
+	std::vector<std::string> t7Adj = { "t5", "t6", "t8" };
+	std::vector<std::string> t8Adj = { "t4", "t7", "t10" };
+	std::vector<std::string> t9Adj = { "t6", "t10" };
+	std::vector<std::string> t10Adj = { "t9", "t8" };
 
 	Territory* t1;
 	Territory* t2;
@@ -58,8 +58,8 @@ void testOrdersExecution()
 	t10->setAdjacentTerritories({t8, t9});
 
 	//We create a list of territories (2 to have one for each player)
-	std::list<Territory*> territoriesList1 = { t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 };
-	std::list<Territory*> territoriesList2 = { t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 };
+	std::vector<Territory*> territoriesList1 = { t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 };
+	std::vector<Territory*> territoriesList2 = { t1, t2, t3, t4, t5, t6, t7, t8, t9, t10 };
 
 	//We create players and a hand for them
 	Hand* hd = new Hand();

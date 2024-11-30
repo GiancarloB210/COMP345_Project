@@ -39,10 +39,10 @@ public:
 
 class Deck {
 public:
-    Card* cards[40];
+    std::vector<Card*> cards;
 
     Deck(); //Instantiates a Deck with 8 of each of the 5 types of cards.
-    Deck(Card* newDeckCards[40]);
+    Deck(std::vector<Card*> cards);
     Deck(Deck& deck);
     ~Deck();
     friend ostream& operator <<(ostream& out_stream, Deck& deck);
@@ -53,7 +53,7 @@ public:
 
 class Hand {
 public:
-    Card* cardsInHand[40];
+    std::vector<Card*> cardsInHand;
     Deck* deckPlayedWith;
     int associatedDeckPosition;
     int handPosition;

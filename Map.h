@@ -29,15 +29,15 @@ private:
     std::string continentName;
     int xCoord;
     int yCoord;
-    std::list<std::string> adjacentTerritoryNames;
-    std::list<Territory*> adjacentTerritories;
+    std::vector<std::string> adjacentTerritoryNames;
+    std::vector<Territory*> adjacentTerritories;
     Player* territoryOwner;
     int armyCount;
 
 public:
     // Constructors
     Territory(std::string name, std::string continentName, int xCoord, int yCoord,
-        std::list<std::string> adjacentTerritoryNames);
+        std::vector<std::string> adjacentTerritoryNames);
     Territory(Territory& territory);
 
     // Operators
@@ -52,11 +52,11 @@ public:
     int getXCoord();
     int getYCoord();
     int getArmyCount();
-    std::list<std::string> getAdjacentTerritoryNames();
-    std::list<Territory*> getAdjacentTerritories();
+    std::vector<std::string> getAdjacentTerritoryNames();
+    std::vector<Territory*> getAdjacentTerritories();
 
     // Mutators
-    void setAdjacentTerritories(std::list<Territory*> adjacentTerritories);
+    void setAdjacentTerritories(std::vector<Territory*> adjacentTerritories);
     void addAdjacentTerritory(Territory* territory);
     void setArmyCount(int armyCount);
     Player* getPlayer();
@@ -143,7 +143,7 @@ public:
     std:: string toString();
     bool traverseContinents(std::list<Continent*> adjacentContinents, std::list<Continent*> &uncheckedContinents,
     Continent* startingContinent);
-    bool traverseTerritories(std::list<Territory*> adjacentTerritories, std::list<Territory*> &uncheckedTerritories,
+    bool traverseTerritories(std::vector<Territory*> adjacentTerritories, std::list<Territory*> &uncheckedTerritories,
     Territory* startingTerritory);
     bool validate(Map* map);
 };

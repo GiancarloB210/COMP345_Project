@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 
+class Map;
 #include "Map.h"
 #include "Player.h"
 #include "Orders.h"
@@ -74,6 +75,8 @@ public:
     bool isValidCommand(const std::string& command) const;
     void startupPhase();
     CommandProcessor* getCommandProcessor();
+    Player* getPlayerByID(int id);
+    int getNumPlayers();
 
 
     // Override stringToLog() for logging

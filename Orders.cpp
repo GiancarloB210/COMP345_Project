@@ -32,6 +32,10 @@ std::vector<Order*> OrderList::getList()
 	return ListofOrders;
 }
 
+void OrderList::setList(std::vector<Order*> list) {
+	this->ListofOrders = list;
+}
+
 //Returns the global variable accessors
 std::list<Player*> OrderList::getArmistice()
 {
@@ -228,12 +232,23 @@ DeployOrder::DeployOrder(DeployOrder& order)
 //Deconstructor
 DeployOrder::~DeployOrder() {}
 
+Territory* DeployOrder::getTarget() {
+	return this->target;
+}
+
+int DeployOrder::getArmiesToAdd() {
+	return this->ArmiesToAdd;
+}
+
 //methods
 bool DeployOrder::validate()
 {
-	if (CurrentPlayer == target->getPlayer()) //Verify that current player is the same as territory owner
+	cout<<"Validating deployOrder"<<endl;
+	if (CurrentPlayer == target->getPlayer()) {
+		//Verify that current player is the same as territory owner
+		cout<<"deployOrder validated!"<<endl;
 		valid = true;
-
+	}
 	return valid;
 }
 void DeployOrder::execute()
@@ -244,6 +259,8 @@ void DeployOrder::execute()
 	{
 		int TotalArmies = ArmiesToAdd + target->getArmyCount();
 		target->setArmyCount(TotalArmies);
+		cout<<target->getName()<<" has had armies deployed to it, and now contains "<<target->getArmyCount()<<" armies."<<endl;
+
 	}
 	else
 	{
@@ -333,9 +350,11 @@ void AdvanceOrder::execute()
 			//First, move armies by setting a new amount of armies in the target
 			TotalArmies = ArmiesToAdvance + target->getArmyCount();
 			target->setArmyCount(TotalArmies);
+			cout<<"Target "<<target->getName()<<" -> number of armies increased to "<<TotalArmies<<endl;
 			//Then, substract current number of armies in source by removing number of armies that moved
 			TotalArmies = source->getArmyCount() - ArmiesToAdvance;
 			source->setArmyCount(TotalArmies);
+			cout<<"Source "<<source->getName()<<" -> number of armies decreased to "<<TotalArmies<<endl;
 		}
 		else
 		{
@@ -351,6 +370,7 @@ void AdvanceOrder::execute()
 			//First, we substract current number of armies in source by removing number of armies that moved
 			TotalArmies = source->getArmyCount() - ArmiesToAdvance;
 			source->setArmyCount(TotalArmies);
+			cout<<"Source "<<source->getName()<<" -> number of armies changed to "<<TotalArmies<<endl;
 
 			//Then we set the number of enemies to fight
 			TargetArmies = target->getArmyCount();
@@ -373,9 +393,14 @@ void AdvanceOrder::execute()
 			//After battle, we see if attacker won and has troups left. Else, nothing happens
 			if (TargetArmies == 0 && ArmiesToAdvance != 0)
 			{
+				cout<<CurrentPlayer->name<<" has won the battle between their owned "<<source->getName()<<" and the opponent's "<<target->getName()<<endl;
 				target->setArmyCount(ArmiesToAdvance);
 				target->setPlayer(CurrentPlayer);
+				//The player who won draws a card.
+				CurrentPlayer->hand->drawCard();
+				cout<<"Player "<<CurrentPlayer->playerID<<" drew a "<<CurrentPlayer->hand->cardsInHand[CurrentPlayer->hand->cardsInHand.size() - 1]->getCardTypeStringValue()<<" card."<<endl;
 				GetCard = true;
+				cout<<"Target "<<target->getName()<<" -> number of armies changed to "<<ArmiesToAdvance<<endl;
 			}
 
 		}
@@ -461,6 +486,7 @@ void BombOrder::execute()
 		int TotalArmy = target->getArmyCount();
 		TotalArmy = TotalArmy / 2;
 		target->setArmyCount(TotalArmy);
+		cout<<target->getName()<<" has been bombed and now has "<<target->getArmyCount()<<" armies left."<<endl;
 	}
 	else
 	{

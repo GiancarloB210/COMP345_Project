@@ -138,38 +138,35 @@ std::string Card::getCardTypeStringValue() {
 //Instantiates a Deck with 40 cards, 8 of each defined type.
 Deck::Deck() {
     for (int i = 0; i < 8; i++) {
-        this->cards[i] = new Card(new CardType(BOMB));;
+        this->cards.push_back(new Card(new CardType(BOMB)));
     }
     for (int i = 8; i < 16; i++) {
-        this->cards[i] = new Card(new CardType(REINFORCEMENT));
+        this->cards.push_back( new Card(new CardType(REINFORCEMENT)));
     }
     for (int i = 16; i < 24; i++) {
-        this->cards[i] = new Card(new CardType(BLOCKADE));
+        this->cards.push_back(new Card(new CardType(BLOCKADE)));
     }
     for (int i = 24; i < 32; i++) {
-        this->cards[i] = new Card(new CardType(AIRLIFT));
+        this->cards.push_back(new Card(new CardType(AIRLIFT)));
     }
     for (int i = 32; i < 40; i++) {
-        this->cards[i] = new Card(new CardType(DIPLOMACY));
+        this->cards.push_back(new Card(new CardType(DIPLOMACY)));
     }
 }
 
 //Instantiates a Deck with 40 cards from a pre-made array.
-Deck::Deck(Card* newDeckCards[40]) {
-    for (int i = 0; i < 40; i++) {
-        this->cards[i] = newDeckCards[i];
-    }
+Deck::Deck(std::vector<Card*> preMadeDeck) {
+    this->cards = preMadeDeck;
 }
 
 //Copy constructor for the Deck class.
 Deck::Deck(Deck& deck) {
-    for (int i = 0; i < 40; i++) {
-        this->cards[i] = deck.cards[i];
-    }
+    this->cards = deck.cards;
 }
 
 Deck::~Deck() {
-    for (int i = 0; i < 40; i++) {
+    int size = this->cards.size();
+    for (int i = 0; i < size; i++) {
         delete this->cards[i];
         this->cards[i] = NULL;
     }
@@ -186,7 +183,7 @@ ostream& operator << (ostream &out_stream, Deck &deck) {
 
 //Allows for the creation of a new Deck via console input.
 istream& operator >> (istream &in_stream, Deck &deck) {
-    Card* newCards[40];
+    std::vector<Card*> newCards;
     //How many cards are in the Deck at any time. Needed for ensuring that exactly 40 cards are added.
     int howeverManyCards = 0;
     //Keeps track of the position of the last card in the Deck. Needed for adding more cards afterwards without any gaps.
@@ -203,7 +200,7 @@ istream& operator >> (istream &in_stream, Deck &deck) {
     howeverManyCards += numBombCards;
     //Instantiates the inputted number of cards within the Deck array, starting from the position of the "last" card in the array..
     for (int i = lastPositionTracker;i < numBombCards;i++) {
-        newCards[i] = new Card(new CardType(BOMB));
+        newCards.push_back(new Card(new CardType(BOMB)));
     }
     //Updates the position of the last card position accordingly.
     lastPositionTracker += numBombCards;
@@ -217,7 +214,7 @@ istream& operator >> (istream &in_stream, Deck &deck) {
     }
     howeverManyCards += numReinCards;
     for (int i = lastPositionTracker;i < numReinCards;i++) {
-        newCards[i] = new Card(new CardType(REINFORCEMENT));
+        newCards.push_back(new Card(new CardType(REINFORCEMENT)));
     }
     lastPositionTracker += numReinCards;
     cout<<"How many cards of type 'Blockade' would you like [7-9]?"<<endl;
@@ -229,7 +226,7 @@ istream& operator >> (istream &in_stream, Deck &deck) {
     }
     howeverManyCards += numBlockCards;
     for (int i = lastPositionTracker;i < numBlockCards;i++) {
-        newCards[i] = new Card(new CardType(BLOCKADE));
+        newCards.push_back(newCards[i] = new Card(new CardType(BLOCKADE)));
     }
     lastPositionTracker += numBlockCards;
     cout<<"How many cards of type 'Airlift' would you like [7-9]?"<<endl;
@@ -241,25 +238,25 @@ istream& operator >> (istream &in_stream, Deck &deck) {
     }
     howeverManyCards += numAirCards;
     for (int i = lastPositionTracker;i < numAirCards;i++) {
-        newCards[i] = new Card(new CardType(AIRLIFT));
+        newCards.push_back(newCards[i] = new Card(new CardType(AIRLIFT)));
     }
     lastPositionTracker += numAirCards;
     cout<<"The remaining "<<40 - howeverManyCards<<" cards will be of type 'Diplomacy'.";
     for (int i = lastPositionTracker;i < 40;i++) {
-        newCards[i] = new Card(new CardType(DIPLOMACY));
+        newCards.push_back(newCards[i] = new Card(new CardType(DIPLOMACY)));
     }
     //Adds all of the cards in the temporary Deck to the Deck variable we wish to create.
-    for (int i = 0;i < 40;i++) {
-        deck.cards[i] = newCards[i];
-    }
+    deck.cards = newCards;
     return in_stream;
 }
 
 Deck& Deck::operator=(Deck deck) {
     //Swapping pointers requires storing one swapped value in a temporary value which can then be pointed to by the other swapped value.
-    Card* tempDeckPointer = *(this->cards);
-    *(this->cards) = *(deck.cards);
-    *(deck.cards) = tempDeckPointer;
+    for (int i = 0; i < this->cards.size(); i++) {
+        Card* tempDeckPointer = this->cards[i];
+        this->cards[i] = deck.cards[i];
+        deck.cards[i] = tempDeckPointer;
+    }
     return *this;
 }
 
@@ -268,7 +265,7 @@ Card* Deck::draw() {
     //Code for shuffling an array and obtaining a true random generation using a time-oriented seed sourced from: https://cplusplus.com/reference/algorithm/shuffle/
     shuffle(std::begin(this->cards), std::end(this->cards), std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()));
     //Returns the first card in the Deck that can actually be drawn (the first card in what would be a tangible Deck with cards already drawn),
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < this->cards.size(); i++) {
         if (this->cards[i]->availableToDraw == true) {
             this->cards[i]->makeUnavailableToDraw();
             return this->cards[i];
@@ -295,9 +292,7 @@ Hand::Hand(Deck* deckInput) {
 //Copy constructor for the Hand class.
 Hand::Hand(Hand& hand) {
     //The 40 pointers in the pointer array are individually copied, since the entire pointer array cannot be.
-    for (int i = 0; i < 40; i++) {
-        this->cardsInHand[i] = hand.cardsInHand[i];
-    }
+    this->cardsInHand = hand.cardsInHand;
     this->deckPlayedWith = hand.deckPlayedWith;
     this->associatedDeckPosition = hand.associatedDeckPosition;
     this->handPosition = hand.handPosition;
@@ -333,9 +328,11 @@ istream& operator >> (istream &in_stream, Hand &hand) {
 
 Hand& Hand::operator=(Hand hand) {
     //Swapping pointers requires storing one swapped value in a temporary value which can then be pointed to by the other swapped value.
-    Card* tempCardsInHandPointer = *(this->cardsInHand);
-    *(this->cardsInHand) = *(hand.cardsInHand);
-    *(hand.cardsInHand) = tempCardsInHandPointer;
+    for (int i = 0; i < this->cardsInHand.size(); i++) {
+        Card* tempCardsInHandPointer = this->cardsInHand[i];
+        this->cardsInHand[i] = hand.cardsInHand[i];
+        hand.cardsInHand[i] = tempCardsInHandPointer;
+    }
 
     Deck tempDeckPlayedWithPointer = *(this->deckPlayedWith);
     *(this->deckPlayedWith) = *(hand.deckPlayedWith);
@@ -351,51 +348,31 @@ Hand& Hand::operator=(Hand hand) {
 //Plays a card in a certain position in the current hand, and returns it to the Deck afterwards.
 Order* Hand::play(int cardIndex) {
     Order* order = this->cardsInHand[cardIndex]->play();
-    for (int i = 0; i < 40; i++) {
-        //Comparison using IDs is best, since it can almost always guarantee a match when the hand plays with the corresponding Deck.
-        if (this->deckPlayedWith->cards[i]->cardID == this->cardsInHand[cardIndex]->cardID) {
-            //"Returns" the card to the deck by making it available to draw in the deck.
-            this->deckPlayedWith->cards[i]->makeAvailableToDraw();
-            break;
-        }
-    }
     //Removes the card from the hand, and sets the next empty spot in the hand to where the most recently played card originally was.
     this->cardsInHand[cardIndex] = nullptr;
-    handPosition = cardIndex;
+    this->cardsInHand.erase(this->cardsInHand.begin() + cardIndex);
+    handPosition = this->cardsInHand.size();
     return order;
 }
 
 //Adds a card to the current hand. Done in conjunction with the draw() method for the Deck class, which returns a drawn card (which is added to the current hand using this method).
 void Hand::addToHand(Card* card) {
     //Adds the card to the first available position in the hand, indicated by handPosition.
-    this->cardsInHand[handPosition] = card;
+    this->cardsInHand.push_back(card);
     //Sets handPosition to the next free position in the hand (the next one with a null pointer).
-    handPosition++;
-    while (this->cardsInHand[handPosition] != nullptr) {
-        handPosition++;
-    }
+    handPosition = this->cardsInHand.size();
 }
 
 //Draws a card from the associated Deck, and adds it to the current hand.
 void Hand::drawCard() {
     //Draws a card from the associated Deck, and adds it to the first available position in the hand, indicated by handPosition.
-    this->cardsInHand[handPosition] = this->deckPlayedWith->draw();
-    //Sets handPosition to the next free position in the hand (the next one with a null pointer).
-    handPosition++;
-    while (this->cardsInHand[handPosition] != nullptr) {
-        handPosition++;
-    }
+    this->cardsInHand.push_back(this->deckPlayedWith->draw());
+    handPosition = this->cardsInHand.size();
 }
 
 //Displays all cards in the current hand.
 void Hand::displayCardsInHand() {
-    for (int i = 0; i < 40; i++) {
-        //Make it clear if no card is in any position in the hand.
-        if (this->cardsInHand[i] == nullptr) {
-            cout<<"No card in position "<<i<<endl;
-        } else {
-            //Uses the overridden stream output operator for the Card class to display card information.
-            cout<<i<<": "<<this->cardsInHand[i]<<endl;
-        }
+    for (int i = 0; i < this->cardsInHand.size(); i++) {
+        cout<<i<<": "<<this->cardsInHand[i]<<endl;
     }
 }

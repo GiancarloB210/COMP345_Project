@@ -37,8 +37,8 @@ int main(int argc, char* argv[]) {
         gameEngine = new GameEngine(new CommandProcessor(gameEngine));
     }
 
-    testGameStates();
-    //testStartupPhase();
+    // testGameStates();
+    testStartupPhase();
     //testCommandProcessor(gameEngine);
     //testMainGameLoop();
     //testOrdersExecution();
