@@ -21,6 +21,7 @@ class BombOrder;
 class BlockadeOrder;
 class AirliftOrder;
 class NegotiateOrder;
+class CheaterOrder;
 
 //Free functions
 std::ostream& operator << (std::ostream& os, OrderList& orderlist);
@@ -61,7 +62,7 @@ public:
 	std::string stringToLog() override;
 };
 
-class Order: public Subject, public ILoggable
+class Order : public Subject, public ILoggable
 {
 public:
 	std::string type, description, effect;
@@ -214,6 +215,25 @@ public:
 
 	//Deconstructor
 	~NegotiateOrder();
+
+	//methods
+	bool validate() override;
+	void execute() override;
+};
+class CheaterOrder : public Order {
+private:
+	Territory* target;
+public:
+	//Constructors
+	CheaterOrder();
+	CheaterOrder(Player* CurrentPlayer, Territory* target);
+	CheaterOrder(CheaterOrder& order);
+
+	//Operators
+	CheaterOrder& operator=(const CheaterOrder& order);
+
+	//Deconstructor
+	~CheaterOrder();
 
 	//methods
 	bool validate() override;

@@ -243,11 +243,11 @@ int DeployOrder::getArmiesToAdd() {
 //methods
 bool DeployOrder::validate()
 {
-	cout<<"Validating deployOrder"<<endl;
-	cout<<"Target: "<<target->getName()<<endl;
+	cout << "Validating deployOrder" << endl;
+	cout << "Target: " << target->getName() << endl;
 	if (CurrentPlayer == target->getPlayer()) {
 		//Verify that current player is the same as territory owner
-		cout<<"deployOrder validated!"<<endl;
+		cout << "deployOrder validated!" << endl;
 		valid = true;
 	}
 	return valid;
@@ -260,7 +260,7 @@ void DeployOrder::execute()
 	{
 		int TotalArmies = ArmiesToAdd + target->getArmyCount();
 		target->setArmyCount(TotalArmies);
-		cout<<target->getName()<<" has had armies deployed to it, and now contains "<<target->getArmyCount()<<" armies."<<endl;
+		cout << target->getName() << " has had armies deployed to it, and now contains " << target->getArmyCount() << " armies." << endl;
 
 	}
 	else
@@ -320,13 +320,13 @@ bool AdvanceOrder::validate()
 	}
 	if (CurrentPlayer == source->getPlayer()) //First, we check if player of source territory is the same as the current player
 	{
-		cout<<"AdvanceOrder: source player verification complete"<<endl;
+		cout << "AdvanceOrder: source player verification complete" << endl;
 		//Then, we check through the list of adjacent territories of the source and see if one is equal to the target
 		for (std::string x : source->getAdjacentTerritoryNames())
 		{
 			if (target->getName() == x)
 			{
-				cout<<"AdvanceOrder: target name located in adjacent territory list."<<endl;
+				cout << "AdvanceOrder: target name located in adjacent territory list." << endl;
 				valid = true;
 			}
 		}
@@ -354,19 +354,19 @@ void AdvanceOrder::execute()
 	{
 		if (CurrentPlayer == target->getPlayer()) //If target territory is player territory
 		{
-			cout<<"AdvanceOrder: deploying to another territory owned by player "<<CurrentPlayer->playerID<<endl;
+			cout << "AdvanceOrder: deploying to another territory owned by player " << CurrentPlayer->playerID << endl;
 			//First, move armies by setting a new amount of armies in the target
 			TotalArmies = ArmiesToAdvance + target->getArmyCount();
 			target->setArmyCount(TotalArmies);
-			cout<<"Target "<<target->getName()<<" -> number of armies increased to "<<TotalArmies<<endl;
+			cout << "Target " << target->getName() << " -> number of armies increased to " << TotalArmies << endl;
 			//Then, substract current number of armies in source by removing number of armies that moved
 			TotalArmies = source->getArmyCount() - ArmiesToAdvance;
 			source->setArmyCount(TotalArmies);
-			cout<<"Source "<<source->getName()<<" -> number of armies decreased to "<<TotalArmies<<endl;
+			cout << "Source " << source->getName() << " -> number of armies decreased to " << TotalArmies << endl;
 		}
 		else
 		{
-			cout<<"A battle is about to begin between players "<<source->getPlayer()->getName()<<" (attacking) and "<<target->getPlayer()->getName()<<" (defending)"<<endl;
+			cout << "A battle is about to begin between players " << source->getPlayer()->getName() << " (attacking) and " << target->getPlayer()->getName() << " (defending)" << endl;
 			//We check if we have an agreement with the current holder of the target territory
 			for (Player* p : Armistice)
 			{
@@ -379,7 +379,7 @@ void AdvanceOrder::execute()
 			//First, we substract current number of armies in source by removing number of armies that moved
 			TotalArmies = source->getArmyCount() - ArmiesToAdvance;
 			source->setArmyCount(TotalArmies);
-			cout<<"Source "<<source->getName()<<" -> number of armies changed to "<<TotalArmies<<endl;
+			cout << "Source " << source->getName() << " -> number of armies changed to " << TotalArmies << endl;
 
 			//Then we set the number of enemies to fight
 			TargetArmies = target->getArmyCount();
@@ -391,30 +391,30 @@ void AdvanceOrder::execute()
 				{
 					randomValue = distrib(gen);
 					if (randomValue <= 6)
-						cout<<target->getPlayer()->getName()<<" (the defender) lost one army!"<<endl;
-						TargetArmies -= 1;
+						cout << target->getPlayer()->getName() << " (the defender) lost one army!" << endl;
+					TargetArmies -= 1;
 
 					randomValue = distrib(gen);
 					if (randomValue <= 7)
-						cout<<source->getPlayer()->getName()<<" (the attacker) lost one army!"<<endl;
-						ArmiesToAdvance -= 1;
+						cout << source->getPlayer()->getName() << " (the attacker) lost one army!" << endl;
+					ArmiesToAdvance -= 1;
 				}
 			}
 
 			//After battle, we see if attacker won and has troups left. Else, nothing happens
 			if (TargetArmies == 0 && ArmiesToAdvance != 0)
 			{
-				cout<<CurrentPlayer->name<<" has won the battle between their owned "<<source->getName()<<" and the opponent's "<<target->getName()<<endl;
+				cout << CurrentPlayer->name << " has won the battle between their owned " << source->getName() << " and the opponent's " << target->getName() << endl;
 				target->setArmyCount(ArmiesToAdvance);
 				target->setPlayer(CurrentPlayer);
 				//The player who won draws a card.
 				CurrentPlayer->hand->drawCard();
-				cout<<"Player "<<CurrentPlayer->playerID<<" drew a "<<CurrentPlayer->hand->cardsInHand[CurrentPlayer->hand->cardsInHand.size() - 1]->getCardTypeStringValue()<<" card."<<endl;
+				cout << "Player " << CurrentPlayer->playerID << " drew a " << CurrentPlayer->hand->cardsInHand[CurrentPlayer->hand->cardsInHand.size() - 1]->getCardTypeStringValue() << " card." << endl;
 				GetCard = true;
-				cout<<"Target "<<target->getName()<<" -> number of armies changed to "<<ArmiesToAdvance<<endl;
+				cout << "Target " << target->getName() << " -> number of armies changed to " << ArmiesToAdvance << endl;
 			}
 			else {
-				cout<<CurrentPlayer->name<<" has lost the battle between their owned "<<source->getName()<<" and the opponent's "<<target->getName()<<endl;
+				cout << CurrentPlayer->name << " has lost the battle between their owned " << source->getName() << " and the opponent's " << target->getName() << endl;
 			}
 		}
 	}
@@ -500,7 +500,7 @@ void BombOrder::execute()
 		int TotalArmy = target->getArmyCount();
 		TotalArmy = TotalArmy / 2;
 		target->setArmyCount(TotalArmy);
-		cout<<target->getName()<<" has been bombed and now has "<<target->getArmyCount()<<" armies left."<<endl;
+		cout << target->getName() << " has been bombed and now has " << target->getArmyCount() << " armies left." << endl;
 	}
 	else
 	{
@@ -568,17 +568,17 @@ void BlockadeOrder::execute()
 		cout << "This order is default and invalid\n";
 	else if (validate())
 	{
-		cout<<"in BlockadeOrder execution"<<endl;
+		cout << "in BlockadeOrder execution" << endl;
 		//Double the number of armies in the target territory.
 		int TotalArmies = target->getArmyCount();
 		TotalArmies = TotalArmies * 2;
-		cout<<"initialized TotalArmies (BlockadeOrder execution) to "<<TotalArmies<<endl;
+		cout << "initialized TotalArmies (BlockadeOrder execution) to " << TotalArmies << endl;
 		//Make it owned by nobody as it is technically within a blockade.
 		target->setPlayer(nullptr);
-		cout<<"set player to null"<<endl;
+		cout << "set player to null" << endl;
 		target->setArmyCount(TotalArmies);
-		cout<<"set armyCount"<<endl;
-		cout<<"Finished with BlockadeOrder execution"<<endl;
+		cout << "set armyCount" << endl;
+		cout << "Finished with BlockadeOrder execution" << endl;
 	}
 	else
 	{
@@ -734,3 +734,79 @@ std::string OrderList::stringToLog() {
 std::string Order::stringToLog() {
 	return "";
 }
+
+
+#pragma region CheaterOrder
+//AirliftOrder Subclass
+//--------------------------------------------------------------------------------------------------------
+
+//Constructors
+CheaterOrder::CheaterOrder()
+{
+	type = "Cheater";
+	description = "Captures target territory without a battle";
+	effect = "Changes the target territory's player to the current one";
+	valid = false;
+	isDefaultOrder = true;
+}
+
+CheaterOrder::CheaterOrder(Player* CurrentPlayer, Territory* target)
+{
+	this->CurrentPlayer = CurrentPlayer;
+	this->target = target;
+	type = "Cheater";
+	description = "Captures target territory without a battle";
+	effect = "Changes the target territory's player to the current one";
+	valid = false;
+	isDefaultOrder = false;
+}
+CheaterOrder::CheaterOrder(CheaterOrder& order)
+{
+	type = order.type;
+	description = order.description;
+	effect = order.effect;
+	valid = order.valid;
+}
+
+//Deconstructor
+CheaterOrder::~CheaterOrder() {}
+
+//methods
+bool CheaterOrder::validate()
+{
+	if (CurrentPlayer != target->getPlayer()) //First, we check if player of source territory is NOT the same as the current player
+	{
+		//Then, we check through the list of adjacent territories of the target and see if one is the territory of the Current player
+		for (Territory* x : target->getAdjacentTerritories())
+		{
+			if (x->getPlayer() == CurrentPlayer)
+			{
+				valid = true;
+			}
+		}
+	}
+	return valid;
+}
+void CheaterOrder::execute()
+{
+	if (isDefaultOrder)
+	{
+		cout << "This order is default and invalid\n";
+		return;
+	}
+	if (validate())
+	{
+		target->setPlayer(CurrentPlayer);
+		//The player who won draws a card.
+		CurrentPlayer->hand->drawCard();
+		GetCard = true;
+	}
+	else
+	{
+		cout << "Order to Cheat is not valid\n";
+	}
+}
+
+//Operators
+CheaterOrder& CheaterOrder::operator=(const CheaterOrder& order) = default;
+#pragma endregion
