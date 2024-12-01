@@ -6,12 +6,12 @@
 // Function to test the Player class methods
 void testPlayers() {
     // Mock territories from the Map
-    Territory* t1 = new Territory("Territory1", "Continent1", 10, 10, std::list<std::string>{"Territory2", "Territory3"});
-    Territory* t2 = new Territory("Territory2", "Continent1", 20, 20, std::list<std::string>{"Territory1", "Territory4"});
-    Territory* t3 = new Territory("Territory3", "Continent1", 30, 30, std::list<std::string>{"Territory1", "Territory5"});
+    Territory* t1 = new Territory("Territory1", "Continent1", 10, 10, std::vector<std::string>{"Territory2", "Territory3"});
+    Territory* t2 = new Territory("Territory2", "Continent1", 20, 20, std::vector<std::string>{"Territory1", "Territory4"});
+    Territory* t3 = new Territory("Territory3", "Continent1", 30, 30, std::vector<std::string>{"Territory1", "Territory5"});
     
-    std::list<Territory*> territories = { t1, t2, t3 };
-    std::list<Territory*>* territoryPointer = &territories;
+    std::vector<Territory*> territories = { t1, t2, t3 };
+    std::vector<Territory*>* territoryPointer = &territories;
 
     // Mock hand of cards and deck
     Deck* deck = new Deck();
@@ -22,19 +22,17 @@ void testPlayers() {
 
     // Test toDefend method
     std::cout << "Testing toDefend method: \n";
-    std::list<Territory*>* defendList = player->toDefend();
-    for (Territory* t : *defendList) {
+    std::vector<Territory*> defendList = player->toDefend();
+    for (Territory* t : defendList) {
         std::cout << "Territory to defend: " << t->getName() << "\n";
     }
-    delete defendList; // Clean up dynamically allocated defendList
 
     // Test toAttack method
     std::cout << "Testing toAttack method: \n";
-    std::list<Territory*>* attackList = player->toAttack();
-    for (Territory* t : *attackList) {
+    std::vector<Territory*> attackList = player->toAttack();
+    for (Territory* t : attackList) {
         std::cout << "Territory to attack: " << t->getName() << "\n";
     }
-    delete attackList; // Clean up dynamically allocated attackList
 
     // Test issueOrder method
     std::cout << "Testing issueOrder method:\n";

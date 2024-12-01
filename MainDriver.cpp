@@ -11,6 +11,7 @@
 #include "MapDriver.h"
 #include "PlayerDriver.h"
 #include "GameEngineDriver.h"
+#include "PlayerStrategiesDriver.h"
 #include "GameEngine.h"
 #include "Map.h"
 #include "Player.h"
@@ -37,13 +38,16 @@ int main(int argc, char* argv[]) {
         gameEngine = new GameEngine(new CommandProcessor(gameEngine));
     }
 
-    gameEngine->startupPhase();
+    // testGameStates();
+    // testStartupPhase();
+    //gameEngine->startupPhase();
 
     //testGameStates();
     //testStartupPhase();
     //testCommandProcessor(gameEngine);
     //testMainGameLoop();
     //testOrdersExecution();
+    testPlayerStrategies();
 
     return 0;
 }

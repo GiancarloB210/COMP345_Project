@@ -123,6 +123,19 @@ void GameEngine::setupTransitions() {
     stateTransitions[State::START]["tournament"] = State::TOURNAMENT;
 }
 
+Player* GameEngine::getPlayerByID(int id) {
+    for (int i = 0;i < this->gamePlayers.size();i++) {
+        if (this->gamePlayers[i]->playerID == id) {
+            return this->gamePlayers[i];
+        }
+    }
+    return nullptr;
+}
+
+int GameEngine::getNumPlayers() {
+    return this->numPlayers;
+}
+
 
 // Main Game Loop Method
 void GameEngine::mainGameLoop() {
@@ -157,6 +170,14 @@ void GameEngine::reinforcementPhase() {
 
         // Total reinforcements
         int totalReinforcements = baseReinforcements + continentBonus;
+
+        //Adds the player's new units to their armyUnits vector, making sure that each new
+        //army unit is associated with them.
+        for (int i = 0;i < totalReinforcements; i++) {
+            player->armyUnits.push_back(new ArmyUnit(player));
+        }
+
+        //Adds the player's new units to their numerically indicated total army units.
         player->addToReinforcementPool(totalReinforcements);
 
         // Output message about reinforcements
@@ -172,26 +193,39 @@ void GameEngine::reinforcementPhase() {
 
 // Issue Orders Phase Method
 void GameEngine::issueOrdersPhase() {
-    bool ordersPending;
-    do {
-        ordersPending = false;
-        for (Player* player : gamePlayers) {
-            if (player->reinforcementPool > 0 || player->hasMoreOrders()) {
-                player->issueOrder();
-                ordersPending = true;
+    for (int i = 0;i < this->playerOrder.size(); i++) {
+        Player* player = this->gamePlayers[0];
+        for (Player* p : this->gamePlayers) {
+            if (p->playerID == this->playerOrder[i]) {
+                player = p;
+                break;
             }
         }
-    } while (ordersPending);
+        player->issueOrder();
+    }
 }
 
 // Execute Orders Phase Method
 void GameEngine::executeOrdersPhase() {
+    cout<<"in executeOrders"<<endl;
     bool ordersLeft;
     do {
-        ordersLeft = false;
+        vector<bool> ordersLeftTracker(playerOrder.size(), true);
         for (Player* player : gamePlayers) {
-            if (player->hasMoreOrders()) {
-                player->getNextOrder()->execute();
+            cout<<"Current player: "<<player->playerID<<endl;
+            Order* nextOrder = player->getNextOrder();
+            if (nextOrder == nullptr) {
+                cout<<"No more orders."<<endl;
+                ordersLeftTracker[player->playerID] = false;
+            }
+            else {
+                cout<<"Player "<<player->playerID<<" has more orders"<<endl;
+                nextOrder->execute();
+            }
+        }
+        ordersLeft = false;
+        for (int i = 0;i < ordersLeftTracker.size();i++) {
+            if (ordersLeftTracker[i] == true) {
                 ordersLeft = true;
             }
         }
@@ -338,13 +372,42 @@ void GameEngine::setUpPlayers() {
         string newPlayerName;
         cout << "Enter the name of player " << (i + 1) << endl;
         cin >> newPlayerName;
-        Player* p = new Player(newPlayerName, new std::list<Territory*>, new Hand(gameDeck));
+        Player* p = new Player(newPlayerName, new std::vector<Territory*>, new Hand(gameDeck));
+        p->currentGame = this;
+
+        string strategyName;
+        PlayerStrategy* newStrategy;
+        bool validPlayerStrategyCheck = false;
+        while (!validPlayerStrategyCheck) {
+            cout << "Enter the type of player [Human/Benevolent/Aggressive]." << endl;
+            cin >> strategyName;
+            if (cin.fail() || (strategyName != "Human" && strategyName != "Benevolent" && strategyName != "Aggressive")) {
+                cin.clear();
+                cin.ignore();
+                cout << "Invalid. Please enter a valid number of players (from 2 to 6)." << endl;
+            } else {
+                validPlayerStrategyCheck = true;
+                if (strategyName == "Human") {
+                    newStrategy = new HumanPlayerStrategy(p);
+                    p->ps = newStrategy;
+                }
+                if (strategyName == "Aggressive") {
+                    newStrategy = new AggressivePlayerStrategy(p);
+                    p->ps = newStrategy;
+                }
+                if (strategyName == "Benevolent") {
+                    newStrategy = new BenevolentPlayerStrategy(p);
+                    p->ps = newStrategy;
+                }
+            }
+        }
 
         // Add the player to the list of game players.
         this->gamePlayers.push_back(p);
     }
 
     // Transition state to PLAYERS_ADDED once players are added
+    this->numPlayers = this->gamePlayers.size();
     currentState = State::PLAYERS_ADDED;
     cout << "Players added. Now, issue the gamestart command to start the game!" << endl;
 }
@@ -391,6 +454,7 @@ void GameEngine::determinePlayerOrder() {
 
 void GameEngine::allocateInitialArmies() {
     for (int j = 0; j < this->gamePlayers.size(); j++) {
+        this->gamePlayers[j]->reinforcementPool = 50;
         for (int k = 0; k < 50; k++) {
             this->gamePlayers[j]->armyUnits.push_back(new ArmyUnit(this->gamePlayers[j]));
         }
@@ -406,7 +470,16 @@ void GameEngine::drawInitialCards() {
     cout << "Initial cards drawn for players." << endl;
 }
 
-
+//Changes the strategy of an existing player to a new one.
+//Used for testing and the Neutral -> Aggressive transition.
+void GameEngine::changePlayerStrategy(int playerID, PlayerStrategy* newStrategy) {
+    for (int i = 0; i < this->gamePlayers.size(); i++) {
+        if (this->gamePlayers[i]->playerID == playerID) {
+            this->gamePlayers[i]->ps = newStrategy;
+            return;
+        }
+    }
+}
 
 void GameEngine::startGame() {
     cout << "The game has been started." << endl;
@@ -691,7 +764,7 @@ void GameEngine::tournamentMode(const string & command) {
 
                 // Set-up Players
                 for (const auto & player : tournamentCommand.at(1)) {
-                    gamePlayers.push_back(new Player(player, new std::list<Territory*>, new Hand(gameDeck)));
+                    gamePlayers.push_back(new Player(player, new std::vector<Territory*>, new Hand(gameDeck)));
                 }
 
                 distributeTerritories();

@@ -7,6 +7,8 @@
 #include <vector>
 #include <algorithm>
 
+class Map;
+
 #include "CommandProcessing.h"
 #include "Map.h"
 #include "Player.h"
@@ -85,6 +87,9 @@ public:
     bool isValidCommand(const std::string& command) const;
     void startupPhase();
     CommandProcessor* getCommandProcessor();
+    Player* getPlayerByID(int id);
+    int getNumPlayers();
+
     void tournamentMode(const string & command);
 
     // Override stringToLog() for logging
@@ -100,6 +105,8 @@ public:
     void determinePlayerOrder();
     void allocateInitialArmies();
     void drawInitialCards();
+
+    void changePlayerStrategy(int playerID, PlayerStrategy* newStrategy);
 
     // Main game loop methods
     void mainGameLoop();             // Main game loop function

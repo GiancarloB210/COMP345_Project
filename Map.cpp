@@ -18,7 +18,7 @@ Territory::Territory(Territory &territory) {
 
 // Territory Class Constructor
 Territory::Territory(std::string name, std::string continentName, int xCoord, int yCoord,
-    std::list<std::string> adjacentTerritoryNames) {
+    std::vector<std::string> adjacentTerritoryNames) {
     this->name = name;
     this->continentName = continentName;
     this->xCoord = xCoord;
@@ -58,16 +58,16 @@ int Territory::getArmyCount() {
     return this->armyCount;
 }
 
-std::list<std::string> Territory::getAdjacentTerritoryNames() {
+std::vector<std::string> Territory::getAdjacentTerritoryNames() {
     return this->adjacentTerritoryNames;
 }
 
-std::list<Territory*> Territory::getAdjacentTerritories() {
-    return this-> adjacentTerritories;
+std::vector<Territory*> Territory::getAdjacentTerritories() {
+    return this->adjacentTerritories;
 }
 
 // Territory Class Mutators
-void Territory::setAdjacentTerritories(std::list<Territory *> adjacentTerritories) {
+void Territory::setAdjacentTerritories(std::vector<Territory *> adjacentTerritories) {
     this->adjacentTerritories = adjacentTerritories;
 }
 
@@ -85,7 +85,28 @@ void Territory::setArmyCount(int armyCount) {
  }
 
  void Territory::setPlayer(Player* player) {
- this->territoryOwner = player;
+    //If the player owner hasn't been set yet, set it to the target player and be done.
+    if (this->territoryOwner == nullptr) {
+        this->territoryOwner = player;
+    }
+    else {
+        Player* oldPlayer = this->territoryOwner;
+        int territoryTracker = 0;
+        //Find the index of the current territory within the associated player's list of territories.
+        for (int i = 0;i < this->territoryOwner->territories->size();i++) {
+            if (this == (*this->territoryOwner->territories)[i]) {
+                territoryTracker = i;
+                i = this->territoryOwner->territories->size();
+            }
+        }
+        //Delete territory from old owner's list, set its owner to the new player, and add the territory to that new player's list of owned territories.
+        oldPlayer->territories->erase(this->territoryOwner->territories->begin() + territoryTracker);
+        this->territoryOwner = player;
+        //This cannot be done if the new player is null (in the case of issuing Blockade orders).
+        if (player != nullptr) {
+            player->territories->push_back(this);
+        }
+    }
  }
 
 // Territory Class Operators
@@ -315,7 +336,7 @@ bool Map::traverseContinents(std::list<Continent*> adjacentContinents, std::list
 
 // traverseTerritories checks to see if the Map's Territories are a connected graph by visiting Territories and their
 // adjacentTerritory list, while keeping track of a list of territories that haven't been visited yet
-bool Map::traverseTerritories(std::list<Territory*> adjacentTerritories, std::list<Territory*> &uncheckedTerritories,
+bool Map::traverseTerritories(std::vector<Territory*> adjacentTerritories, std::list<Territory*> &uncheckedTerritories,
     Territory* startingTerritory) {
 
     for (auto const& i : uncheckedTerritories) {
@@ -500,7 +521,7 @@ Map *MapLoader::readFile(std::string filePath) {
             std::string territoryName;
             int territoryXCoord;
             int territoryYCoord;
-            std::list<std::string> adjacentTerritoryNames;
+            std::vector<std::string> adjacentTerritoryNames;
             std::list<Territory*> continentTerritories;
             std::string continentName;
 

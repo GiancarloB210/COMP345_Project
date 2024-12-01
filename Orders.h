@@ -46,6 +46,7 @@ public:
 
 	//Accessors
 	std::vector<Order*> getList();
+	void setList(std::vector<Order*> list);
 	std::list<Player*> getArmistice();
 	bool isGettingCard();
 
@@ -105,6 +106,9 @@ public:
 	DeployOrder();
 	DeployOrder(Player* CurrentPlayer, Territory* target, int ATD);
 	DeployOrder(DeployOrder& order);
+
+	Territory* getTarget();
+	int getArmiesToAdd();
 
 	//Operators
 	DeployOrder& operator=(const DeployOrder& order);
