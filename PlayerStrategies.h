@@ -13,7 +13,7 @@ public:
     virtual std::vector<Territory*> toDefend() = 0;
 };
 
-class HumanPlayerStrategy: public PlayerStrategy {
+class HumanPlayerStrategy : public PlayerStrategy {
 public:
     Player* pi;
     HumanPlayerStrategy(Player* pi);
@@ -23,7 +23,7 @@ public:
     std::vector<Territory*> toDefend();
 };
 
-class AggressivePlayerStrategy: public PlayerStrategy {
+class AggressivePlayerStrategy : public PlayerStrategy {
 public:
     Player* pi;
     AggressivePlayerStrategy(Player* pi);
@@ -33,10 +33,30 @@ public:
     std::vector<Territory*> toDefend();
 };
 
-class BenevolentPlayerStrategy: public PlayerStrategy {
+class BenevolentPlayerStrategy : public PlayerStrategy {
 public:
     Player* pi;
     BenevolentPlayerStrategy(Player* pi);
+
+    void issueOrder();
+    std::vector<Territory*> toAttack();
+    std::vector<Territory*> toDefend();
+};
+
+class NeutralPlayerStrategy : public PlayerStrategy {
+public:
+    Player* pi;
+    NeutralPlayerStrategy(Player* pi);
+
+    void issueOrder();
+    std::vector<Territory*> toAttack();
+    std::vector<Territory*> toDefend();
+};
+
+class CheaterPlayerStrategy : public PlayerStrategy {
+public:
+    Player* pi;
+    CheaterPlayerStrategy(Player* pi);
 
     void issueOrder();
     std::vector<Territory*> toAttack();
