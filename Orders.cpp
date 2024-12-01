@@ -244,6 +244,7 @@ int DeployOrder::getArmiesToAdd() {
 bool DeployOrder::validate()
 {
 	cout<<"Validating deployOrder"<<endl;
+	cout<<"Target: "<<target->getName()<<endl;
 	if (CurrentPlayer == target->getPlayer()) {
 		//Verify that current player is the same as territory owner
 		cout<<"deployOrder validated!"<<endl;
@@ -313,13 +314,19 @@ AdvanceOrder::~AdvanceOrder() {}
 //methods
 bool AdvanceOrder::validate()
 {
+	//Cannot attack or advance to a territory with no owner (one in a blockade).
+	if (target->getPlayer() == nullptr) {
+		return false;
+	}
 	if (CurrentPlayer == source->getPlayer()) //First, we check if player of source territory is the same as the current player
 	{
+		cout<<"AdvanceOrder: source player verification complete"<<endl;
 		//Then, we check through the list of adjacent territories of the source and see if one is equal to the target
 		for (std::string x : source->getAdjacentTerritoryNames())
 		{
 			if (target->getName() == x)
 			{
+				cout<<"AdvanceOrder: target name located in adjacent territory list."<<endl;
 				valid = true;
 			}
 		}
@@ -347,6 +354,7 @@ void AdvanceOrder::execute()
 	{
 		if (CurrentPlayer == target->getPlayer()) //If target territory is player territory
 		{
+			cout<<"AdvanceOrder: deploying to another territory owned by player "<<CurrentPlayer->playerID<<endl;
 			//First, move armies by setting a new amount of armies in the target
 			TotalArmies = ArmiesToAdvance + target->getArmyCount();
 			target->setArmyCount(TotalArmies);
@@ -358,6 +366,7 @@ void AdvanceOrder::execute()
 		}
 		else
 		{
+			cout<<"A battle is about to begin between players "<<source->getPlayer()->getName()<<" (attacking) and "<<target->getPlayer()->getName()<<" (defending)"<<endl;
 			//We check if we have an agreement with the current holder of the target territory
 			for (Player* p : Armistice)
 			{
@@ -382,10 +391,12 @@ void AdvanceOrder::execute()
 				{
 					randomValue = distrib(gen);
 					if (randomValue <= 6)
+						cout<<target->getPlayer()->getName()<<" (the defender) lost one army!"<<endl;
 						TargetArmies -= 1;
 
 					randomValue = distrib(gen);
 					if (randomValue <= 7)
+						cout<<source->getPlayer()->getName()<<" (the attacker) lost one army!"<<endl;
 						ArmiesToAdvance -= 1;
 				}
 			}
@@ -402,7 +413,9 @@ void AdvanceOrder::execute()
 				GetCard = true;
 				cout<<"Target "<<target->getName()<<" -> number of armies changed to "<<ArmiesToAdvance<<endl;
 			}
-
+			else {
+				cout<<CurrentPlayer->name<<" has lost the battle between their owned "<<source->getName()<<" and the opponent's "<<target->getName()<<endl;
+			}
 		}
 	}
 	else
@@ -483,6 +496,7 @@ void BombOrder::execute()
 			}
 		}
 
+		//Destroy half of the armies in the target territory, and set that half-value as their new army count value.
 		int TotalArmy = target->getArmyCount();
 		TotalArmy = TotalArmy / 2;
 		target->setArmyCount(TotalArmy);
@@ -536,6 +550,10 @@ BlockadeOrder::~BlockadeOrder() {}
 //methods
 bool BlockadeOrder::validate()
 {
+	//If there's no player owner, don't do anything.
+	if (target->getPlayer() == nullptr) {
+		return false;
+	}
 	if (CurrentPlayer == target->getPlayer())
 	{
 		valid = true;
@@ -550,10 +568,17 @@ void BlockadeOrder::execute()
 		cout << "This order is default and invalid\n";
 	else if (validate())
 	{
+		cout<<"in BlockadeOrder execution"<<endl;
+		//Double the number of armies in the target territory.
 		int TotalArmies = target->getArmyCount();
 		TotalArmies = TotalArmies * 2;
+		cout<<"initialized TotalArmies (BlockadeOrder execution) to "<<TotalArmies<<endl;
+		//Make it owned by nobody as it is technically within a blockade.
 		target->setPlayer(nullptr);
+		cout<<"set player to null"<<endl;
 		target->setArmyCount(TotalArmies);
+		cout<<"set armyCount"<<endl;
+		cout<<"Finished with BlockadeOrder execution"<<endl;
 	}
 	else
 	{

@@ -38,6 +38,8 @@ add_executable(COMP345_Project
         LogObserver.h
         LogObserver.cpp
         PlayerStrategies.cpp
-        PlayerStrategies.h)
+        PlayerStrategies.h
+        PlayerStrategiesDriver.cpp
+        PlayerStrategiesDriver.h)
 
 

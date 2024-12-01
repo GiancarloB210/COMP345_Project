@@ -85,7 +85,28 @@ void Territory::setArmyCount(int armyCount) {
  }
 
  void Territory::setPlayer(Player* player) {
- this->territoryOwner = player;
+    //If the player owner hasn't been set yet, set it to the target player and be done.
+    if (this->territoryOwner == nullptr) {
+        this->territoryOwner = player;
+    }
+    else {
+        Player* oldPlayer = this->territoryOwner;
+        int territoryTracker = 0;
+        //Find the index of the current territory within the associated player's list of territories.
+        for (int i = 0;i < this->territoryOwner->territories->size();i++) {
+            if (this == (*this->territoryOwner->territories)[i]) {
+                territoryTracker = i;
+                i = this->territoryOwner->territories->size();
+            }
+        }
+        //Delete territory from old owner's list, set its owner to the new player, and add the territory to that new player's list of owned territories.
+        oldPlayer->territories->erase(this->territoryOwner->territories->begin() + territoryTracker);
+        this->territoryOwner = player;
+        //This cannot be done if the new player is null (in the case of issuing Blockade orders).
+        if (player != nullptr) {
+            player->territories->push_back(this);
+        }
+    }
  }
 
 // Territory Class Operators

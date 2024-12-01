@@ -115,6 +115,7 @@ void Player::playCard(int handIndex) {
     Order* returnedOrder = this->hand->play(handIndex);
     BombOrder* bo = dynamic_cast<BombOrder*>(returnedOrder);
     if (bo != NULL) {
+        //List of candidate bomb targets.
         std::vector<Territory*> bombList;
         int iterator = 0;
         cout<<"List of territories that can be bombed by player "<<playerID<<endl;
@@ -122,6 +123,7 @@ void Player::playCard(int handIndex) {
             for (int j = 0;j < (*this->territories)[i]->getAdjacentTerritories().size();j++) {
                 //Only return an adjacent territory if it doesn't belong to the current player.
                 if ((*this->territories)[i]->getAdjacentTerritories()[j]->getPlayer() != this) {
+                    //Only add a territory to the list of potential bomb targets if it isn't already on the list.
                     if (std::find(bombList.begin(), bombList.end(), (*this->territories)[i]->getAdjacentTerritories()[j]) == bombList.end()) {
                         bombList.push_back((*this->territories)[i]->getAdjacentTerritories()[j]);
                         cout<<"["<<iterator<<"] "<<(*this->territories)[i]->getAdjacentTerritories()[j]->getName()<<endl;
@@ -130,6 +132,7 @@ void Player::playCard(int handIndex) {
                 }
             }
         }
+        //Index of enemy territory to be bombed
         int bombedIndex = 0;
         bool validBombOrder = false;
         while (!validBombOrder) {
@@ -157,9 +160,11 @@ void Player::playCard(int handIndex) {
     }
     BlockadeOrder* bl_order = dynamic_cast<BlockadeOrder*>(returnedOrder);
     if (bl_order != NULL) {
+        //All owned territories can technically have a blockade set up.
         std::vector<Territory*> blockadeList = toDefend();
         cout<<"Enter the index corresponding to the territory which you would like to set up a blockade for."<<endl;
         cout<<"Note that ownership of the territory will transfer to a Neutral player."<<endl;
+        //This 'iterator' variable isn't used, but it might be in a later code iteration.
         int iterator = 0;
         int blockadeIndex = 0;
         bool validBlockadeCheck = false;
@@ -179,6 +184,8 @@ void Player::playCard(int handIndex) {
     }
     AirliftOrder* ao = dynamic_cast<AirliftOrder*>(returnedOrder);
     if (ao != NULL) {
+        //Same as an advance order from one owned territory to another, but applying to a card
+        //and its associated order type.
         std::vector<TempTerritoryUnitInfo> infoList = getTempTerritoryUnitInfo();
         int fromIndex_Airlift = 0;
             int toIndex_Airlift = 0;
@@ -259,6 +266,7 @@ void Player::playCard(int handIndex) {
                         cout << "Invalid. Please enter a valid index." << endl;
                     } else {
                         validUnitsSentCheck = true;
+                        validAirliftCommandCheck = true;
                         for (int j = 0;j < infoList.size();j++) {
                             if (infoList[j].territory->getName() == fromTerritory->getName()) {
                                 infoList[j].numUnitsThere -= numUnitsSent;
@@ -276,19 +284,45 @@ void Player::playCard(int handIndex) {
     }
     NegotiateOrder* no = dynamic_cast<NegotiateOrder*>(returnedOrder);
     if (no != NULL) {
+        //This field is unused, but it may be used in a later code iteration.
         int indexer = 0;
         std::vector<int> playerIDs;
-        for (int i = 0;i < playerIDs.size();i++) {
-
+        //Gets all of the IDs from the player's associated game's player list and puts them all in a list.
+        for (int i = 0;i < this->currentGame->getNumPlayers();i++) {
+            playerIDs.push_back(i);
+            cout<<"["<<i<<"] "<<this->currentGame->getPlayerByID(i)->getName()<<" with ID "<<this->currentGame->getPlayerByID(i)->playerID<<endl;
+        }
+        //Checks if a valid ID has been inputted;
+        bool validIDCheck = false;
+        //Chosen player ID corresponding to player to establish a negotiation with.
+        int selectedID;
+        while (!validIDCheck) {
+            cout << "Enter the index of the territory which you would like to deploy units to" << endl;
+            cin >> selectedID;
+            if (cin.fail() || (selectedID < 0 || selectedID >= playerIDs.size())) {
+                cin.clear();
+                cin.ignore();
+                cout << "Invalid. Please enter a valid index." << endl;
+            } else {
+                validIDCheck = true;
+                //Gets the player from the selected ID, and establishes a negotiate order between the current player & that player.
+                orders->add(new NegotiateOrder(this, this->currentGame->getPlayerByID(selectedID)));
+            }
         }
     }
 }
 
+//Returns info of all owned terrtories and all associated army units for those territories.
+//Associated: either in them already or about to be thanks to deployment orders.
 std::vector<TempTerritoryUnitInfo> Player::getTempTerritoryUnitInfo() {
     std::vector<TempTerritoryUnitInfo> infoList;
     for (int i = 0;i < this->territories->size();i++) {
+        //Will contain territory-unit info for the curret territory in the list.
         TempTerritoryUnitInfo newInfo;
+        //Gets the number of army units already there.
         int deployedThere = (*this->territories)[i]->getArmyCount();
+        //Gets the total number of to-be-deployed army units (thanks to DeployOrder conversions)
+        //and adds this to the number of units assumed to be there.
         std::vector<Order*> orderList = this->orders->getList();
         for (int j = 0;j < orderList.size();j++) {
             if (dynamic_cast<DeployOrder*>(orderList[j]) != nullptr) {

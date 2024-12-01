@@ -376,6 +376,7 @@ void GameEngine::setUpPlayers() {
     }
 
     // Transition state to PLAYERS_ADDED once players are added
+    this->numPlayers = this->gamePlayers.size();
     currentState = State::PLAYERS_ADDED;
     cout << "Players added. Now, issue the gamestart command to start the game!" << endl;
 }
@@ -438,7 +439,16 @@ void GameEngine::drawInitialCards() {
     cout << "Initial cards drawn for players." << endl;
 }
 
-
+//Changes the strategy of an existing player to a new one.
+//Used for testing and the Neutral -> Aggressive transition.
+void GameEngine::changePlayerStrategy(int playerID, PlayerStrategy* newStrategy) {
+    for (int i = 0; i < this->gamePlayers.size(); i++) {
+        if (this->gamePlayers[i]->playerID == playerID) {
+            this->gamePlayers[i]->ps = newStrategy;
+            return;
+        }
+    }
+}
 
 void GameEngine::startGame() {
     cout << "The game has been started." << endl;

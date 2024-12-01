@@ -93,6 +93,8 @@ public:
     void allocateInitialArmies();
     void drawInitialCards();
 
+    void changePlayerStrategy(int playerID, PlayerStrategy* newStrategy);
+
     // Main game loop methods
     void mainGameLoop();             // Main game loop function
     void reinforcementPhase();        // Reinforcement phase function
