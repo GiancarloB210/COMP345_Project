@@ -19,6 +19,7 @@ class Command;
 class CommandProcessor;
 class FileLineReader;
 class FileCommandProcessorAdapter;
+class GameEngine;
 
 // Free functions
 std::ostream& operator << (std::ostream& os, const Command& command);
@@ -66,7 +67,7 @@ protected:
 
 public:
     // Constructors
-    CommandProcessor(GameEngine* gameEngine);
+    explicit CommandProcessor(GameEngine* gameEngine);
     CommandProcessor(CommandProcessor& commandProcessor);
 
     // Operators
@@ -83,8 +84,9 @@ public:
 
     // Public Methods
     Command* getCommand();
-    bool validate(Command* command);
+    bool validate(std::string commandString);
     std::string toString();
+    std::vector<std::vector<std::string>> processTournamentCommand(std::string commandString);
 };
 
 class FileLineReader {
@@ -112,6 +114,7 @@ public:
     // Methods
     std::string readLineFromFile();
     std::string toString();
+
 };
 
 class FileCommandProcessorAdapter: public CommandProcessor {
@@ -119,6 +122,7 @@ class FileCommandProcessorAdapter: public CommandProcessor {
     std::string fileName;
     std::list<Command*> commandList;
     FileLineReader* fileLineReader;
+    GameEngine* gameEngine;
 
     // Private Methods
     std::string readCommand();
@@ -148,10 +152,13 @@ public:
 
     // Public Methods
     Command* getCommand();
-    bool validate(Command* command);
+    bool validate(std::string commandString);
     std::string toString();
+    std::vector<std::vector<std::string>> processTournamentCommand(std::string commandString);
 
 };
 
+std::vector<std::vector<std::string>> processTournamentCommandString(std::string commandString);
+bool validateTournamentInputs(std::vector<std::vector<std::string>> tournamentInputs);
 
 #endif //COMMANDPROCESSING_H

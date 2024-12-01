@@ -40,6 +40,10 @@ int main(int argc, char* argv[]) {
 
     // testGameStates();
     // testStartupPhase();
+    //gameEngine->startupPhase();
+
+    //testGameStates();
+    //testStartupPhase();
     //testCommandProcessor(gameEngine);
     //testMainGameLoop();
     //testOrdersExecution();

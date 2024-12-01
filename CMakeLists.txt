@@ -4,7 +4,9 @@ project(COMP345_Project)
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories(. MapFiles)
+include_directories(. CommandFiles)
 
+file(COPY CommandFiles/command.txt DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY MapFiles/USA.map DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY MapFiles/USA_Fail1.map DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY MapFiles/USA_Fail2.map DESTINATION ${CMAKE_BINARY_DIR})
@@ -40,6 +42,8 @@ add_executable(COMP345_Project
         PlayerStrategies.cpp
         PlayerStrategies.h
         PlayerStrategiesDriver.cpp
-        PlayerStrategiesDriver.h)
+        PlayerStrategiesDriver.h
+        TournamentDriver.cpp
+        TournamentDriver.h)
 
 
