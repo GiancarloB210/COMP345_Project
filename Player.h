@@ -39,6 +39,7 @@ public:
     int reinforcementPool;              // Army units available for reinforcements
     GameEngine* currentGame;            //The game which the player is a part of.
     PlayerStrategy* ps;           //The type of the current player.
+    bool gotAttacked;
 
     // Constructors
     Player(std::string newName, std::vector<Territory*>* territories, Hand* hand); // Parameterized constructor with name input
