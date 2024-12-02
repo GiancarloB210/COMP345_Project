@@ -802,9 +802,9 @@ void GameEngine::tournamentMode(const string & command) {
                         p->ps = new NeutralPlayerStrategy(p);
 
                     p->currentGame = this;
-                    this->numPlayers = this->gamePlayers.size();
                     this->gamePlayers.push_back(p);
                 }
+                this->numPlayers = this->gamePlayers.size();
 
                 distributeTerritories();
                 determinePlayerOrder();
@@ -812,6 +812,9 @@ void GameEngine::tournamentMode(const string & command) {
                 drawInitialCards();
 
                 while(!isGameOver()) {
+                    for (int j = 0;j < this->gamePlayers.size();j++) {
+                        this->gamePlayers[i]->drewCard = false;
+                    }
                     cout << "\nStarting turn: " << turnCounter << endl;
                     if (turnCounter > maxTurns) {
                         break;
@@ -821,7 +824,31 @@ void GameEngine::tournamentMode(const string & command) {
                     executeOrdersPhase();
                     turnCounter++;
                 }
-                tournamentResultsLog.append(gamePlayers[0]->getName());
+                if(isGameOver()) {
+                    std::cout << "Game over! The winner is " << gamePlayers[0]->getName() << "!\n" << std::endl;
+                    tournamentResultsLog.append(gamePlayers[0]->getName());
+                } else if (!isGameOver()) {
+                    int mostTerritories = 0;
+                    int playerInTheLead = 0;
+                    for (const auto & player : this->gamePlayers) {
+                        if(player->getTerritories().size() > mostTerritories) {
+                            mostTerritories = player->getTerritories().size();
+                            playerInTheLead = player->playerID;
+                        }
+                    }
+                    for (int k = 0; k < numPlayers; k++) {
+                        if (gamePlayers[k]->playerID == playerInTheLead) {
+                            std::cout << "Game over due to turn limit reached! The winner is "
+                            << gamePlayers[k]->getName() << "!\n" << std::endl;
+                            tournamentResultsLog.append(gamePlayers[k]->getName());
+                        }
+                    }
+                }
+
+                for (auto & gamePlayer : this->gamePlayers)
+                    delete gamePlayer;
+
+                this->gamePlayers.clear();
             }
         }
 
