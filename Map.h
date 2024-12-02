@@ -61,6 +61,7 @@ public:
     void setArmyCount(int armyCount);
     Player* getPlayer();
     void setPlayer(Player* player);
+    void setInitialPlayer(Player* player);
 
     // Methods
     std::string toString();

@@ -13,10 +13,10 @@ file(COPY MapFiles/USA_Fail2.map DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY MapFiles/USA_Fail3.map DESTINATION ${CMAKE_BINARY_DIR})
 
 add_executable(COMP345_Project
-    Map.cpp
-    Map.h
-    MapDriver.cpp
-    MapDriver.h
+        Map.cpp
+        Map.h
+        MapDriver.cpp
+        MapDriver.h
         Cards.cpp
         Cards.h
         CardsDriver.cpp
@@ -45,5 +45,3 @@ add_executable(COMP345_Project
         PlayerStrategiesDriver.h
         TournamentDriver.cpp
         TournamentDriver.h)
-
-

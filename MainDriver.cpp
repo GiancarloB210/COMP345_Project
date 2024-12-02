@@ -4,7 +4,7 @@
 
 #include "MainDriver.h"
 
-#include <OrdersDriver.h>
+#include "OrdersDriver.h"
 #include <string.h>
 
 #include "CardsDriver.h"
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 
     // testGameStates();
     // testStartupPhase();
-    gameEngine->startupPhase();
+    // gameEngine->startupPhase();
 
     //testGameStates();
     testStartupPhase();

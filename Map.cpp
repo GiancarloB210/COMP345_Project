@@ -30,11 +30,9 @@ Territory::Territory(std::string name, std::string continentName, int xCoord, in
 
 // Territory Class Deconstructor
 Territory::~Territory() {
-    for (auto const& i : adjacentTerritories) {
-    delete i;
-    }
 
-    delete territoryOwner;
+    // delete territoryOwner;
+    // territoryOwner = nullptr;
 }
 
 // Territory Class Accessors
@@ -83,6 +81,10 @@ void Territory::setArmyCount(int armyCount) {
  Player* Territory::getPlayer() {
  return this->territoryOwner;
  }
+
+void Territory::setInitialPlayer(Player* player) {
+    this->territoryOwner = player;
+}
 
  void Territory::setPlayer(Player* player) {
     //If the player owner hasn't been set yet, set it to the target player and be done.
@@ -155,12 +157,12 @@ Continent::Continent(std::string name, int score) {
 // Continent Class Deconstructor
 Continent::~Continent() {
     for (auto const& i : territories) {
-    delete i;
+        delete i;
     }
 
-    for (auto const& i : adjacentContinents) {
-    delete i;
-    }
+    // for (auto const& i : adjacentContinents) {
+    // delete i;
+    // }
 }
 
 // Continent Class Accessors
@@ -247,11 +249,11 @@ Map::Map(std::string name, std::string image, bool isWrappable,  bool scrollsVer
 // Map Class Deconstructor
 Map::~Map() {
     for (auto const& i : continents) {
-    delete i;
+        delete i;
     }
 
     for (auto const& i : territories) {
-    delete i;
+        delete i;
     }
 }
 
@@ -411,9 +413,9 @@ MapLoader::MapLoader() = default;
 
 // MapLoader Class Deconstructor
 MapLoader::~MapLoader() {
-    for (auto const& i : loadedMaps) {
-    delete i;
-    }
+    // for (auto const& i : loadedMaps) {
+    // delete i;
+    // }
 }
 
 // MapLoader Class Accessors
