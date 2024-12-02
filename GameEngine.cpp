@@ -782,11 +782,13 @@ void GameEngine::tournamentMode(const string & command) {
         for (const auto & map : mapLoader.getMaps()) {
             tournamentResultsLog.append("\nMap " + map->getName() + ":");
             Map* currentMap = new Map(*map);
+            Map nonPointerMap = *currentMap;
 
             for (int i = 1; i <= stoi(tournamentCommand.at(2).at(0)); i++) {
                 tournamentResultsLog.append("\n\tGame " + std::to_string(i) + ": ");
 
-                Map nonPointerMap = *currentMap;
+                // set-up map for game
+
                 setCurrentMap(&nonPointerMap);
                 //set-up counters for turns
                 int turnCounter = 1;
@@ -851,11 +853,11 @@ void GameEngine::tournamentMode(const string & command) {
                     }
                 }
 
-
-                for (auto & gamePlayer : this->gamePlayers)
+                for (const auto & gamePlayer : this->gamePlayers)
                     delete gamePlayer;
 
                 this->gamePlayers.clear();
+                this->playerOrder.clear();
             }
         }
 

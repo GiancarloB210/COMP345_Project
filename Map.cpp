@@ -31,6 +31,10 @@ Territory::Territory(std::string name, std::string continentName, int xCoord, in
 // Territory Class Deconstructor
 Territory::~Territory() {
 
+    for (const auto territory : adjacentTerritories) {
+        delete territory;
+    }
+
     delete territoryOwner;
     territoryOwner = nullptr;
 }
