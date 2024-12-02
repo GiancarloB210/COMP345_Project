@@ -140,6 +140,10 @@ int GameEngine::getNumPlayers() {
 // Main Game Loop Method
 void GameEngine::mainGameLoop() {
     while (!isGameOver()) {
+        //At the beginning of the turn, set all player draw checks to false.
+        for (int i = 0;i < this->gamePlayers.size();i++) {
+            this->gamePlayers[i]->drewCard = false;
+        }
         reinforcementPhase();   // Assign reinforcements automatically
         issueOrdersPhase();     // Players issue orders in a round-robin fashion
         executeOrdersPhase();   // Execute orders in a round-robin fashion
@@ -477,6 +481,7 @@ void GameEngine::drawInitialCards() {
             this->gamePlayers[i]->hand->drawCard();
         } else {
             cout<<"No more cards are able to be drawn. Player "<<this->gamePlayers[i]->getName()<<" will be unable to draw another card."<<endl;
+            return;
         }
         //A separate second check for drawable cards still being in the deck needs to be done
         //since only one would run the risk of generating an error if only one more drawable
@@ -485,6 +490,7 @@ void GameEngine::drawInitialCards() {
             this->gamePlayers[i]->hand->drawCard();
         } else {
             cout<<"No more cards are able to be drawn. Player "<<this->gamePlayers[i]->getName()<<" will only draw one card instead of 2."<<endl;
+            return;
         }
     }
     cout << "Initial cards drawn for players." << endl;

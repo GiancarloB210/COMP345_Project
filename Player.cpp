@@ -13,6 +13,7 @@ Player::Player(std::vector<Territory*>* territories, Hand* hand) {
     this->armyUnits = std::vector<ArmyUnit*>();
     this->reinforcementPool = 0; // Initialize reinforcement pool
     this->gotAttacked = false; //Boolean to determine if PlayerStrategy should be changed to Aggressive
+    this->drewCard = false; //This is automatically false since we're not in order checking yet.
 }
 
 // Parameterized constructor (with name input)
@@ -26,6 +27,7 @@ Player::Player(std::string newName, std::vector<Territory*>* territories, Hand* 
     this->armyUnits = std::vector<ArmyUnit*>();
     this->reinforcementPool = 0; // Initialize reinforcement pool
     this->gotAttacked = false; //Boolean to determine if PlayerStrategy should be changed to Aggressive
+    this->drewCard = false;
 }
 
 // Copy constructor (deep copy)
@@ -40,6 +42,7 @@ Player::Player(const Player& player) {
     this->reinforcementPool = player.reinforcementPool;
     this->currentGame = player.currentGame;
     this->gotAttacked = player.gotAttacked; //Boolean to determine if PlayerStrategy should be changed to Aggressive
+    this->drewCard = player.drewCard;
 }
 
 // Destructor to clean up dynamic memory
@@ -74,6 +77,7 @@ Player& Player::operator=(const Player& player) {
         this->reinforcementPool = player.reinforcementPool;
         this->currentGame = new GameEngine(*player.currentGame);
         this->gotAttacked = player.gotAttacked; //Boolean to determine if PlayerStrategy should be changed to Aggressive
+        this->drewCard = player.drewCard;
     }
     return *this;
 }

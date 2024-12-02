@@ -407,10 +407,16 @@ void AdvanceOrder::execute()
 				cout << CurrentPlayer->name << " has won the battle between their owned " << source->getName() << " and the opponent's " << target->getName() << endl;
 				target->setArmyCount(ArmiesToAdvance);
 				target->setPlayer(CurrentPlayer);
-				//The player who won draws a card.
-				CurrentPlayer->hand->drawCard();
-				cout << "Player " << CurrentPlayer->playerID << " drew a " << CurrentPlayer->hand->cardsInHand[CurrentPlayer->hand->cardsInHand.size() - 1]->getCardTypeStringValue() << " card." << endl;
-				GetCard = true;
+				//The player who won draws a card if possible and if they haven't already drawn any after playing orders this turn.
+				if (CurrentPlayer->hand->deckPlayedWith->getNumDrawableCards() > 0 && CurrentPlayer->drewCard == false) {
+					CurrentPlayer->hand->drawCard();
+					cout << "Player " << CurrentPlayer->playerID << " drew a " << CurrentPlayer->hand->cardsInHand[CurrentPlayer->hand->cardsInHand.size() - 1]->getCardTypeStringValue() << " card." << endl;
+					GetCard = true;
+					CurrentPlayer->drewCard = true;
+				} else {
+					cout << "Player " << CurrentPlayer->playerID << " cannot draw any more cards because there are no more cards left to draw."<<endl;
+					GetCard = false;
+				}
 				cout << "Target " << target->getName() << " -> number of armies changed to " << ArmiesToAdvance << endl;
 			}
 			else {
@@ -801,10 +807,15 @@ void CheaterOrder::execute()
 	if (validate())
 	{
 		target->setPlayer(CurrentPlayer);
-		//The player who won draws a card.
-		CurrentPlayer->hand->drawCard();
-		GetCard = true;
-
+		//The player who won draws a card if they can and if they haven't already drawn any after playing orders this turn.
+		if (CurrentPlayer->hand->deckPlayedWith->getNumDrawableCards() > 0 && CurrentPlayer->drewCard == false) {
+			CurrentPlayer->hand->drawCard();
+			GetCard = true;
+			CurrentPlayer->drewCard = true;
+		} else {
+			cout << "Player " << CurrentPlayer->playerID << " cannot draw any more cards because there are no more cards left to draw."<<endl;
+			GetCard = false;
+		}
 		target->getPlayer()->gotAttacked = true; //Value changed at the end of an attack order if it is executed successfully
 	}
 	else
