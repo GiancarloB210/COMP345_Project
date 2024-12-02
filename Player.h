@@ -44,6 +44,7 @@ public:
 
     // Constructors
     Player(std::string newName, std::vector<Territory*>* territories, Hand* hand); // Parameterized constructor with name input
+    Player(std::string newName, std::vector<Territory*>* territories, Hand* hand, int playerID); // Parameterized constructor with name and player ID inputs.
     Player(std::vector<Territory*>* territories, Hand* hand);                      // Parameterized constructor without name input
     Player(const Player& player);                                                // Copy constructor
 

@@ -316,7 +316,7 @@ Hand::~Hand() {
 //Displays all cards in the current hand, at their respective indexes.
 ostream& operator << (ostream &out_stream, Hand &hand) {
     cout<<"Hand Contents:"<<endl;
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < hand.cardsInHand.size(); i++) {
         //If no card is in the hand at the current position, don't display anything.
         if (hand.cardsInHand[i] != nullptr) {
             out_stream<<"["<<i<<"]: "<<to_string(*(hand.cardsInHand[i]->type))<<endl;

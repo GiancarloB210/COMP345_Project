@@ -458,6 +458,10 @@ void AggressivePlayerStrategy::issueOrder() {
     std::vector<Territory*> orderedByStrongest = this->toDefend();
     cout << "Finished toDefend() [Aggressive]" << endl;
     //The first territory in the returned list is the one with the most territories.
+    if (orderedByStrongest.size() == 0) {
+        cout<<"Player "<<this->pi->playerID<<" has no more territories left to defend."<<endl;
+        return;
+    }
     Territory* strongest = orderedByStrongest[0];
     std::vector<Territory*> adjacentToAttack;
     std::vector<Territory*> adjacent = strongest->getAdjacentTerritories();
@@ -583,14 +587,19 @@ void BenevolentPlayerStrategy::issueOrder() {
     int minNumArmies = orderedByWeakest[0]->getArmyCount();
     //bool check for the while loop below
     bool minNumArmiesChecker = true;
+    cout<<"About to enter orderedByWeakest if"<<endl;
     //This if check is necessary so that orderedByWeakest[indexer] does not go out of bounds if the array is of size 1.
     if (orderedByWeakest.size() > 1) {
         int indexer = 1;
-        while (orderedByWeakest[indexer]->getArmyCount() == minNumArmies && minNumArmiesChecker) {
+        while (minNumArmiesChecker && orderedByWeakest[indexer]->getArmyCount() == minNumArmies) {
+            cout<<"indexer: "<<indexer<<endl;
             allWeakest.push_back(orderedByWeakest[indexer]);
+            cout<<"Pushed back"<<endl;
             indexer++;
+            cout<<"indexer: "<<indexer<<", size: "<<orderedByWeakest.size()<<endl;
             if (indexer >= orderedByWeakest.size() - 1) {
                 //Break condition for the while loop.
+                cout<<"Breaking free"<<endl;
                 minNumArmiesChecker = false;
             }
         }

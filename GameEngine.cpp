@@ -262,6 +262,9 @@ void GameEngine::executeOrdersPhase() {
         }
         ordersLeft = false;
         for (int i = 0;i < ordersLeftTracker.size();i++) {
+            cout<<i<<": "<<(ordersLeftTracker[i] ? "True" : "False")<<endl;
+        }
+        for (int i = 0;i < ordersLeftTracker.size();i++) {
             if (ordersLeftTracker[i] == true) {
                 ordersLeft = true;
             }
@@ -461,12 +464,18 @@ void GameEngine::setUpPlayers() {
 
 void GameEngine::distributeTerritories() {
     std::vector<Territory *> mapTerritories = this->currentMap->getTerritories();
+    cout<<"Got territories"<<endl;
+    for (int i = 0; i < mapTerritories.size(); i++) {
+        mapTerritories[i]->setPlayer(nullptr);
+    }
+    cout<<"Finished setting all owners to null"<<endl;
     int territoriesPerPlayer = mapTerritories.size() / this->gamePlayers.size();
     std::cout << "Territories per Player: " << territoriesPerPlayer << endl;
     int territoryCounter = 0, playerCount = 0;
 
     for (Territory* territory : mapTerritories) {
         territory->setPlayer(this->gamePlayers[playerCount]);
+        cout<<"Set owner"<<endl;
         this->gamePlayers[playerCount]->territories->push_back(territory);
         territoryCounter++;
 
@@ -483,6 +492,7 @@ void GameEngine::distributeTerritories() {
 
 void GameEngine::determinePlayerOrder() {
     // Randomly shuffle the player order
+    this->playerOrder.clear();
     std::vector<int> playerIDs(this->gamePlayers.size());
     for (int i = 0; i < this->gamePlayers.size(); i++) {
         playerIDs[i] = i;
@@ -816,15 +826,33 @@ void GameEngine::tournamentMode(const string & command) {
             setCurrentMap(map);
             tournamentResultsLog.append("\nMap " + map->getName() + ":");
             for (int i = 1; i <= stoi(tournamentCommand.at(2).at(0)); i++) {
+                this->gamePlayers.clear();
                 tournamentResultsLog.append("\n\tGame " + std::to_string(i) + ": ");
                 //set-up counters for turns
                 int turnCounter = 1;
                 int maxTurns = stoi(tournamentCommand.at(3).at(0));
+                int playerCounter = 0;
 
                 // Set-up Players
                 for (const auto & player : tournamentCommand.at(1)) {
-                    gamePlayers.push_back(new Player(player, new std::vector<Territory*>, new Hand(gameDeck)));
+                    cout<<"name: "<<player<<endl;
+                    Player* p = new Player(player, new std::vector<Territory*>, new Hand(gameDeck), playerCounter);
+
+                    if (player == "Benevolent")
+                        p->ps = new BenevolentPlayerStrategy(p);
+                    if (player == "Aggressive")
+                        p->ps = new AggressivePlayerStrategy(p);
+                    if (player == "Cheater")
+                        p->ps = new CheaterPlayerStrategy(p);
+                    if (player == "Neutral")
+                        p->ps = new NeutralPlayerStrategy(p);
+
+                    p->currentGame = this;
+                    this->gamePlayers.push_back(p);
+                    playerCounter++;
                 }
+                this->numPlayers = this->gamePlayers.size();
+                cout<<"numPlayers: "<<this->numPlayers<<endl;
 
                 distributeTerritories();
                 determinePlayerOrder();
@@ -832,6 +860,10 @@ void GameEngine::tournamentMode(const string & command) {
                 drawInitialCards();
 
                 while(!isGameOver()) {
+                    for (int j = 0;j < this->gamePlayers.size();j++) {
+                        this->gamePlayers[i]->drewCard = false;
+                    }
+                    cout << "\nStarting turn: " << turnCounter << endl;
                     if (turnCounter > maxTurns) {
                         break;
                     }
@@ -839,19 +871,41 @@ void GameEngine::tournamentMode(const string & command) {
                     issueOrdersPhase();
                     executeOrdersPhase();
                     turnCounter++;
+                    cout<<"Turn counter updated"<<endl;
                 }
-                tournamentResultsLog.append(gamePlayers[0]->getName());
+                if(isGameOver()) {
+                    std::cout << "Game over! The winner is " << gamePlayers[0]->getName() << "!\n" << std::endl;
+                    tournamentResultsLog.append(gamePlayers[0]->getName());
+                } else if (!isGameOver()) {
+                    int mostTerritories = 0;
+                    int playerInTheLead = 0;
+                    for (const auto & player : this->gamePlayers) {
+                        if(player->getTerritories().size() > mostTerritories) {
+                            mostTerritories = player->getTerritories().size();
+                            playerInTheLead = player->playerID;
+                        }
+                    }
+                    for (int k = 0; k < numPlayers; k++) {
+                        if (gamePlayers[k]->playerID == playerInTheLead) {
+                            std::cout << "Game over due to turn limit reached! The winner is "
+                            << gamePlayers[k]->getName() << "!\n" << std::endl;
+                            tournamentResultsLog.append(gamePlayers[k]->getName());
+                        }
+                    }
+                }
+
+                for (auto & gamePlayer : this->gamePlayers)
+                    delete gamePlayer;
+
+                this->gamePlayers.clear();
             }
         }
-
 
         //TODO: Log this
         cout << tournamentInputsLog << endl;
         cout << tournamentResultsLog << endl;
     }
-
-
-};
+}
 
 std::string GameEngine::stringToLog() {  
     return "";
