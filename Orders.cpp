@@ -407,10 +407,15 @@ void AdvanceOrder::execute()
 				cout << CurrentPlayer->name << " has won the battle between their owned " << source->getName() << " and the opponent's " << target->getName() << endl;
 				target->setArmyCount(ArmiesToAdvance);
 				target->setPlayer(CurrentPlayer);
-				//The player who won draws a card.
-				CurrentPlayer->hand->drawCard();
-				cout << "Player " << CurrentPlayer->playerID << " drew a " << CurrentPlayer->hand->cardsInHand[CurrentPlayer->hand->cardsInHand.size() - 1]->getCardTypeStringValue() << " card." << endl;
-				GetCard = true;
+				//The player who won draws a card if possible.
+				if (CurrentPlayer->hand->deckPlayedWith->getNumDrawableCards() > 0) {
+					CurrentPlayer->hand->drawCard();
+					cout << "Player " << CurrentPlayer->playerID << " drew a " << CurrentPlayer->hand->cardsInHand[CurrentPlayer->hand->cardsInHand.size() - 1]->getCardTypeStringValue() << " card." << endl;
+					GetCard = true;
+				} else {
+					cout << "Player " << CurrentPlayer->playerID << " cannot draw any more cards because there are no more cards left to draw."<<endl;
+					GetCard = false;
+				}
 				cout << "Target " << target->getName() << " -> number of armies changed to " << ArmiesToAdvance << endl;
 			}
 			else {
@@ -797,9 +802,14 @@ void CheaterOrder::execute()
 	if (validate())
 	{
 		target->setPlayer(CurrentPlayer);
-		//The player who won draws a card.
-		CurrentPlayer->hand->drawCard();
-		GetCard = true;
+		if (CurrentPlayer->hand->deckPlayedWith->getNumDrawableCards() > 0) {
+			CurrentPlayer->hand->drawCard();
+			GetCard = true;
+		} else {
+			cout << "Player " << CurrentPlayer->playerID << " cannot draw any more cards because there are no more cards left to draw."<<endl;
+			GetCard = false;
+		}
+
 	}
 	else
 	{

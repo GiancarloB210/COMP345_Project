@@ -477,6 +477,7 @@ void GameEngine::drawInitialCards() {
             this->gamePlayers[i]->hand->drawCard();
         } else {
             cout<<"No more cards are able to be drawn. Player "<<this->gamePlayers[i]->getName()<<" will be unable to draw another card."<<endl;
+            return;
         }
         //A separate second check for drawable cards still being in the deck needs to be done
         //since only one would run the risk of generating an error if only one more drawable
@@ -485,6 +486,7 @@ void GameEngine::drawInitialCards() {
             this->gamePlayers[i]->hand->drawCard();
         } else {
             cout<<"No more cards are able to be drawn. Player "<<this->gamePlayers[i]->getName()<<" will only draw one card instead of 2."<<endl;
+            return;
         }
     }
     cout << "Initial cards drawn for players." << endl;
