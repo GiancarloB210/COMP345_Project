@@ -39,6 +39,8 @@ public:
     int reinforcementPool;              // Army units available for reinforcements
     GameEngine* currentGame;            //The game which the player is a part of.
     PlayerStrategy* ps;           //The type of the current player.
+    bool gotAttacked;
+    bool drewCard;                  //Checks if the player drew a card during the current turn. Each player should only be able to draw one order-facilitated card per turn.
 
     // Constructors
     Player(std::string newName, std::vector<Territory*>* territories, Hand* hand); // Parameterized constructor with name input

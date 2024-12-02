@@ -140,6 +140,10 @@ int GameEngine::getNumPlayers() {
 // Main Game Loop Method
 void GameEngine::mainGameLoop() {
     while (!isGameOver()) {
+        //At the beginning of the turn, set all player draw checks to false.
+        for (int i = 0;i < this->gamePlayers.size();i++) {
+            this->gamePlayers[i]->drewCard = false;
+        }
         reinforcementPhase();   // Assign reinforcements automatically
         issueOrdersPhase();     // Players issue orders in a round-robin fashion
         executeOrdersPhase();   // Execute orders in a round-robin fashion
