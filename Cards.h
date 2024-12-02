@@ -45,6 +45,7 @@ public:
     Deck(std::vector<Card*> cards);
     Deck(Deck& deck);
     ~Deck();
+    int getNumDrawableCards();
     friend ostream& operator <<(ostream& out_stream, Deck& deck);
     friend istream& operator >>(istream& in_stream, Deck& deck);
     Deck& operator=(Deck deck);
