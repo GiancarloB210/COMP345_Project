@@ -416,6 +416,8 @@ void AdvanceOrder::execute()
 			else {
 				cout << CurrentPlayer->name << " has lost the battle between their owned " << source->getName() << " and the opponent's " << target->getName() << endl;
 			}
+
+			target->getPlayer()->gotAttacked = true; //Value changed at the end of an attack order if it is executed successfully
 		}
 	}
 	else
@@ -501,6 +503,8 @@ void BombOrder::execute()
 		TotalArmy = TotalArmy / 2;
 		target->setArmyCount(TotalArmy);
 		cout << target->getName() << " has been bombed and now has " << target->getArmyCount() << " armies left." << endl;
+
+		target->getPlayer()->gotAttacked = true; //Value changed at the end of an attack order if it is executed successfully
 	}
 	else
 	{
@@ -800,6 +804,8 @@ void CheaterOrder::execute()
 		//The player who won draws a card.
 		CurrentPlayer->hand->drawCard();
 		GetCard = true;
+
+		target->getPlayer()->gotAttacked = true; //Value changed at the end of an attack order if it is executed successfully
 	}
 	else
 	{
