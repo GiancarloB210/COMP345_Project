@@ -227,7 +227,7 @@ Map::Map(Map &map) {
 
 // Map Class Constructor
 Map::Map(std::string name, std::string image, bool isWrappable,  bool scrollsVertically, std::string author,
-    bool includeWarnings, std::list<Continent *> continents, std::list<Territory *> territories, bool areTerritoriesValid) {
+    bool includeWarnings, std::list<Continent *> continents, std::vector<Territory *> territories, bool areTerritoriesValid) {
     this->name = name;
     this->image = image;
     this->isWrappable = isWrappable;
@@ -279,7 +279,7 @@ std::list<Continent *> Map::getContinents() {
     return this->continents;
 }
 
-std::list<Territory *> Map::getTerritories() {
+std::vector<Territory *> Map::getTerritories() {
     return this->territories;
 }
 
@@ -336,12 +336,19 @@ bool Map::traverseContinents(std::list<Continent*> adjacentContinents, std::list
 
 // traverseTerritories checks to see if the Map's Territories are a connected graph by visiting Territories and their
 // adjacentTerritory list, while keeping track of a list of territories that haven't been visited yet
-bool Map::traverseTerritories(std::vector<Territory*> adjacentTerritories, std::list<Territory*> &uncheckedTerritories,
+bool Map::traverseTerritories(std::vector<Territory*> adjacentTerritories, std::vector<Territory*> &uncheckedTerritories,
     Territory* startingTerritory) {
 
-    for (auto const& i : uncheckedTerritories) {
-        if (i->getName() == startingTerritory->getName()) {
-            uncheckedTerritories.remove(startingTerritory);
+    // for (auto const& i : uncheckedTerritories) {
+    //     if (i->getName() == startingTerritory->getName()) {
+    //         uncheckedTerritories.remove(startingTerritory);
+    //         break;
+    //     }
+    // }
+
+    for (int i = 0;i < uncheckedTerritories.size();i++) {
+        if (uncheckedTerritories[i]->getName() == startingTerritory->getName()) {
+            uncheckedTerritories.erase(uncheckedTerritories.begin() + i);
             break;
         }
     }
@@ -374,7 +381,7 @@ bool Map::validate(Map* map) {
 
     // validate that the territories are a connected graph by validating that a path exists from all territories to all
     // other territories
-    std::list<Territory*> uncheckedTerritories(map->getTerritories());
+    std::vector<Territory*> uncheckedTerritories(map->getTerritories());
     std::cout << "validating territory graph: " << std::endl;
     validTerritoriesGraph = traverseTerritories(map->getTerritories().front()->getAdjacentTerritories(),
         uncheckedTerritories,map->getTerritories().front());
@@ -451,7 +458,7 @@ Map *MapLoader::readFile(std::string filePath) {
     std::string mapImage;
     bool mapIncludeWarnings;
     std::list<Continent*> mapContinents;
-    std::list<Territory*> mapTerritories;
+    std::vector<Territory*> mapTerritories;
     std::string line;
 
     bool mapTerritoriesAreValid = true;

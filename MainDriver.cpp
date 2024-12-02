@@ -43,11 +43,11 @@ int main(int argc, char* argv[]) {
     //gameEngine->startupPhase();
 
     //testGameStates();
-    //testStartupPhase();
+    testStartupPhase();
     //testCommandProcessor(gameEngine);
     //testMainGameLoop();
     //testOrdersExecution();
-    testPlayerStrategies();
+    // testPlayerStrategies();
 
     return 0;
 }

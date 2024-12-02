@@ -100,6 +100,7 @@ public:
     void validateMap();
     void setUpPlayers();
     void startGame();
+    Player* getGameWinner();
 
     void distributeTerritories();
     void determinePlayerOrder();

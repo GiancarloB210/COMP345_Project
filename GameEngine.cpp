@@ -148,7 +148,40 @@ void GameEngine::mainGameLoop() {
         issueOrdersPhase();     // Players issue orders in a round-robin fashion
         executeOrdersPhase();   // Execute orders in a round-robin fashion
     }
-    std::cout << "Game over! The winner is " << gamePlayers[0]->getName() << "!" << std::endl;
+    Player* winner = this->getGameWinner();
+    if (winner == nullptr) {
+        std::cout << "Game over! Unfortunately, nobody wins the game." << std::endl;
+    } else {
+        std::cout << "Game over! The winner is " << winner->getName() << "!" << std::endl;
+    }
+}
+
+//Checks to see who won the game.
+Player* GameEngine::getGameWinner() {
+    Player* winner;
+    int numOwnedCheck = 0;
+    //Number of map territories which don't have a blockade.
+    int numTerritoriesNotBlockaded = 0;
+    //The player check is set to the first territory's player so all other territories' owners can be compared to it.
+    Player* playerCheck = this->currentMap->getTerritories()[0]->getPlayer();
+    for (int i = 0;i < this->currentMap->getTerritories().size();i++) {
+        //Checks to see if a player really does own all territories, one at a time.
+        if (this->currentMap->getTerritories()[i]->getPlayer() != nullptr) {
+            numTerritoriesNotBlockaded++;
+            if (this->currentMap->getTerritories()[i]->getPlayer() == playerCheck) {
+                numOwnedCheck++;
+            }
+        }
+    }
+    //If a player's owned territories equals the number of map territories that are not blockaded, they're the winner.
+    if (numOwnedCheck == numTerritoriesNotBlockaded) {
+        winner = this->currentMap->getTerritories()[0]->getPlayer();
+    }
+    //Otherwise, something has happened which renders the player not the winner, and nobody wins.
+    else {
+        winner = nullptr;
+    }
+    return winner;
 }
 
 // Reinforcement Phase Method
@@ -383,7 +416,7 @@ void GameEngine::setUpPlayers() {
         PlayerStrategy* newStrategy;
         bool validPlayerStrategyCheck = false;
         while (!validPlayerStrategyCheck) {
-            cout << "Enter the type of player [Human/Benevolent/Aggressive]." << endl;
+            cout << "Enter the type of player [Human/Benevolent/Aggressive/Neutral/Cheater]." << endl;
             cin >> strategyName;
             if (cin.fail() || (strategyName != "Human" && strategyName != "Benevolent" && strategyName != "Aggressive" && strategyName != "Neutral" && strategyName != "Cheater")) {
                 cin.clear();
@@ -427,7 +460,7 @@ void GameEngine::setUpPlayers() {
 
 
 void GameEngine::distributeTerritories() {
-    std::list<Territory *> mapTerritories = this->currentMap->getTerritories();
+    std::vector<Territory *> mapTerritories = this->currentMap->getTerritories();
     int territoriesPerPlayer = mapTerritories.size() / this->gamePlayers.size();
     std::cout << "Territories per Player: " << territoriesPerPlayer << endl;
     int territoryCounter = 0, playerCount = 0;

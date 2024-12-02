@@ -113,13 +113,13 @@ private:
     std::string author;
     bool includeWarnings;
     std::list<Continent*> continents;
-    std::list<Territory*> territories;
+    std::vector<Territory*> territories;
     bool areTerritoriesValid;
 
 public:
     // Constructors
     Map(std::string name, std::string image, bool isWrappable, bool scrollsVertically, std::string author,
-        bool includeWarnings, std::list<Continent*> continents, std::list<Territory*> territories, bool areTerritoriesValid);
+        bool includeWarnings, std::list<Continent*> continents, std::vector<Territory*> territories, bool areTerritoriesValid);
     Map(Map& map);
 
     // Operators
@@ -136,14 +136,14 @@ public:
     std::string getAuthor();
     bool getIncludeWarnings();
     std::list<Continent*> getContinents();
-    std::list<Territory*> getTerritories();
+    std::vector<Territory*> getTerritories();
     bool getAreTerritoriesValid();
 
     // Methods
     std:: string toString();
     bool traverseContinents(std::list<Continent*> adjacentContinents, std::list<Continent*> &uncheckedContinents,
     Continent* startingContinent);
-    bool traverseTerritories(std::vector<Territory*> adjacentTerritories, std::list<Territory*> &uncheckedTerritories,
+    bool traverseTerritories(std::vector<Territory*> adjacentTerritories, std::vector<Territory*> &uncheckedTerritories,
     Territory* startingTerritory);
     bool validate(Map* map);
 };
