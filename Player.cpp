@@ -30,6 +30,18 @@ Player::Player(std::string newName, std::vector<Territory*>* territories, Hand* 
     this->drewCard = false;
 }
 
+Player::Player(std::string newName, std::vector<Territory*>* territories, Hand* hand, int playerID) {
+    this->playerID = playerID;
+    this->name = newName;
+    this->territories = new std::vector<Territory*>(*territories);
+    this->hand = new Hand(*hand);
+    this->orders = new OrderList();
+    this->armyUnits = std::vector<ArmyUnit*>();
+    this->reinforcementPool = 0; // Initialize reinforcement pool
+    this->gotAttacked = false; //Boolean to determine if PlayerStrategy should be changed to Aggressive
+    this->drewCard = false;
+}
+
 // Copy constructor (deep copy)
 Player::Player(const Player& player) {
     this->playerID = staticPlayerID;

@@ -433,7 +433,7 @@ void GameEngine::distributeTerritories() {
     int territoryCounter = 0, playerCount = 0;
 
     for (Territory* territory : mapTerritories) {
-        territory->setPlayer(this->gamePlayers[playerCount]);
+        territory->setInitialPlayer(this->gamePlayers[playerCount]);
         this->gamePlayers[playerCount]->territories->push_back(territory);
         territoryCounter++;
 
@@ -780,17 +780,22 @@ void GameEngine::tournamentMode(const string & command) {
 
         // Start the automated game process
         for (const auto & map : mapLoader.getMaps()) {
-            setCurrentMap(map);
             tournamentResultsLog.append("\nMap " + map->getName() + ":");
+            Map* currentMap = new Map(*map);
+
             for (int i = 1; i <= stoi(tournamentCommand.at(2).at(0)); i++) {
                 tournamentResultsLog.append("\n\tGame " + std::to_string(i) + ": ");
+
+                Map nonPointerMap = *currentMap;
+                setCurrentMap(&nonPointerMap);
                 //set-up counters for turns
                 int turnCounter = 1;
                 int maxTurns = stoi(tournamentCommand.at(3).at(0));
+                int playerCounter = 0;
 
                 // Set-up Players
                 for (const auto & player : tournamentCommand.at(1)) {
-                    Player* p = new Player(player, new std::vector<Territory*>, new Hand(gameDeck));
+                    Player* p = new Player(player, new std::vector<Territory*>, new Hand(gameDeck), playerCounter);
 
                     if (player == "Benevolent")
                         p->ps = new BenevolentPlayerStrategy(p);
@@ -803,6 +808,7 @@ void GameEngine::tournamentMode(const string & command) {
 
                     p->currentGame = this;
                     this->gamePlayers.push_back(p);
+                    playerCounter++;
                 }
                 this->numPlayers = this->gamePlayers.size();
 
@@ -827,7 +833,7 @@ void GameEngine::tournamentMode(const string & command) {
                 if(isGameOver()) {
                     std::cout << "Game over! The winner is " << gamePlayers[0]->getName() << "!\n" << std::endl;
                     tournamentResultsLog.append(gamePlayers[0]->getName());
-                } else if (!isGameOver()) {
+                } else {
                     int mostTerritories = 0;
                     int playerInTheLead = 0;
                     for (const auto & player : this->gamePlayers) {
@@ -844,6 +850,7 @@ void GameEngine::tournamentMode(const string & command) {
                         }
                     }
                 }
+
 
                 for (auto & gamePlayer : this->gamePlayers)
                     delete gamePlayer;

@@ -8,11 +8,11 @@
 #include <string>
 #include <fstream>
 #include "GameEngine.h"
-#include <ILoggable.h>
+#include "ILoggable.h"
 #include <iostream>
 #include <utility>
 #include <sstream>
-#include <Subject.h>
+#include "Subject.h"
 
 // Forward Declarations
 class Command;

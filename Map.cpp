@@ -30,11 +30,9 @@ Territory::Territory(std::string name, std::string continentName, int xCoord, in
 
 // Territory Class Deconstructor
 Territory::~Territory() {
-    for (auto const& i : adjacentTerritories) {
-    delete i;
-    }
 
     delete territoryOwner;
+    territoryOwner = nullptr;
 }
 
 // Territory Class Accessors
@@ -83,6 +81,10 @@ void Territory::setArmyCount(int armyCount) {
  Player* Territory::getPlayer() {
  return this->territoryOwner;
  }
+
+void Territory::setInitialPlayer(Player* player) {
+    this->territoryOwner = player;
+}
 
  void Territory::setPlayer(Player* player) {
     //If the player owner hasn't been set yet, set it to the target player and be done.
