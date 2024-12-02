@@ -381,7 +381,7 @@ void GameEngine::setUpPlayers() {
         while (!validPlayerStrategyCheck) {
             cout << "Enter the type of player [Human/Benevolent/Aggressive]." << endl;
             cin >> strategyName;
-            if (cin.fail() || (strategyName != "Human" && strategyName != "Benevolent" && strategyName != "Aggressive")) {
+            if (cin.fail() || (strategyName != "Human" && strategyName != "Benevolent" && strategyName != "Aggressive" && strategyName != "Neutral" && strategyName != "Cheater")) {
                 cin.clear();
                 cin.ignore();
                 cout << "Invalid. Please enter a valid number of players (from 2 to 6)." << endl;
@@ -397,6 +397,14 @@ void GameEngine::setUpPlayers() {
                 }
                 if (strategyName == "Benevolent") {
                     newStrategy = new BenevolentPlayerStrategy(p);
+                    p->ps = newStrategy;
+                }
+                if (strategyName == "Neutral") {
+                    newStrategy = new NeutralPlayerStrategy(p);
+                    p->ps = newStrategy;
+                }
+                if (strategyName == "Cheater") {
+                    newStrategy = new CheaterPlayerStrategy(p);
                     p->ps = newStrategy;
                 }
             }
@@ -464,8 +472,20 @@ void GameEngine::allocateInitialArmies() {
 
 void GameEngine::drawInitialCards() {
     for (int i = 0; i < this->gamePlayers.size(); i++) {
-        this->gamePlayers[i]->hand->drawCard();
-        this->gamePlayers[i]->hand->drawCard();
+        //Checks to see if any additional cards can be drawn. If there are, draw one.
+        if (this->gameDeck->getNumDrawableCards() > 0) {
+            this->gamePlayers[i]->hand->drawCard();
+        } else {
+            cout<<"No more cards are able to be drawn. Player "<<this->gamePlayers[i]->getName()<<" will be unable to draw another card."<<endl;
+        }
+        //A separate second check for drawable cards still being in the deck needs to be done
+        //since only one would run the risk of generating an error if only one more drawable
+        //card is in it when 2 cards are to be drawn at once.
+        if (this->gameDeck->getNumDrawableCards() > 0) {
+            this->gamePlayers[i]->hand->drawCard();
+        } else {
+            cout<<"No more cards are able to be drawn. Player "<<this->gamePlayers[i]->getName()<<" will only draw one card instead of 2."<<endl;
+        }
     }
     cout << "Initial cards drawn for players." << endl;
 }

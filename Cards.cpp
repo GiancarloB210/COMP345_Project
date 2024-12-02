@@ -172,6 +172,17 @@ Deck::~Deck() {
     }
 }
 
+//Returns the number of cards in the deck which can still be drawn.
+int Deck::getNumDrawableCards() {
+    int numDrawable = 0;
+    for (int i = 0;i < this->cards.size();i++) {
+        if (this->cards[i]->availableToDraw == true) {
+            numDrawable++;
+        }
+    }
+    return numDrawable;
+}
+
 //Outputs all deck contents (all cards in the Deck).
 ostream& operator << (ostream &out_stream, Deck &deck) {
     out_stream<<"Deck Contents:"<<endl;
