@@ -768,7 +768,7 @@ std::vector<Territory*> CheaterPlayerStrategy::toDefend() {
     return defendList;
 }
 
-std::vector<Territory*> AggressivePlayerStrategy::toAttack() {
+std::vector<Territory*> CheaterPlayerStrategy::toAttack() {
     std::vector<Territory*> attackList;
     Territory* temp;
     bool uniqueTerritory = true;

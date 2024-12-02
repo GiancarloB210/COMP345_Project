@@ -764,7 +764,20 @@ void GameEngine::tournamentMode(const string & command) {
 
                 // Set-up Players
                 for (const auto & player : tournamentCommand.at(1)) {
-                    gamePlayers.push_back(new Player(player, new std::vector<Territory*>, new Hand(gameDeck)));
+                    Player* p = new Player(player, new std::vector<Territory*>, new Hand(gameDeck));
+
+                    if (player == "Benevolent")
+                        p->ps = new BenevolentPlayerStrategy(p);
+                    if (player == "Aggressive")
+                        p->ps = new AggressivePlayerStrategy(p);
+                    if (player == "Cheater")
+                        p->ps = new CheaterPlayerStrategy(p);
+                    if (player == "Neutral")
+                        p->ps = new NeutralPlayerStrategy(p);
+
+                    p->currentGame = this;
+                    this->numPlayers = this->gamePlayers.size();
+                    this->gamePlayers.push_back(p);
                 }
 
                 distributeTerritories();
@@ -773,6 +786,7 @@ void GameEngine::tournamentMode(const string & command) {
                 drawInitialCards();
 
                 while(!isGameOver()) {
+                    cout << "\nStarting turn: " << turnCounter << endl;
                     if (turnCounter > maxTurns) {
                         break;
                     }
@@ -785,13 +799,10 @@ void GameEngine::tournamentMode(const string & command) {
             }
         }
 
-
         //TODO: Log this
         cout << tournamentInputsLog << endl;
         cout << tournamentResultsLog << endl;
     }
-
-
 };
 
 std::string GameEngine::stringToLog() {  
